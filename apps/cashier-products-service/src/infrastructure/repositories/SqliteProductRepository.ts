@@ -1,25 +1,27 @@
 import { Inject, Injectable } from '@nestjs/common';
-import Database from 'better-sqlite3';
+import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { eq } from 'drizzle-orm';
 import { Product } from '../../domain/entities/Product';
 import { ProductRepository } from '../../application/interfaces/ProductRepository';
 import { DATABASE_CONNECTION } from '../database/database.provider';
+import * as schema from '../database/schema';
 
 @Injectable()
 export class SqliteProductRepository implements ProductRepository {
   constructor(
     @Inject(DATABASE_CONNECTION)
-    private readonly db: Database.Database,
+    private readonly db: BetterSQLite3Database<typeof schema>,
   ) {}
 
   async findByBarcode(barcode: string): Promise<Product | null> {
-    const row = this.db
-      .prepare('SELECT * FROM products WHERE barcode = ?')
-      .get(barcode) as any;
+    const result = await this.db.query.products.findFirst({
+      where: eq(schema.products.barcode, barcode),
+    });
 
-    if (!row) {
+    if (!result) {
       return null;
     }
 
-    return new Product(row.id, row.barcode, row.name, row.price);
+    return new Product(result.id, result.barcode, result.name, result.price);
   }
 }
