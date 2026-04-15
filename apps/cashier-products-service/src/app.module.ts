@@ -1,19 +1,21 @@
 import { Module } from '@nestjs/common';
 import { ProductController } from './presentation/controllers/ProductController';
 import { GetProductByBarcodeUseCase } from './application/use-cases/GetProductByBarcodeUseCase';
-import { MockProductRepository } from './infrastructure/repositories/MockProductRepository';
+import { SqliteProductRepository } from './infrastructure/repositories/SqliteProductRepository';
+import { DatabaseProvider } from './infrastructure/database/database.provider';
 
 @Module({
   imports: [],
   controllers: [ProductController],
   providers: [
+    DatabaseProvider,
     {
       provide: 'ProductRepository',
-      useClass: MockProductRepository,
+      useClass: SqliteProductRepository,
     },
     {
       provide: GetProductByBarcodeUseCase,
-      useFactory: (productRepository: MockProductRepository) => {
+      useFactory: (productRepository: SqliteProductRepository) => {
         return new GetProductByBarcodeUseCase(productRepository);
       },
       inject: ['ProductRepository'],

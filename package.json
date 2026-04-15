@@ -16,6 +16,9 @@
   },
   "packageManager": "pnpm@10.3.0",
   "pnpm": {
-    "trustedDependencies": []
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "esbuild"
+    ]
   }
 }
