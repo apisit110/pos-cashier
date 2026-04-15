@@ -1,0 +1,124 @@
+openapi: 3.0.3
+info:
+  title: Lightning POS Microservices API
+  description: API documentation for Lightning POS microservices (Products and Orders).
+  version: 1.0.0
+servers:
+  - url: http://localhost:3001
+    description: Products Service
+  - url: http://localhost:3002
+    description: Orders Service
+paths:
+  /v1/products/barcode/{barcode}:
+    description: Products service endpoints
+    get:
+      summary: Get product by barcode
+      tags:
+        - Products
+      parameters:
+        - name: barcode
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The barcode of the product to retrieve
+      responses:
+        '200':
+          description: Product found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found
+  /v1/orders:
+    description: Orders service endpoints
+    post:
+      summary: Create a new order
+      tags:
+        - Orders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderDto'
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '500':
+          description: Internal server error
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        barcode:
+          type: string
+        name:
+          type: string
+        price:
+          type: number
+      required:
+        - id
+        - barcode
+        - name
+        - price
+    OrderItem:
+      type: object
+      properties:
+        productId:
+          type: string
+        quantity:
+          type: integer
+        price:
+          type: number
+      required:
+        - productId
+        - quantity
+        - price
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        totalAmount:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - items
+        - totalAmount
+        - createdAt
+    CreateOrderDto:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: string
+              quantity:
+                type: integer
+              price:
+                type: number
+            required:
+              - productId
+              - quantity
+              - price
+      required:
+        - items

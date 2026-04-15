@@ -1,0 +1,21 @@
+{
+  "name": "lightning-pos-service",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "dev:portal": "turbo dev --filter=portal*",
+    "dev:cashier": "turbo dev --filter=cashier-*",
+    "watch": "nodemon",
+    "lint": "turbo lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14",
+    "turbo": "^2.0.0"
+  },
+  "packageManager": "pnpm@10.3.0",
+  "pnpm": {
+    "trustedDependencies": []
+  }
+}
