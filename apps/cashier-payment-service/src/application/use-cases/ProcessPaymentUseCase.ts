@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Payment, PaymentMethod, PaymentStatus } from '../../domain/entities/Payment';
 import type { PaymentRepository } from '../interfaces/PaymentRepository';
 
@@ -11,7 +11,10 @@ export class ProcessPaymentDto {
 
 @Injectable()
 export class ProcessPaymentUseCase {
-  constructor(private readonly paymentRepository: PaymentRepository) {}
+  constructor(
+    @Inject('PaymentRepository')
+    private readonly paymentRepository: PaymentRepository
+  ) {}
 
   async execute(data: ProcessPaymentDto): Promise<Payment> {
     const payment = new Payment(

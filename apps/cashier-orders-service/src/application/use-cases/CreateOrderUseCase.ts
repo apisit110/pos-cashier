@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Order, OrderItem } from '../../domain/entities/Order';
 import type { OrderRepository } from '../interfaces/OrderRepository';
 
@@ -8,7 +8,10 @@ export class CreateOrderDto {
 
 @Injectable()
 export class CreateOrderUseCase {
-  constructor(private readonly orderRepository: OrderRepository) {}
+  constructor(
+    @Inject('OrderRepository')
+    private readonly orderRepository: OrderRepository
+  ) {}
 
   async execute(data: CreateOrderDto, staffId: string): Promise<Order> {
     const items = data.items.map(

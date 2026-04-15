@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { OrderRepository } from '../interfaces/OrderRepository';
 import { OrderStatus } from '../../domain/entities/Order';
 
@@ -8,7 +8,10 @@ export class UpdateOrderStatusDto {
 
 @Injectable()
 export class UpdateOrderStatusUseCase {
-  constructor(private readonly orderRepository: OrderRepository) {}
+  constructor(
+    @Inject('OrderRepository')
+    private readonly orderRepository: OrderRepository
+  ) {}
 
   async execute(id: string, data: UpdateOrderStatusDto) {
     const order = await this.orderRepository.findById(id);

@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Order, OrderItem, OrderStatus } from '../../domain/entities/Order';
 import type { OrderRepository } from '../interfaces/OrderRepository';
-import { PaymentService, PaymentMethod } from '../interfaces/PaymentService';
+import type { PaymentService } from '../interfaces/PaymentService';
+import { PaymentMethod } from '../interfaces/PaymentService';
 
 export class CheckoutDto {
   items: { productId: string; quantity: number; price: number }[];
@@ -14,7 +15,9 @@ export class CheckoutDto {
 @Injectable()
 export class CheckoutUseCase {
   constructor(
+    @Inject('OrderRepository')
     private readonly orderRepository: OrderRepository,
+    @Inject('PaymentService')
     private readonly paymentService: PaymentService
   ) {}
 
