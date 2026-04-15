@@ -1,0 +1,10 @@
+{
+  "name": "@lightning-pos/tsconfig",
+  "version": "1.0.0",
+  "private": true,
+  "files": [
+    "base.json",
+    "nestjs.json"
+  ],
+  "main": "base.json"
+}
