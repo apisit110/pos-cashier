@@ -4,7 +4,7 @@ import type { AuthResponse } from '../../domain/entities/User';
 import type { LoginCredentials } from '../../domain/entities/Auth';
 
 export class ApiAuthRepository implements AuthRepository {
-  private readonly baseUrl = 'http://localhost:3005/auth';
+  private readonly baseUrl = 'http://localhost:3005/v1/staff/auth';
   private readonly STORAGE_KEY = 'lightning_pos_session';
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
