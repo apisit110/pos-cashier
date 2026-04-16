@@ -17,7 +17,10 @@ export const DatabaseProvider: Provider = {
         id TEXT PRIMARY KEY,
         barcode TEXT UNIQUE NOT NULL,
         name TEXT NOT NULL,
-        price REAL NOT NULL
+        price REAL NOT NULL,
+        image_url TEXT,
+        unit_name TEXT,
+        brand TEXT
       );
     `);
 

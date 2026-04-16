@@ -5,4 +5,7 @@ export const products = sqliteTable('products', {
   barcode: text('barcode').notNull().unique(),
   name: text('name').notNull(),
   price: real('price').notNull(),
+  imageUrl: text('image_url'),
+  unitName: text('unit_name'),
+  brand: text('brand'),
 });
