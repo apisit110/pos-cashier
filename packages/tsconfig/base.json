@@ -11,8 +11,6 @@
     "resolvePackageJsonExports": true,
     "declaration": true,
     "incremental": true,
-    "sourceMap": true,
-    "baseUrl": "./",
-    "outDir": "./dist"
+    "sourceMap": true
   }
 }

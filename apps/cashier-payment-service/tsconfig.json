@@ -1,7 +1,8 @@
 {
   "extends": "@lightning-pos/tsconfig/nestjs.json",
   "compilerOptions": {
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "outDir": "./dist"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
