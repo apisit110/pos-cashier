@@ -48,7 +48,7 @@ export class SqliteSyncMetadataRepository implements SyncMetadataRepository {
     } else {
       await this.db.insert(schema.syncMetadata).values({
         id: this.DEFAULT_ID,
-        lastProductSyncVersion: metadata.lastProductSyncVersion ?? null,
+        lastProductSyncVersion: metadata.lastProductSyncVersion ?? 0,
         status: metadata.status ?? 'IDLE',
         updatedAt: now,
       });

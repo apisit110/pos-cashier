@@ -21,7 +21,7 @@ export class SyncProductsUseCase {
     try {
       // 1. Get current sync metadata
       const metadata = await this.syncMetadataRepository.getLatest();
-      const lastSyncVersion = metadata?.lastProductSyncVersion ?? null;
+      const lastSyncVersion = metadata?.lastProductSyncVersion ?? 0;
 
       // 2. Set status to SYNCING
       await this.syncMetadataRepository.updateStatus('SYNCING');

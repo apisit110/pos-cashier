@@ -25,7 +25,7 @@ export const DatabaseProvider: Provider = {
 
       CREATE TABLE IF NOT EXISTS sync_metadata (
         id TEXT PRIMARY KEY,
-        last_product_sync_version TEXT,
+        last_product_sync_version INTEGER NOT NULL DEFAULT 0,
         status TEXT NOT NULL DEFAULT 'IDLE',
         updated_at TEXT NOT NULL
       );

@@ -22,7 +22,15 @@ export class SqliteProductRepository implements ProductRepository {
       return null;
     }
 
-    return new Product(result.id, result.barcode, result.name, result.price);
+    return new Product(
+      result.id,
+      result.barcode,
+      result.name,
+      result.price,
+      result.imageUrl,
+      result.unitName,
+      result.brand,
+    );
   }
 
   async upsertMany(products: Product[]): Promise<void> {
@@ -36,6 +44,9 @@ export class SqliteProductRepository implements ProductRepository {
           barcode: product.barcode,
           name: product.name,
           price: product.price,
+          imageUrl: product.imageUrl,
+          unitName: product.unitName,
+          brand: product.brand,
         })
         .onConflictDoUpdate({
           target: schema.products.id,
@@ -43,6 +54,9 @@ export class SqliteProductRepository implements ProductRepository {
             barcode: product.barcode,
             name: product.name,
             price: product.price,
+            imageUrl: product.imageUrl,
+            unitName: product.unitName,
+            brand: product.brand,
           },
         });
     }

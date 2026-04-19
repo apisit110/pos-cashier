@@ -4,6 +4,6 @@ export interface ProductSyncGateway {
   fetchProducts(
     merchantId: string,
     storeId: string,
-    lastSyncVersion: string | null,
-  ): Promise<{ products: Product[]; syncVersion: string }>;
+    lastSyncVersion: number,
+  ): Promise<{ products: Product[]; syncVersion: number }>;
 }
