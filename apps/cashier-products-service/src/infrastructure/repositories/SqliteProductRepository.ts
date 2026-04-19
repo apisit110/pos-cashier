@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
 import { Product } from '../../domain/entities/Product';
 import { ProductRepository } from '../../application/interfaces/ProductRepository';
@@ -23,5 +23,28 @@ export class SqliteProductRepository implements ProductRepository {
     }
 
     return new Product(result.id, result.barcode, result.name, result.price);
+  }
+
+  async upsertMany(products: Product[]): Promise<void> {
+    if (products.length === 0) return;
+
+    for (const product of products) {
+      await this.db
+        .insert(schema.products)
+        .values({
+          id: product.id,
+          barcode: product.barcode,
+          name: product.name,
+          price: product.price,
+        })
+        .onConflictDoUpdate({
+          target: schema.products.id,
+          set: {
+            barcode: product.barcode,
+            name: product.name,
+            price: product.price,
+          },
+        });
+    }
   }
 }

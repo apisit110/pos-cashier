@@ -9,3 +9,10 @@ export const products = sqliteTable('products', {
   unitName: text('unit_name'),
   brand: text('brand'),
 });
+
+export const syncMetadata = sqliteTable('sync_metadata', {
+  id: text('id').primaryKey(), // Using a fixed ID like 'latest' or 'default'
+  lastProductSyncVersion: text('last_product_sync_version'),
+  status: text('status').$type<'IDLE' | 'SYNCING' | 'ERROR' | 'SUCCESS'>().notNull().default('IDLE'),
+  updatedAt: text('updated_at').notNull(),
+});

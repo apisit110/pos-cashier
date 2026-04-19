@@ -22,6 +22,13 @@ export const DatabaseProvider: Provider = {
         unit_name TEXT,
         brand TEXT
       );
+
+      CREATE TABLE IF NOT EXISTS sync_metadata (
+        id TEXT PRIMARY KEY,
+        last_product_sync_version TEXT,
+        status TEXT NOT NULL DEFAULT 'IDLE',
+        updated_at TEXT NOT NULL
+      );
     `);
 
     // Seed data if empty
