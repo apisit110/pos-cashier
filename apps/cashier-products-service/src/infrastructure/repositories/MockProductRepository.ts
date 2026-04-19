@@ -12,4 +12,15 @@ export class MockProductRepository implements ProductRepository {
     const product = this.products.find((p) => p.barcode === barcode);
     return product || null;
   }
+
+  async upsertMany(products: Product[]): Promise<void> {
+    for (const product of products) {
+      const index = this.products.findIndex((p) => p.id === product.id);
+      if (index !== -1) {
+        this.products[index] = product;
+      } else {
+        this.products.push(product);
+      }
+    }
+  }
 }

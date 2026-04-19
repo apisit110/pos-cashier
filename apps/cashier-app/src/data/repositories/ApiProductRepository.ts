@@ -40,4 +40,14 @@ export class ApiProductRepository implements ProductRepository {
       return [];
     }
   }
+
+  async syncProducts(): Promise<{ success: boolean; count: number }> {
+    try {
+      const response = await api.post(`${this.baseUrl}/products/sync`);
+      return response.data;
+    } catch (error) {
+      console.error('Error syncing products:', error);
+      throw error;
+    }
+  }
 }

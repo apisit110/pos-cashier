@@ -9,7 +9,7 @@ export class HttpProductSyncGateway implements ProductSyncGateway {
     storeId: string,
     lastSyncVersion: number,
   ): Promise<{ products: Product[]; syncVersion: number }> {
-    const url = 'http://localhost:3005/v1/sync/products';
+    const url = 'http://localhost:4002/v1/sync/products';
     
     try {
       const response = await fetch(url, {

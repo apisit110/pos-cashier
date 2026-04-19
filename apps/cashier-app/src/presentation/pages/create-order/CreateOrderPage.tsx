@@ -6,6 +6,7 @@ import { ApiProductRepository } from '../../../data/repositories/ApiProductRepos
 import { ApiMemberRepository } from '../../../data/repositories/ApiMemberRepository';
 import { ApiOrderRepository } from '../../../data/repositories/ApiOrderRepository';
 import { ScanProductUseCase } from '../../../application/use-cases/ScanProductUseCase';
+import { SyncProductsUseCase } from '../../../application/use-cases/SyncProductsUseCase';
 import { Product } from '../../../domain/entities/Product';
 import { Member } from '../../../domain/entities/Member';
 import { IdentifyMemberUseCase } from '../../../application/use-cases/IdentifyMemberUseCase';
@@ -24,6 +25,7 @@ const orderRepository = new ApiOrderRepository();
 
 const scanUseCase = new ScanProductUseCase(productRepository);
 const identifyMemberUseCase = new IdentifyMemberUseCase(memberRepository);
+const syncUseCase = new SyncProductsUseCase(productRepository);
 
 interface CreateOrderPageProps {
   onLogout?: () => void;
@@ -37,9 +39,11 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
   const [member, setMember] = useState<Member | null>(null);
   const [promotionResult, setPromotionResult] = useState<PromotionResult | null>(null);
   const [isScanning, setIsScanning] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const [isIdentifyingMember, setIsIdentifyingMember] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
   
   const inputRef = useRef<HTMLInputElement>(null);
   const memberInputRef = useRef<HTMLInputElement>(null);
@@ -214,6 +218,27 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
     });
   };
 
+  const handleSync = async () => {
+    setIsSyncing(true);
+    setError(null);
+    setSyncMessage(null);
+
+    try {
+      const result = await syncUseCase.execute();
+      if (result.success) {
+        setSyncMessage(`Sync successful! ${result.count} products updated.`);
+        // Auto-clear message after 3 seconds
+        setTimeout(() => setSyncMessage(null), 3000);
+      } else {
+        setError('Sync failed.');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Error during sync.');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   const total = promotionResult?.finalTotal ?? items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
 
   return (
@@ -226,6 +251,15 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
           <h2>Lightning POS</h2>
         </div>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          {syncMessage && <span className="sync-success-msg">{syncMessage}</span>}
+          <Button 
+            variant="secondary" 
+            onClick={handleSync} 
+            isLoading={isSyncing}
+            disabled={isSyncing}
+          >
+            Sync Products
+          </Button>
           {user && (
             <div className="user-indicator">
               <span className="user-icon">👤</span>
