@@ -49,9 +49,9 @@ export class SqliteProductRepository implements ProductRepository {
           brand: product.brand,
         })
         .onConflictDoUpdate({
-          target: schema.products.id,
+          target: schema.products.barcode,
           set: {
-            barcode: product.barcode,
+            id: product.id, // Update id as well in case it changed in the source
             name: product.name,
             price: product.price,
             imageUrl: product.imageUrl,

@@ -15,7 +15,7 @@ export class MockProductRepository implements ProductRepository {
 
   async upsertMany(products: Product[]): Promise<void> {
     for (const product of products) {
-      const index = this.products.findIndex((p) => p.id === product.id);
+      const index = this.products.findIndex((p) => p.barcode === product.barcode);
       if (index !== -1) {
         this.products[index] = product;
       } else {

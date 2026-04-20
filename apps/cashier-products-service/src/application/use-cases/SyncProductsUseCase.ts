@@ -5,7 +5,7 @@ import type { ProductSyncGateway } from '../interfaces/ProductSyncGateway';
 
 @Injectable()
 export class SyncProductsUseCase {
-  private readonly MERCHANT_ID = 'fd1b2c4c-7372-4580-8017-1fff8ceb6169';
+  private readonly MERCHANT_ID = 'f19bd616-43d2-4bd2-9a84-fbd77cfab778';
   private readonly STORE_ID = 'S-001';
 
   constructor(
