@@ -1,13 +1,13 @@
 import type { User, UserRepository } from '../../domain/repositories/UserRepository';
 
-export class CreateUserUseCase {
+export class GetUsersUseCase {
   private userRepository: UserRepository;
 
   constructor(userRepository: UserRepository) {
     this.userRepository = userRepository;
   }
 
-  async execute(userData: { fullName: string; roleId: number; userId?: string; pin: string }): Promise<User> {
-    return this.userRepository.createUser(userData);
+  async execute(page: number, limit: number): Promise<{ users: User[]; total: number }> {
+    return this.userRepository.getUsers(page, limit);
   }
 }

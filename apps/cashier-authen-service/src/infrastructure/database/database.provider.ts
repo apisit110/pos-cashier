@@ -9,7 +9,7 @@ export const DATABASE_CONNECTION = 'DATABASE_CONNECTION';
 export const DatabaseProvider: Provider = {
   provide: DATABASE_CONNECTION,
   useFactory: () => {
-    const sqlite = new Database(join(process.cwd(), 'staff.db'));
+    const sqlite = new Database(join(process.cwd(), 'cashier-authen.db'));
     
     // Initialize schema
     sqlite.exec(`
@@ -20,7 +20,7 @@ export const DatabaseProvider: Provider = {
 
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        staff_id TEXT NOT NULL UNIQUE,
+        user_id TEXT NOT NULL UNIQUE,
         role_id INTEGER NOT NULL,
         full_name TEXT NOT NULL,
         pin_hash TEXT NOT NULL,
@@ -42,7 +42,7 @@ export const DatabaseProvider: Provider = {
     insertRole.run(1, 'manager');
     insertRole.run(2, 'cashier');
 
-    const insertUser = sqlite.prepare('INSERT OR REPLACE INTO users (staff_id, role_id, full_name, pin_hash, status, updated_at) VALUES (?, ?, ?, ?, ?, ?)');
+    const insertUser = sqlite.prepare('INSERT OR REPLACE INTO users (user_id, role_id, full_name, pin_hash, status, updated_at) VALUES (?, ?, ?, ?, ?, ?)');
     insertUser.run('M001', 1, 'Admin Manager', '123456', 'active', Date.now());
 
 

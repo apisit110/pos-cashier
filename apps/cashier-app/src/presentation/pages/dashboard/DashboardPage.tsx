@@ -1,23 +1,20 @@
 import React, { useState } from 'react';
 import './DashboardPage.css';
 import { Button } from '../../components/Button';
-import { CreateUserUseCase } from '../../../application/use-cases/CreateUserUseCase';
-import { SyncUserUseCase } from '../../../application/use-cases/SyncUserUseCase';
 import { SyncProductUseCase } from '../../../application/use-cases/SyncProductUseCase';
-import { MockUserRepository } from '../../../data/repositories/MockUserRepository';
 import { ApiProductRepository } from '../../../data/repositories/ApiProductRepository';
 
 // For simplicity, instantiating dependencies here.
-const userRepository = new MockUserRepository();
 const productRepository = new ApiProductRepository();
 
-const syncUserUseCase = new SyncUserUseCase(userRepository);
 const syncProductUseCase = new SyncProductUseCase(productRepository);
 
 interface DashboardPageProps {
   onLogout: () => void;
   onNavigateToSell: () => void;
   onNavigateToCreateUser: () => void;
+  onNavigateToUserList: () => void;
+  onNavigateToTransactionList: () => void;
   user: { uid: string; username: string; role: string; accessToken: string } | null;
 }
 
@@ -25,6 +22,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   onLogout, 
   onNavigateToSell, 
   onNavigateToCreateUser,
+  onNavigateToUserList,
+  onNavigateToTransactionList,
   user 
 }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -38,19 +37,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       setMessage({ text: `Products synced! ${result.count} items updated.`, type: 'success' });
     } catch (err: any) {
       setMessage({ text: err.message || 'Failed to sync products', type: 'error' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSyncUser = async () => {
-    setIsLoading(true);
-    setMessage(null);
-    try {
-      await syncUserUseCase.execute();
-      setMessage({ text: 'User sync completed (Mock)', type: 'success' });
-    } catch (err: any) {
-      setMessage({ text: err.message || 'Failed to sync users', type: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -94,6 +80,30 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             <p>Generate a temporary user ID for new employees.</p>
           </div>
 
+          <div className="dashboard-card" onClick={onNavigateToUserList}>
+            <div className="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+            <h3>Manage Users</h3>
+            <p>View and manage all employees in the system.</p>
+          </div>
+
+          <div className="dashboard-card" onClick={onNavigateToTransactionList}>
+            <div className="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+              </svg>
+            </div>
+            <h3>Transactions</h3>
+            <p>View sales history, payment methods, and statuses.</p>
+          </div>
+
           <div className="dashboard-card" onClick={handleSyncProduct}>
             <div className="card-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -104,19 +114,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             </div>
             <h3>Sync Product</h3>
             <p>Update product list and pricing from the server.</p>
-          </div>
-
-          <div className="dashboard-card" onClick={handleSyncUser}>
-            <div className="card-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-              </svg>
-            </div>
-            <h3>Sync User</h3>
-            <p>Synchronize user data with the central database.</p>
           </div>
 
           <div className="dashboard-card sell-card" onClick={onNavigateToSell}>

@@ -6,6 +6,7 @@ export interface User {
 }
 
 export interface UserRepository {
-  createUser(userData: { fullName: string; roleId: number }): Promise<User>;
+  createUser(userData: { fullName: string; roleId: number; userId?: string; pin: string }): Promise<User>;
+  getUsers(page: number, limit: number): Promise<{ users: User[]; total: number }>;
   syncUsers(): Promise<void>;
 }

@@ -9,8 +9,8 @@ export class LoginUseCase {
     private readonly jwtService: JwtService,
   ) {}
 
-  async execute(staffId: string, pin: string) {
-    const user = await this.userRepository.findByStaffId(staffId);
+  async execute(userId: string, pin: string) {
+    const user = await this.userRepository.findByUserId(userId);
 
     // Note: In a real production app, pin/password comparison would use a hashing library like bcrypt/argon2
     if (!user || user.pinHash !== pin) {
@@ -19,7 +19,7 @@ export class LoginUseCase {
 
     const payload = { 
       sub: user.id, 
-      staffId: user.staffId, 
+      userId: user.userId, 
       fullName: user.fullName, 
       roleId: user.roleId 
     };
@@ -27,7 +27,7 @@ export class LoginUseCase {
     return {
       user: {
         id: user.id,
-        staffId: user.staffId,
+        userId: user.userId,
         fullName: user.fullName,
         roleId: user.roleId,
         status: user.status,

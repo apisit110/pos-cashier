@@ -13,9 +13,9 @@ export class SqliteUserRepository implements UserRepository {
     private readonly db: BetterSQLite3Database<typeof schema>,
   ) {}
 
-  async findByStaffId(staffId: string): Promise<User | null> {
+  async findByUserId(userId: string): Promise<User | null> {
     const result = await this.db.query.users.findFirst({
-      where: eq(schema.users.staffId, staffId),
+      where: eq(schema.users.userId, userId),
     });
 
     if (!result) {
@@ -37,10 +37,41 @@ export class SqliteUserRepository implements UserRepository {
     return this.mapToEntity(result);
   }
 
+  async findAll(page: number, limit: number): Promise<{ users: User[]; total: number }> {
+    const offset = (page - 1) * limit;
+    
+    const results = await this.db.query.users.findMany({
+      limit,
+      offset,
+      orderBy: (users, { desc }) => [desc(users.updatedAt)],
+    });
+
+    const allUsers = this.db.select().from(schema.users).all();
+    const totalCount = allUsers.length;
+
+    return {
+      users: results.map(r => this.mapToEntity(r)),
+      total: totalCount,
+    };
+  }
+
+  async create(userData: { userId: string; fullName: string; roleId: number; pinHash: string; status: string }): Promise<User> {
+    const [result] = await this.db.insert(schema.users).values({
+      userId: userData.userId,
+      fullName: userData.fullName,
+      roleId: userData.roleId,
+      pinHash: userData.pinHash,
+      status: userData.status as any,
+      updatedAt: new Date(),
+    }).returning();
+
+    return this.mapToEntity(result);
+  }
+
   private mapToEntity(result: any): User {
     return new User(
       result.id,
-      result.staffId,
+      result.userId,
       result.roleId,
       result.fullName,
       result.pinHash,

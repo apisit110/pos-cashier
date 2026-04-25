@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './CreateUserPage.css';
 import { Button } from '../../components/Button';
+import { PinInput } from '../../components/PinInput';
 import type { CreateUserUseCase } from '../../../application/use-cases/CreateUserUseCase';
 import type { SyncUserUseCase } from '../../../application/use-cases/SyncUserUseCase';
 
@@ -12,9 +13,20 @@ interface CreateUserPageProps {
 
 export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUserUseCase, syncUserUseCase }) => {
   const [fullName, setFullName] = useState('');
+  const [userId, setUserId] = useState('');
+  const [pin, setPin] = useState('');
   const [roleId, setRoleId] = useState(2); // Default to Cashier
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+
+  const generateUserId = () => {
+    const id = `U${Date.now().toString().slice(-6)}`;
+    setUserId(id);
+  };
+
+  useEffect(() => {
+    generateUserId();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,12 +35,17 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
       return;
     }
 
+    if (!pin.trim() || pin.length < 4) {
+      setMessage({ text: 'Please enter a valid PIN (at least 4 digits)', type: 'error' });
+      return;
+    }
+
     setIsLoading(true);
     setMessage(null);
 
     try {
       // 1. Create User (Saves to local/mock repo)
-      const newUser = await createUserUseCase.execute({ fullName, roleId });
+      const newUser = await createUserUseCase.execute({ fullName, roleId, userId, pin });
       
       // 2. Sync User (Calls mock sync)
       await syncUserUseCase.execute();
@@ -38,7 +55,9 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
         type: 'success' 
       });
       setFullName('');
+      setPin('');
       setRoleId(2);
+      generateUserId(); // Generate next ID
     } catch (err: any) {
       setMessage({ text: err.message || 'Failed to create user', type: 'error' });
     } finally {
@@ -64,6 +83,33 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
       <main className="create-user-content">
         <form className="create-user-form" onSubmit={handleSubmit}>
           <div className="form-group">
+            <label htmlFor="userId">User ID (Generated)</label>
+            <div className="user-id-input-group">
+              <input
+                id="userId"
+                type="text"
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+                placeholder="User ID"
+                disabled={isLoading}
+                required
+              />
+              <button 
+                type="button" 
+                className="regenerate-button" 
+                onClick={generateUserId}
+                disabled={isLoading}
+                title="Regenerate ID"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 4v6h-6" />
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div className="form-group">
             <label htmlFor="fullName">Full Name</label>
             <input
               id="fullName"
@@ -73,6 +119,16 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
               placeholder="Enter employee full name"
               disabled={isLoading}
               required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>PIN Code (6 digits)</label>
+            <PinInput
+              length={6}
+              value={pin}
+              onChange={setPin}
+              disabled={isLoading}
             />
           </div>
 

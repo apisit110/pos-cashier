@@ -3,23 +3,31 @@ import { LoginPage } from './presentation/pages/login/LoginPage';
 import { CreateOrderPage } from './presentation/pages/create-order/CreateOrderPage';
 import { DashboardPage } from './presentation/pages/dashboard/DashboardPage';
 import { CreateUserPage } from './presentation/pages/create-user/CreateUserPage';
+import { UserListPage } from './presentation/pages/user-list/UserListPage';
+import { TransactionListPage } from './presentation/pages/transaction-list/TransactionListPage';
 import { GetSessionUseCase } from './domain/use-cases/GetSessionUseCase';
 import { CreateUserUseCase } from './application/use-cases/CreateUserUseCase';
 import { SyncUserUseCase } from './application/use-cases/SyncUserUseCase';
+import { GetUsersUseCase } from './application/use-cases/GetUsersUseCase';
+import { GetTransactionsUseCase } from './application/use-cases/GetTransactionsUseCase';
 import { ApiAuthRepository } from './data/repositories/ApiAuthRepository';
-import { MockUserRepository } from './data/repositories/MockUserRepository';
+import { ApiUserRepository } from './data/repositories/ApiUserRepository';
+import { MockTransactionRepository } from './data/repositories/MockTransactionRepository';
 import './App.css';
 
 // For simplicity, instantiating dependencies here.
 const authRepository = new ApiAuthRepository();
-const userRepository = new MockUserRepository();
+const userRepository = new ApiUserRepository();
+const transactionRepository = new MockTransactionRepository();
 
 const getSessionUseCase = new GetSessionUseCase(authRepository);
 const createUserUseCase = new CreateUserUseCase(userRepository);
 const syncUserUseCase = new SyncUserUseCase(userRepository);
+const getUsersUseCase = new GetUsersUseCase(userRepository);
+const getTransactionsUseCase = new GetTransactionsUseCase(transactionRepository);
 
 function App() {
-  const [currentView, setCurrentView] = useState<'login' | 'create-order' | 'dashboard' | 'create-user'>('login');
+  const [currentView, setCurrentView] = useState<'login' | 'create-order' | 'dashboard' | 'create-user' | 'user-list' | 'transaction-list'>('login');
   const [user, setUser] = useState<{ uid: string; username: string; role: string; roleId: number; accessToken: string; refreshToken?: string } | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
 
@@ -100,6 +108,8 @@ function App() {
           onLogout={handleLogout} 
           onNavigateToSell={handleNavigateToSell} 
           onNavigateToCreateUser={() => setCurrentView('create-user')}
+          onNavigateToUserList={() => setCurrentView('user-list')}
+          onNavigateToTransactionList={() => setCurrentView('transaction-list')}
           user={user} 
         />
       )}
@@ -109,6 +119,18 @@ function App() {
           onBack={() => setCurrentView('dashboard')}
           createUserUseCase={createUserUseCase}
           syncUserUseCase={syncUserUseCase}
+        />
+      )}
+      {currentView === 'user-list' && (
+        <UserListPage 
+          onBack={() => setCurrentView('dashboard')}
+          getUsersUseCase={getUsersUseCase}
+        />
+      )}
+      {currentView === 'transaction-list' && (
+        <TransactionListPage 
+          onBack={() => setCurrentView('dashboard')}
+          getTransactionsUseCase={getTransactionsUseCase}
         />
       )}
     </div>

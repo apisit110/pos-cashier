@@ -1,0 +1,71 @@
+import React, { useRef, useEffect } from 'react';
+import './PinInput.css';
+
+interface PinInputProps {
+  length?: number;
+  value: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+}
+
+export const PinInput: React.FC<PinInputProps> = ({ length = 6, value, onChange, disabled }) => {
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Initialize refs array
+  useEffect(() => {
+    inputRefs.current = inputRefs.current.slice(0, length);
+  }, [length]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const char = e.target.value.slice(-1);
+    if (!/^\d*$/.test(char)) return;
+
+    const newValue = value.split('');
+    newValue[index] = char;
+    const finalValue = newValue.join('');
+    
+    onChange(finalValue);
+
+    // Focus next input
+    if (char && index < length - 1) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+    if (e.key === 'Backspace' && !value[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').slice(0, length).replace(/\D/g, '');
+    onChange(pastedData);
+    
+    // Focus last character input or next empty
+    const nextIndex = Math.min(pastedData.length, length - 1);
+    inputRefs.current[nextIndex]?.focus();
+  };
+
+  return (
+    <div className="pin-input-group">
+      {Array.from({ length }).map((_, index) => (
+        <input
+          key={index}
+          ref={(el) => { inputRefs.current[index] = el; }}
+          type="text"
+          inputMode="numeric"
+          maxLength={1}
+          value={value[index] || ''}
+          onChange={(e) => handleChange(e, index)}
+          onKeyDown={(e) => handleKeyDown(e, index)}
+          onPaste={handlePaste}
+          disabled={disabled}
+          className={`pin-digit-input ${value[index] ? 'filled' : ''}`}
+          autoComplete="one-time-code"
+        />
+      ))}
+    </div>
+  );
+};

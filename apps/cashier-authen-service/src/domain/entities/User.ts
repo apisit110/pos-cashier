@@ -7,7 +7,7 @@ export enum UserStatus {
 export class User {
   constructor(
     public readonly id: number,
-    public readonly staffId: string,
+    public readonly userId: string,
     public readonly roleId: number,
     public readonly fullName: string,
     public readonly pinHash: string,

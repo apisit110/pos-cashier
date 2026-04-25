@@ -45,6 +45,45 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
+.user-id-input-group {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.user-id-input-group input {
+  flex: 1;
+}
+
+.regenerate-button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.regenerate-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.regenerate-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.regenerate-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .create-user-header h2 {
   margin: 0;
   font-size: 1.5rem;
