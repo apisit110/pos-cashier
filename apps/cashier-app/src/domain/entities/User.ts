@@ -1,10 +1,11 @@
-export type UserRole = 'manager' | 'staff';
+export type UserRole = 'manager' | 'cashier';
 
 export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: UserRole;
+  id: number;
+  staffId: string;
+  fullName: string;
+  roleId: number;
+  status: 'active' | 'pending_sync' | 'inactive';
 }
 
 export interface AuthResponse {
@@ -12,4 +13,3 @@ export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
 }
-

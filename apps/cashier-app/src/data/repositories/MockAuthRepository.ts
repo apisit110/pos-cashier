@@ -11,33 +11,20 @@ export class MockAuthRepository implements AuthRepository {
 
     let response: AuthResponse;
 
-    if (credentials.email === 'staff' && credentials.password === 'staff') {
-      const payload = {
-        uid: 'staff-67890',
-        role: 'cashier',
-        name: 'Staff User'
-      };
-      const token = `header.${btoa(JSON.stringify(payload))}.signature`;
-      
+    if (credentials.staffId === 'M001' && credentials.pin === '123456') {
       response = {
         user: {
-          id: 'staff-67890',
-          email: 'staff@lighting-pos.com',
-          name: 'Staff User',
+          id: 1,
+          staffId: 'M001',
+          fullName: 'Admin Manager',
+          roleId: 1,
+          status: 'active'
         },
-        token,
-      };
-    } else if (credentials.email === 'admin' && credentials.password === 'admin') {
-      response = {
-        user: {
-          id: 'admin-12345',
-          email: credentials.email,
-          name: 'Admin User',
-        },
-        token: 'mock-jwt-admin-token',
+        accessToken: 'mock-access-token-manager',
+        refreshToken: 'mock-refresh-token-manager'
       };
     } else {
-      throw new Error('Invalid email or password');
+      throw new Error('Invalid Staff ID or PIN');
     }
 
     // Persist session

@@ -10,9 +10,9 @@ export class LoginUseCase {
   }
 
   async execute(credentials: LoginCredentials): Promise<AuthResponse> {
-    // Basic validation logic could go here
-    if (!credentials.email || !credentials.password) {
-      throw new Error('Email and password are required');
+    // Basic validation logic
+    if (!credentials.staffId || !credentials.pin) {
+      throw new Error('Staff ID and PIN are required');
     }
     
     return await this.authRepository.login(credentials);

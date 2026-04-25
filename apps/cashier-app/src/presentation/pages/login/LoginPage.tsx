@@ -11,12 +11,12 @@ const authRepository = new ApiAuthRepository();
 const loginUseCase = new LoginUseCase(authRepository);
 
 interface LoginPageProps {
-  onLoginSuccess?: (userData: { uid: string; username: string; role: string; accessToken: string; refreshToken: string }) => void;
+  onLoginSuccess?: (userData: { uid: number; username: string; roleId: number; accessToken: string; refreshToken: string }) => void;
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [staffId, setStaffId] = useState('');
+  const [pin, setPin] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -25,27 +25,27 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     setError(null);
 
     // Basic validation
-    if (!email || !password) {
+    if (!staffId || !pin) {
       setError('Please fill in all fields.');
       return;
     }
 
     setIsLoading(true);
     try {
-      const response = await loginUseCase.execute({ email, password });
+      const response = await loginUseCase.execute({ staffId, pin });
       console.log('Login successful:', response);
       // Here you would typically store the token and redirect
       if (onLoginSuccess) {
         onLoginSuccess({ 
           uid: response.user.id, 
-          username: response.user.name,
-          role: response.user.role,
+          username: response.user.fullName,
+          roleId: response.user.roleId,
           accessToken: response.accessToken,
           refreshToken: response.refreshToken
         });
 
       } else {
-        alert(`Welcome, ${response.user.name}!`);
+        alert(`Welcome, ${response.user.fullName}!`);
       }
     } catch (err: any) {
       setError(err.message || 'Login failed. Please try again.');
@@ -76,25 +76,25 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
         <form onSubmit={handleSubmit} className="login-form">
           <InputField
-            label="Username / Email"
+            label="Staff ID"
             type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="name@example.com"
+            value={staffId}
+            onChange={(e) => setStaffId(e.target.value)}
+            placeholder="e.g. M001"
             disabled={isLoading}
           />
           
           <InputField
-            label="Password"
+            label="PIN"
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
+            value={pin}
+            onChange={(e) => setPin(e.target.value)}
+            placeholder="••••••"
             disabled={isLoading}
           />
           
           <div className="form-actions">
-            <a href="#" className="forgot-password">Forgot password?</a>
+            <a href="#" className="forgot-password">Forgot PIN?</a>
           </div>
 
           <Button type="submit" isLoading={isLoading}>
@@ -105,7 +105,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         <div className="login-footer">
           <p>Don't have an account? <a href="#">Contact Support</a></p>
           <div className="demo-hint">
-            <small>Demo Credentials: <code>staff</code> / <code>staff</code></small>
+            <small>Demo Credentials: <code>M001</code> / <code>123456</code></small>
           </div>
         </div>
       </div>
