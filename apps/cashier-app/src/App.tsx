@@ -12,13 +12,13 @@ import { GetUsersUseCase } from './application/use-cases/GetUsersUseCase';
 import { GetTransactionsUseCase } from './application/use-cases/GetTransactionsUseCase';
 import { ApiAuthRepository } from './data/repositories/ApiAuthRepository';
 import { ApiUserRepository } from './data/repositories/ApiUserRepository';
-import { MockTransactionRepository } from './data/repositories/MockTransactionRepository';
+import { ApiTransactionRepository } from './data/repositories/ApiTransactionRepository';
 import './App.css';
 
 // For simplicity, instantiating dependencies here.
 const authRepository = new ApiAuthRepository();
 const userRepository = new ApiUserRepository();
-const transactionRepository = new MockTransactionRepository();
+const transactionRepository = new ApiTransactionRepository();
 
 const getSessionUseCase = new GetSessionUseCase(authRepository);
 const createUserUseCase = new CreateUserUseCase(userRepository);
