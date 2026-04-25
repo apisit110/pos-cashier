@@ -11,11 +11,11 @@ export class MockAuthRepository implements AuthRepository {
 
     let response: AuthResponse;
 
-    if (credentials.staffId === 'M001' && credentials.pin === '123456') {
+    if (credentials.userId === 'M001' && credentials.pin === '123456') {
       response = {
         user: {
           id: 1,
-          staffId: 'M001',
+          userId: 'M001',
           fullName: 'Admin Manager',
           roleId: 1,
           status: 'active'
@@ -24,7 +24,7 @@ export class MockAuthRepository implements AuthRepository {
         refreshToken: 'mock-refresh-token-manager'
       };
     } else {
-      throw new Error('Invalid Staff ID or PIN');
+      throw new Error('Invalid User ID or PIN');
     }
 
     // Persist session

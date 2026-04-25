@@ -11,8 +11,8 @@ export class LoginUseCase {
 
   async execute(credentials: LoginCredentials): Promise<AuthResponse> {
     // Basic validation logic
-    if (!credentials.staffId || !credentials.pin) {
-      throw new Error('Staff ID and PIN are required');
+    if (!credentials.userId || !credentials.pin) {
+      throw new Error('User ID and PIN are required');
     }
     
     return await this.authRepository.login(credentials);

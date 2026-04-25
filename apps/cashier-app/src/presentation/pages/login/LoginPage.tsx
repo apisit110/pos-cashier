@@ -15,7 +15,7 @@ interface LoginPageProps {
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
-  const [staffId, setStaffId] = useState('');
+  const [userId, setUserId] = useState('');
   const [pin, setPin] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -25,14 +25,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     setError(null);
 
     // Basic validation
-    if (!staffId || !pin) {
-      setError('Please fill in all fields.');
+    if (!userId || !pin) {
+      setError('Please enter both User ID and PIN');
       return;
     }
 
     setIsLoading(true);
+    setError(null);
     try {
-      const response = await loginUseCase.execute({ staffId, pin });
+      const response = await loginUseCase.execute({ userId, pin });
       console.log('Login successful:', response);
       // Here you would typically store the token and redirect
       if (onLoginSuccess) {
@@ -76,10 +77,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
         <form onSubmit={handleSubmit} className="login-form">
           <InputField
-            label="Staff ID"
+            label="User ID"
             type="text"
-            value={staffId}
-            onChange={(e) => setStaffId(e.target.value)}
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
             placeholder="e.g. M001"
             disabled={isLoading}
           />

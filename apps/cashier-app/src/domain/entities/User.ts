@@ -2,7 +2,7 @@ export type UserRole = 'manager' | 'cashier';
 
 export interface User {
   id: number;
-  staffId: string;
+  userId: string;
   fullName: string;
   roleId: number;
   status: 'active' | 'pending_sync' | 'inactive';

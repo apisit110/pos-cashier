@@ -9,7 +9,7 @@ export class ApiAuthRepository implements AuthRepository {
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const response = await axios.post<AuthResponse>(`${this.baseUrl}/login`, {
-      staffId: credentials.staffId,
+      userId: credentials.userId,
       pin: credentials.pin,
     });
 
