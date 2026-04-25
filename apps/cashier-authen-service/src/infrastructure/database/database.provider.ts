@@ -25,6 +25,7 @@ export const DatabaseProvider: Provider = {
         full_name TEXT NOT NULL,
         pin_hash TEXT NOT NULL,
         status TEXT NOT NULL,
+        sync_id TEXT,
         updated_at INTEGER NOT NULL,
         FOREIGN KEY (role_id) REFERENCES roles(id)
       );
@@ -42,8 +43,8 @@ export const DatabaseProvider: Provider = {
     insertRole.run(1, 'manager');
     insertRole.run(2, 'cashier');
 
-    const insertUser = sqlite.prepare('INSERT OR REPLACE INTO users (user_id, role_id, full_name, pin_hash, status, updated_at) VALUES (?, ?, ?, ?, ?, ?)');
-    insertUser.run('M001', 1, 'Admin Manager', '123456', 'active', Date.now());
+    const insertUser = sqlite.prepare('INSERT OR REPLACE INTO users (user_id, role_id, full_name, pin_hash, status, sync_id, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)');
+    insertUser.run('M001', 1, 'Admin Manager', '123456', 'active', '550e8400-e29b-41d4-a716-446655440000', Date.now());
 
 
 

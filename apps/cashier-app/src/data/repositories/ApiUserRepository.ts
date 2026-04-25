@@ -38,7 +38,6 @@ export class ApiUserRepository implements UserRepository {
   }
 
   async syncUsers(): Promise<void> {
-    // Mock sync
-    return new Promise(resolve => setTimeout(resolve, 500));
+    await axios.post(`${this.baseUrl}/sync`);
   }
 }

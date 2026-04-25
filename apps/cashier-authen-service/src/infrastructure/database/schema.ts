@@ -12,6 +12,7 @@ export const users = sqliteTable('users', {
   fullName: text('full_name').notNull(),
   pinHash: text('pin_hash').notNull(),
   status: text('status', { enum: ['active', 'pending_sync', 'inactive'] }).notNull(),
+  syncId: text('sync_id'),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
 });
 

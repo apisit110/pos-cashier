@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import { eq } from 'drizzle-orm';
+import { eq, or } from 'drizzle-orm';
 import { User, UserStatus } from '../../domain/entities/User';
 import { UserRepository } from '../../domain/repositories/UserRepository';
 import { DATABASE_CONNECTION } from '../database/database.provider';
@@ -68,6 +68,23 @@ export class SqliteUserRepository implements UserRepository {
     return this.mapToEntity(result);
   }
 
+  async findAllToSync(): Promise<User[]> {
+    const results = await this.db.query.users.findMany({
+      where: or(
+        eq(schema.users.status, 'pending_sync'),
+        eq(schema.users.status, 'active')
+      ),
+    });
+
+    return results.map(r => this.mapToEntity(r));
+  }
+
+  async updateSyncId(id: number, syncId: string): Promise<void> {
+    await this.db.update(schema.users)
+      .set({ syncId })
+      .where(eq(schema.users.id, id));
+  }
+
   private mapToEntity(result: any): User {
     return new User(
       result.id,
@@ -76,6 +93,7 @@ export class SqliteUserRepository implements UserRepository {
       result.fullName,
       result.pinHash,
       result.status as UserStatus,
+      result.syncId,
       result.updatedAt,
     );
   }

@@ -12,6 +12,7 @@ export class User {
     public readonly fullName: string,
     public readonly pinHash: string,
     public readonly status: UserStatus,
+    public readonly syncId: string | null,
     public readonly updatedAt: Date,
   ) {}
 }

@@ -18,14 +18,16 @@
     "better-sqlite3": "^12.9.0",
     "drizzle-orm": "^0.45.2",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
+    "@lightning-pos/tsconfig": "workspace:*",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@types/better-sqlite3": "^7.6.13",
+    "@types/uuid": "^11.0.0",
     "drizzle-kit": "^0.31.10",
-    "@lightning-pos/tsconfig": "workspace:*",
     "typescript": "^5.7.3"
   }
 }

@@ -14,6 +14,8 @@ import { PermissionRepository } from './domain/repositories/PermissionRepository
 import { SqlitePermissionRepository } from './infrastructure/repositories/SqlitePermissionRepository';
 import { DatabaseProvider } from './infrastructure/database/database.provider';
 import { LoggingInterceptor } from './presentation/interceptors/LoggingInterceptor';
+import { SyncUsersUseCase } from './application/use-cases/SyncUsersUseCase';
+import { HttpUserSyncGateway } from './infrastructure/repositories/HttpUserSyncGateway';
 
 @Module({
   imports: [
@@ -42,9 +44,14 @@ import { LoggingInterceptor } from './presentation/interceptors/LoggingIntercept
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
     },
+    {
+      provide: 'UserSyncGateway',
+      useClass: HttpUserSyncGateway,
+    },
     LoginUseCase,
     GetUsersUseCase,
     BackendCreateUserUseCase,
+    SyncUsersUseCase,
   ],
 })
 export class AppModule {}
