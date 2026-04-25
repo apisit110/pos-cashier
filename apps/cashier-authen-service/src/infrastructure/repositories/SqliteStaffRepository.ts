@@ -22,6 +22,6 @@ export class SqliteStaffRepository implements StaffRepository {
       return null;
     }
 
-    return new Staff(result.id, result.email, result.name, result.password, result.role as 'admin' | 'cashier');
+    return new Staff(result.id, result.email, result.name, result.password, result.role as 'manager' | 'staff');
   }
 }

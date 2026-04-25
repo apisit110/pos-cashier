@@ -11,7 +11,7 @@ const authRepository = new ApiAuthRepository();
 const loginUseCase = new LoginUseCase(authRepository);
 
 interface LoginPageProps {
-  onLoginSuccess?: (userData: { uid: string; username: string; accessToken: string; refreshToken: string }) => void;
+  onLoginSuccess?: (userData: { uid: string; username: string; role: string; accessToken: string; refreshToken: string }) => void;
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
@@ -39,9 +39,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         onLoginSuccess({ 
           uid: response.user.id, 
           username: response.user.name,
+          role: response.user.role,
           accessToken: response.accessToken,
           refreshToken: response.refreshToken
         });
+
       } else {
         alert(`Welcome, ${response.user.name}!`);
       }

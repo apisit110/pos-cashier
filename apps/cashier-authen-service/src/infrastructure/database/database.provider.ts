@@ -22,13 +22,13 @@ export const DatabaseProvider: Provider = {
       );
     `);
 
-    // Seed data if empty
-    const count = sqlite.prepare('SELECT COUNT(*) as count FROM staff').get() as { count: number };
-    if (count.count === 0) {
-      const insert = sqlite.prepare('INSERT INTO staff (id, email, name, password, role) VALUES (?, ?, ?, ?, ?)');
-      insert.run('staff-67890', 'staff', 'Staff User', 'staff', 'cashier');
-      insert.run('admin-12345', 'admin', 'Admin User', 'admin', 'admin');
-    }
+    // Seed data
+    const insert = sqlite.prepare('INSERT OR REPLACE INTO staff (id, email, name, password, role) VALUES (?, ?, ?, ?, ?)');
+
+    insert.run('staff-67890', 'staff', 'Staff User', 'staff', 'staff');
+    insert.run('manager-12345', 'manager', 'Manager User', 'manager', 'manager');
+
+
 
     return drizzle(sqlite, { schema });
   },

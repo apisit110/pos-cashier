@@ -29,11 +29,12 @@ const syncUseCase = new SyncProductsUseCase(productRepository);
 
 interface CreateOrderPageProps {
   onLogout?: () => void;
-  user: { uid: string; username: string; accessToken: string } | null;
+  user: { uid: string; username: string; role: string; accessToken: string } | null;
 }
 
 export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user }) => {
   const [items, setItems] = useState<OrderItem[]>([]);
+
   const [barcodeInput, setBarcodeInput] = useState('');
   const [memberInput, setMemberInput] = useState('');
   const [member, setMember] = useState<Member | null>(null);
@@ -263,9 +264,13 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
           {user && (
             <div className="user-indicator">
               <span className="user-icon">👤</span>
-              <span className="username">{user.username}</span>
+              <div className="user-details">
+                <span className="username">{user.username}</span>
+                <span className={`role-badge ${user.role}`}>{user.role}</span>
+              </div>
             </div>
           )}
+
           <Button variant="danger" onClick={onLogout}>Logout</Button>
         </div>
       </header>

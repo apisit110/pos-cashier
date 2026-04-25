@@ -1,7 +1,10 @@
+export type UserRole = 'manager' | 'staff';
+
 export interface User {
   id: string;
   email: string;
   name: string;
+  role: UserRole;
 }
 
 export interface AuthResponse {
@@ -9,3 +12,4 @@ export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
 }
+

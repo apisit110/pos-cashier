@@ -28,7 +28,9 @@ export class LoginUseCase {
         id: staff.id,
         email: staff.email,
         name: staff.name,
+        role: staff.role,
       },
+
       accessToken: await this.jwtService.signAsync(payload, { expiresIn: '60m' }),
       refreshToken: await this.jwtService.signAsync(payload, { expiresIn: '30d' }),
     };

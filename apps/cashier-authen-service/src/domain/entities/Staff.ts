@@ -4,6 +4,6 @@ export class Staff {
     public readonly email: string,
     public readonly name: string,
     public readonly password: string,
-    public readonly role: 'admin' | 'cashier',
+    public readonly role: 'manager' | 'staff',
   ) {}
 }

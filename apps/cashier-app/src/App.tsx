@@ -11,7 +11,7 @@ const getSessionUseCase = new GetSessionUseCase(authRepository);
 
 function App() {
   const [currentView, setCurrentView] = useState<'login' | 'create-order'>('login');
-  const [user, setUser] = useState<{ uid: string; username: string; accessToken: string; refreshToken?: string } | null>(null);
+  const [user, setUser] = useState<{ uid: string; username: string; role: string; accessToken: string; refreshToken?: string } | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
@@ -22,6 +22,7 @@ function App() {
           setUser({
             uid: session.user.id,
             username: session.user.name,
+            role: session.user.role,
             accessToken: session.accessToken,
             refreshToken: session.refreshToken
           });
@@ -37,10 +38,11 @@ function App() {
     checkSession();
   }, []);
 
-  const handleLoginSuccess = (userData: { uid: string; username: string; accessToken: string; refreshToken: string }) => {
+  const handleLoginSuccess = (userData: { uid: string; username: string; role: string; accessToken: string; refreshToken: string }) => {
     setUser(userData);
     setCurrentView('create-order');
   };
+
 
   const handleLogout = async () => {
     try {

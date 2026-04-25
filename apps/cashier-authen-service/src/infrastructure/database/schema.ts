@@ -5,5 +5,5 @@ export const staff = sqliteTable('staff', {
   email: text('email').notNull().unique(),
   name: text('name').notNull(),
   password: text('password').notNull(),
-  role: text('role', { enum: ['admin', 'cashier'] }).notNull(),
+  role: text('role', { enum: ['manager', 'staff'] }).notNull(),
 });
