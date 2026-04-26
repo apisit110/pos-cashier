@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UserRepository } from '../../domain/repositories/UserRepository';
+import { UserStatus } from '../../domain/entities/User';
 import type { UserSyncGateway } from '../interfaces/UserSyncGateway';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -31,16 +32,18 @@ export class SyncUsersUseCase {
         if (!syncId) {
           syncId = uuidv4();
           await this.userRepository.updateSyncId(user.id, syncId);
+          // Update the object in memory so we can find it later
+          (user as any).syncId = syncId;
         }
 
         return {
           posTempId: syncId,
-          staffId: user.userId,
+          userId: user.userId,
           fullName: user.fullName,
           pinHash: user.pinHash,
           roleId: user.roleId,
           branchIds: this.ACCESSIBLE_BRANCH_IDS,
-          status: user.status === 'inactive' ? 'inactive' as const : 'active' as const,
+          status: (user.status === UserStatus.INACTIVE ? 'inactive' : 'active') as 'active' | 'inactive',
           originBranchId: this.ORIGIN_BRANCH_ID,
         };
       }));
@@ -49,6 +52,21 @@ export class SyncUsersUseCase {
       const response = await this.userSyncGateway.syncUsers({
         users: syncUsers,
       });
+
+      // 4. Update local status and user IDs based on response
+      for (const result of response.results) {
+        if (result.status === 'synced' || result.status === 'already_synced') {
+          // Find the local user that matches this posTempId (syncId)
+          const userToUpdate = users.find(u => u.syncId === result.posTempId);
+          if (userToUpdate) {
+            await this.userRepository.updateSyncStatus(
+              userToUpdate.id,
+              result.userId || userToUpdate.userId,
+              userToUpdate.status === UserStatus.PENDING_SYNC ? UserStatus.ACTIVE : userToUpdate.status
+            );
+          }
+        }
+      }
 
       return {
         success: true,

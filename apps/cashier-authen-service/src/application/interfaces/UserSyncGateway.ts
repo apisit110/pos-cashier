@@ -1,7 +1,7 @@
 export interface SyncUserRequestDTO {
   users: {
     posTempId: string;
-    staffId: string;
+    userId: string;
     fullName: string;
     pinHash: string;
     roleId: number;
@@ -16,6 +16,7 @@ export interface SyncUserResponseDTO {
   results: {
     posTempId: string;
     globalUserId: string;
+    userId: string;
     status: 'synced' | 'already_synced' | 'error';
   }[];
 }

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import { eq, or } from 'drizzle-orm';
+import { eq, or, and } from 'drizzle-orm';
 import { User, UserStatus } from '../../domain/entities/User';
 import { UserRepository } from '../../domain/repositories/UserRepository';
 import { DATABASE_CONNECTION } from '../database/database.provider';
@@ -70,10 +70,7 @@ export class SqliteUserRepository implements UserRepository {
 
   async findAllToSync(): Promise<User[]> {
     const results = await this.db.query.users.findMany({
-      where: or(
-        eq(schema.users.status, 'pending_sync'),
-        eq(schema.users.status, 'active')
-      ),
+      where: eq(schema.users.status, UserStatus.PENDING_SYNC as any),
     });
 
     return results.map(r => this.mapToEntity(r));
@@ -82,6 +79,16 @@ export class SqliteUserRepository implements UserRepository {
   async updateSyncId(id: number, syncId: string): Promise<void> {
     await this.db.update(schema.users)
       .set({ syncId })
+      .where(eq(schema.users.id, id));
+  }
+
+  async updateSyncStatus(id: number, userId: string, status: string): Promise<void> {
+    await this.db.update(schema.users)
+      .set({ 
+        userId, 
+        status: status as any,
+        updatedAt: new Date()
+      })
       .where(eq(schema.users.id, id));
   }
 

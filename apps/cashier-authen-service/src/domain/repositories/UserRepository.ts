@@ -7,4 +7,5 @@ export abstract class UserRepository {
   abstract create(user: { userId: string; fullName: string; roleId: number; pinHash: string; status: string }): Promise<User>;
   abstract findAllToSync(): Promise<User[]>;
   abstract updateSyncId(id: number, syncId: string): Promise<void>;
+  abstract updateSyncStatus(id: number, userId: string, status: string): Promise<void>;
 }

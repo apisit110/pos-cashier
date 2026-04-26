@@ -20,7 +20,7 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   const generateUserId = () => {
-    const id = `U${Date.now().toString().slice(-6)}`;
+    const id = `TEMP_${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
     setUserId(id);
   };
 
