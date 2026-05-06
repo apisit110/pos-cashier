@@ -72,3 +72,16 @@ set up
   - default user
 - sync product (download)
 - create user role staff
+
+```bash
+# remove drizzle folder and generate again
+rm -rf apps/*/drizzle
+
+pnpm --filter cashier-payment-service exec drizzle-kit generate
+pnpm --filter cashier-authen-service exec drizzle-kit generate
+pnpm --filter cashier-products-service exec drizzle-kit generate
+pnpm --filter cashier-members-service exec drizzle-kit generate
+pnpm --filter cashier-transactions-service exec drizzle-kit generate
+pnpm --filter cashier-orders-service exec drizzle-kit generate
+pnpm run dev
+```
