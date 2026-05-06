@@ -5,6 +5,6 @@ export default defineConfig({
   out: './drizzle',
   dialect: 'sqlite',
   dbCredentials: {
-    url: './cashier-products-service.db',
+    url: './cashier-transactions-service.db',
   },
 });

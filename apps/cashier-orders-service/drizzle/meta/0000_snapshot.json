@@ -1,29 +1,36 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "3273844c-44b6-4781-9d11-771d2abd8cb6",
+  "id": "3b843d42-9ad9-4a55-bf61-a31f9be80474",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "products": {
-      "name": "products",
+    "order_items": {
+      "name": "order_items",
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": true
         },
-        "barcode": {
-          "name": "barcode",
+        "order_id": {
+          "name": "order_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "name": {
-          "name": "name",
+        "product_id": {
+          "name": "product_id",
           "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -34,45 +41,30 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "image_url": {
-          "name": "image_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "unit_name": {
-          "name": "unit_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "brand": {
-          "name": "brand",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
         }
       },
-      "indexes": {
-        "products_barcode_unique": {
-          "name": "products_barcode_unique",
-          "columns": [
-            "barcode"
+      "indexes": {},
+      "foreignKeys": {
+        "order_items_order_id_orders_id_fk": {
+          "name": "order_items_order_id_orders_id_fk",
+          "tableFrom": "order_items",
+          "tableTo": "orders",
+          "columnsFrom": [
+            "order_id"
           ],
-          "isUnique": true
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
-      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "sync_metadata": {
-      "name": "sync_metadata",
+    "orders": {
+      "name": "orders",
       "columns": {
         "id": {
           "name": "id",
@@ -81,13 +73,26 @@
           "notNull": true,
           "autoincrement": false
         },
-        "last_product_sync_version": {
-          "name": "last_product_sync_version",
-          "type": "integer",
+        "total_amount": {
+          "name": "total_amount",
+          "type": "real",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
-          "default": 0
+          "autoincrement": false
+        },
+        "staff_id": {
+          "name": "staff_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "member_id": {
+          "name": "member_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         },
         "status": {
           "name": "status",
@@ -95,11 +100,11 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'IDLE'"
+          "default": "'PENDING'"
         },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "text",
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
