@@ -15,10 +15,20 @@ export const DatabaseProvider: Provider = {
     const db = drizzle(sqlite, { schema });
 
     // Initialize schema using migrations
-    // Note: migrationsFolder should point to where drizzle-kit generates the migrations
     migrate(db, { 
       migrationsFolder: join(process.cwd(), 'drizzle') 
     });
+
+    // Seed data if empty
+    const count = sqlite.prepare('SELECT COUNT(*) as count FROM products').get() as { count: number };
+    if (count.count === 0) {
+      const insert = sqlite.prepare('INSERT INTO products (id, barcode, name, price, unit_name) VALUES (?, ?, ?, ?, ?)');
+      insert.run('P001', '1234567890', 'Coca Cola', 15, 'can');
+      insert.run('P002', '2345678901', 'Pepsi', 15, 'can');
+      insert.run('P003', '3456789012', 'Water Bottle', 7, 'bottle');
+      insert.run('P004', '4567890123', 'Lays Chips', 20, 'bag');
+      insert.run('P005', '5678901234', 'KitKat', 12, 'bar');
+    }
 
     return db;
   },
