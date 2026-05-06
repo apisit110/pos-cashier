@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import './CreateOrderPage.css';
+import styled, { keyframes, css } from 'styled-components';
 import { InputField } from '../../components/InputField';
 import { Button } from '../../components/Button';
 import { ApiProductRepository } from '../../../data/repositories/ApiProductRepository';
@@ -12,6 +12,320 @@ import { Member } from '../../../domain/entities/Member';
 import { IdentifyMemberUseCase } from '../../../application/use-cases/IdentifyMemberUseCase';
 import type { PromotionResult } from '../../../application/use-cases/CalculatePromotionUseCase';
 import { PaymentModal } from '../../components/PaymentModal';
+
+// Styled Components
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: ${({ theme }) => theme.semantics.colors.bg.main};
+  color: ${({ theme }) => theme.semantics.colors.text.primary};
+`;
+
+const Header = styled.header`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+  background: ${({ theme }) => theme.semantics.colors.bg.main};
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      letter-spacing: -0.5px;
+      font-weight: 600;
+    }
+  }
+`;
+
+const UserIndicator = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  background: ${({ theme }) => theme.semantics.colors.bg.card};
+  border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+  border-radius: ${({ theme }) => theme.borderRadius.xl};
+  font-size: 0.875rem;
+
+  .user-icon {
+    font-size: 1rem;
+  }
+
+  .user-details {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+
+  .username {
+    font-weight: 600;
+    color: ${({ theme }) => theme.semantics.colors.accent.primary};
+  }
+
+  .role-badge {
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    
+    &.manager {
+      color: ${({ theme }) => theme.semantics.colors.accent.primary};
+    }
+    
+    &.cashier {
+      color: ${({ theme }) => theme.semantics.colors.text.secondary};
+    }
+  }
+`;
+
+const Main = styled.main`
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+`;
+
+const ScannerPanel = styled.aside`
+  width: 350px;
+  border-right: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background: linear-gradient(to bottom, ${({ theme }) => theme.semantics.colors.bg.main} 0%, rgba(99, 102, 241, 0.05) 100%);
+
+  h3 {
+    color: ${({ theme }) => theme.semantics.colors.text.primary};
+    font-size: 0.875rem;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
+  }
+`;
+
+const MemberSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+`;
+
+const MemberCard = styled.div`
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid ${({ theme }) => theme.semantics.colors.accent.primary};
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .member-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .member-name {
+    font-weight: 600;
+  }
+
+  .member-sub-info {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .member-points {
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: ${({ theme }) => theme.semantics.colors.bg.main};
+    padding: 0.125rem 0.5rem;
+    border-radius: 4px;
+    color: ${({ theme }) => theme.semantics.colors.accent.primary};
+  }
+
+  .remove-btn {
+    background: none;
+    border: none;
+    color: ${({ theme }) => theme.semantics.colors.text.secondary};
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 4px;
+    &:hover { color: ${({ theme }) => theme.semantics.colors.text.error}; }
+  }
+`;
+
+const ScannerSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const ScannerBox = styled.div<{ $isScanning?: boolean }>`
+  background: ${({ theme }) => theme.semantics.colors.bg.card};
+  border: 1px dashed ${({ theme }) => theme.semantics.colors.border.subtle};
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  padding: 2rem 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  transition: ${({ theme }) => theme.transitions.default};
+
+  ${({ $isScanning, theme }) => $isScanning && css`
+    border-color: ${theme.semantics.colors.accent.primary};
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+  `}
+
+  svg {
+    width: 48px;
+    height: 48px;
+    color: ${({ theme }) => theme.semantics.colors.accent.primary};
+    opacity: 0.8;
+  }
+
+  p {
+    color: ${({ theme }) => theme.semantics.colors.text.secondary};
+    font-size: 0.875rem;
+  }
+`;
+
+const TablePanel = styled.section`
+  flex: 1;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  background: ${({ theme }) => theme.semantics.colors.bg.main};
+  overflow-y: auto;
+
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .item-count {
+      font-size: 0.875rem;
+      color: ${({ theme }) => theme.semantics.colors.text.secondary};
+    }
+  }
+`;
+
+const TableWrapper = styled.div`
+  background: ${({ theme }) => theme.semantics.colors.bg.card};
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+  overflow: hidden;
+`;
+
+const Table = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+
+  th, td {
+    padding: 1rem;
+    border-bottom: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+  }
+
+  th {
+    font-weight: 500;
+    color: ${({ theme }) => theme.semantics.colors.text.secondary};
+    background: rgba(255, 255, 255, 0.02);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+
+  td {
+    color: ${({ theme }) => theme.semantics.colors.text.primary};
+    font-size: 0.875rem;
+    vertical-align: middle;
+  }
+
+  .product-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 500;
+  }
+
+  .number-col {
+    text-align: right;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+`;
+
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 4rem 1.5rem;
+  color: ${({ theme }) => theme.semantics.colors.text.secondary};
+
+  svg {
+    width: 48px;
+    height: 48px;
+    color: ${({ theme }) => theme.semantics.colors.border.subtle};
+    margin-bottom: 1rem;
+  }
+`;
+
+const OrderSummary = styled.div`
+  margin-top: 1.5rem;
+  border-top: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+  padding-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 300px;
+  align-self: flex-end;
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1rem;
+    color: ${({ theme }) => theme.semantics.colors.text.secondary};
+
+    &.total {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: ${({ theme }) => theme.semantics.colors.text.primary};
+      border-top: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+      padding-top: 0.75rem;
+      margin-top: 0.25rem;
+    }
+  }
+`;
+
+const SyncBadge = styled.span`
+  font-size: 0.8125rem;
+  color: #10b981;
+  font-weight: 500;
+  background: rgba(16, 185, 129, 0.1);
+  padding: 0.375rem 0.75rem;
+  border-radius: 20px;
+  animation: ${fadeIn} 0.3s ease-out;
+`;
 
 interface OrderItem {
   product: Product;
@@ -34,7 +348,6 @@ interface CreateOrderPageProps {
 
 export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user }) => {
   const [items, setItems] = useState<OrderItem[]>([]);
-
   const [barcodeInput, setBarcodeInput] = useState('');
   const [memberInput, setMemberInput] = useState('');
   const [member, setMember] = useState<Member | null>(null);
@@ -49,15 +362,12 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
   const inputRef = useRef<HTMLInputElement>(null);
   const memberInputRef = useRef<HTMLInputElement>(null);
 
-  // Recalculate promotions whenever items or member changes (via API)
   useEffect(() => {
     if (items.length === 0) {
       setPromotionResult(null);
       return;
     }
 
-    const abortController = new AbortController();
-    
     const calculate = async () => {
       try {
         const itemDtos = items.map(i => ({
@@ -65,7 +375,6 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
           quantity: i.quantity,
           price: i.product.price
         }));
-        
         const result = await orderRepository.calculatePromotions(itemDtos, member?.id);
         setPromotionResult(result);
       } catch (err) {
@@ -74,46 +383,31 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
     };
 
     calculate();
-    return () => abortController.abort();
   }, [items, member]);
 
-  // Focus the scanner input on mount to be ready for physical scanners
   useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
+    if (inputRef.current) inputRef.current.focus();
   }, []);
 
   const performScan = async (barcode: string) => {
     if (!barcode.trim()) return;
-
     setIsScanning(true);
     setError(null);
-
     try {
       const product = await scanUseCase.execute(barcode.trim());
-      
       setItems((prev) => {
         const existingItem = prev.find(i => i.product.id === product.id);
         if (existingItem) {
-          return prev.map(i => 
-            i.product.id === product.id 
-              ? { ...i, quantity: i.quantity + 1 } 
-              : i
-          );
+          return prev.map(i => i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i);
         }
         return [...prev, { product, quantity: 1 }];
       });
-      
       setBarcodeInput('');
     } catch (err: any) {
       setError(err.message || 'Product not found.');
     } finally {
       setIsScanning(false);
-      // Try to re-focus the manual input for convenience
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
+      if (inputRef.current) inputRef.current.focus();
     }
   };
 
@@ -122,56 +416,33 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
     await performScan(barcodeInput);
   };
 
-  // Global Barcode Scanner Listener
   useEffect(() => {
     let buffer = '';
     let lastKeyTime = Date.now();
-
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      // Don't intercept if focus is in an input field (optional, but safer for manual entry)
-      // However, if we want "Zero Focus" scanning, we should allow it if document.activeElement is body
-      // or if it's not the Member ID input.
       const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' && target !== inputRef.current) {
-        // If focused on another input (like Member ID), don't steal the input
-        return;
-      }
-
-      // If a modal is open, don't scan
+      if (target.tagName === 'INPUT' && target !== inputRef.current) return;
       if (isPaymentModalOpen) return;
-
       const currentTime = Date.now();
-      
-      // If interval between keys > 50ms, it's likely human typing, so reset buffer
-      // Scanners usually send characters within 1-10ms of each other
-      if (currentTime - lastKeyTime > 50) {
-        buffer = '';
-      }
-      
+      if (currentTime - lastKeyTime > 50) buffer = '';
       lastKeyTime = currentTime;
-
       if (e.key === 'Enter') {
         if (buffer.length >= 3) {
           e.preventDefault();
           performScan(buffer);
           buffer = '';
         }
-      } else if (e.key.length === 1) {
-        buffer += e.key;
-      }
+      } else if (e.key.length === 1) buffer += e.key;
     };
-
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [items, isPaymentModalOpen]); // Dependencies ensure we have latest state access
+  }, [items, isPaymentModalOpen]);
 
   const handleIdentifyMember = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!memberInput.trim()) return;
-
     setIsIdentifyingMember(true);
     setError(null);
-
     try {
       const foundMember = await identifyMemberUseCase.execute(memberInput.trim());
       if (foundMember) {
@@ -187,16 +458,9 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
     }
   };
 
-  const handleRemoveMember = () => {
-    setMember(null);
-  };
-
-  const handleRemove = (productId: string) => {
-    setItems((prev) => prev.filter(i => i.product.id !== productId));
-  };
-
+  const handleRemoveMember = () => setMember(null);
+  const handleRemove = (productId: string) => setItems((prev) => prev.filter(i => i.product.id !== productId));
   const handlePaymentSuccess = () => {
-    // Reset order
     setItems([]);
     setMember(null);
     setPromotionResult(null);
@@ -210,7 +474,6 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
       quantity: i.quantity,
       price: i.product.price
     }));
-
     return await orderRepository.checkout({
       items: itemDtos,
       memberId: member?.id,
@@ -223,16 +486,12 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
     setIsSyncing(true);
     setError(null);
     setSyncMessage(null);
-
     try {
       const result = await syncUseCase.execute();
       if (result.success) {
         setSyncMessage(`Sync successful! ${result.count} products updated.`);
-        // Auto-clear message after 3 seconds
         setTimeout(() => setSyncMessage(null), 3000);
-      } else {
-        setError('Sync failed.');
-      }
+      } else setError('Sync failed.');
     } catch (err: any) {
       setError(err.message || 'Error during sync.');
     } finally {
@@ -243,54 +502,48 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
   const total = promotionResult?.finalTotal ?? items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
 
   return (
-    <div className="create-order-container">
-      <header className="create-order-header">
+    <Container>
+      <Header>
         <div className="brand">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
           </svg>
           <h2>Lightning POS</h2>
         </div>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          {syncMessage && <span className="sync-success-msg">{syncMessage}</span>}
-          <Button 
-            variant="secondary" 
-            onClick={handleSync} 
-            isLoading={isSyncing}
-            disabled={isSyncing}
-          >
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          {syncMessage && <SyncBadge>{syncMessage}</SyncBadge>}
+          <Button variant="secondary" onClick={handleSync} isLoading={isSyncing} disabled={isSyncing} style={{ width: 'auto' }}>
             Sync Products
           </Button>
           {user && (
-            <div className="user-indicator">
+            <UserIndicator>
               <span className="user-icon">👤</span>
               <div className="user-details">
                 <span className="username">{user.username}</span>
                 <span className={`role-badge ${user.role}`}>{user.role}</span>
               </div>
-            </div>
+            </UserIndicator>
           )}
-
-          <Button variant="danger" onClick={onLogout}>Logout</Button>
+          <Button variant="danger" onClick={onLogout} style={{ width: 'auto' }}>Logout</Button>
         </div>
-      </header>
+      </Header>
 
-      <main className="order-main">
-        <aside className="order-scanner-panel">
-          <div className="member-section">
+      <Main>
+        <ScannerPanel>
+          <MemberSection>
             <h3>Member</h3>
             {member ? (
-              <div className="member-card">
+              <MemberCard>
                 <div className="member-info">
                   <span className="member-name">{member.fullName}</span>
                   <div className="member-sub-info">
                     <span className="member-points">{member.points} points</span>
                   </div>
                 </div>
-                <button className="remove-member-btn" onClick={handleRemoveMember}>&times;</button>
-              </div>
+                <button className="remove-btn" onClick={handleRemoveMember}>&times;</button>
+              </MemberCard>
             ) : (
-              <form onSubmit={handleIdentifyMember} className="member-entry">
+              <form onSubmit={handleIdentifyMember}>
                 <InputField
                   label="Member ID"
                   value={memberInput}
@@ -299,17 +552,16 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
                   disabled={isIdentifyingMember}
                   ref={memberInputRef}
                 />
-                <Button type="submit" isLoading={isIdentifyingMember} style={{ marginTop: '8px' }}>
+                <Button type="submit" isLoading={isIdentifyingMember} style={{ marginTop: '0.5rem' }}>
                   Identify
                 </Button>
               </form>
             )}
-          </div>
+          </MemberSection>
 
-            <div className="scanner-section">
-              <h3>Scan Product</h3>
-              
-              <div className={`scanner-box ${isScanning ? 'scanning' : ''}`}>
+          <ScannerSection>
+            <h3>Scan Product</h3>
+            <ScannerBox $isScanning={isScanning}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
                 <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
@@ -320,38 +572,36 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
                 <path d="M16 7v10"></path>
               </svg>
               <p>Ready to scan barcode...</p>
-            </div>
+            </ScannerBox>
 
-            <div className="manual-entry">
-              <form onSubmit={handleScan}>
-                <InputField
-                  label="Manual Barcode Entry"
-                  value={barcodeInput}
-                  onChange={(e) => setBarcodeInput(e.target.value)}
+            <form onSubmit={handleScan}>
+              <InputField
+                label="Manual Barcode Entry"
+                value={barcodeInput}
+                onChange={(e) => setBarcodeInput(e.target.value)}
                 placeholder="Enter barcode (e.g. 8850123456789)"
-                  disabled={isScanning}
-                  ref={inputRef}
-                />
-              {error && <span style={{ color: '#ef4444', fontSize: '14px' }}>{error}</span>}
-                <Button type="submit" isLoading={isScanning} style={{ width: '100%', marginTop: '8px' }}>
-                  Add Product
-                </Button>
-              </form>
-            <div style={{ marginTop: '16px', fontSize: '12px', color: 'var(--text)' }}>
-              <i>Hint: Use demo barcode <strong>8850123456789</strong> or <strong>1234567890123</strong></i>
+                disabled={isScanning}
+                ref={inputRef}
+              />
+              {error && <span style={{ color: '#ef4444', fontSize: '0.875rem' }}>{error}</span>}
+              <Button type="submit" isLoading={isScanning} style={{ marginTop: '0.5rem' }}>
+                Add Product
+              </Button>
+            </form>
+            <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: '#94a3b8', fontStyle: 'italic' }}>
+              Hint: Use demo barcode <strong>8850123456789</strong> or <strong>1234567890123</strong>
             </div>
-            </div>
-          </div>
-        </aside>
+          </ScannerSection>
+        </ScannerPanel>
 
-        <section className="order-table-panel">
+        <TablePanel>
           <div className="table-header">
             <h3>Current Order</h3>
             <span className="item-count">{items.length} items</span>
           </div>
 
-          <div className="data-table-wrapper">
-            <table className="data-table">
+          <TableWrapper>
+            <Table>
               <thead>
                 <tr>
                   <th>Product</th>
@@ -366,38 +616,33 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
                 {items.length === 0 ? (
                   <tr>
                     <td colSpan={6}>
-                      <div className="empty-state">
+                      <EmptyState>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                           <circle cx="9" cy="21" r="1"></circle>
                           <circle cx="20" cy="21" r="1"></circle>
                           <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                         </svg>
                         <p>No products added yet. Scan a product to begin.</p>
-                      </div>
+                      </EmptyState>
                     </td>
                   </tr>
                 ) : (
                   items.map((item) => (
                     <tr key={item.product.id}>
                       <td className="product-cell">
-                        <div style={{ width: 40, height: 40, background: 'var(--accent-bg)', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)' }}>
+                        <div style={{ width: 40, height: 40, background: 'rgba(99, 102, 241, 0.1)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6366f1' }}>
                           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
                         </div>
                         {item.product.name}
                       </td>
-                      <td><code>{item.product.barcode}</code></td>
+                      <td><code style={{ background: 'rgba(255,255,255,0.05)', padding: '2px 4px', borderRadius: 4 }}>{item.product.barcode}</code></td>
                       <td className="number-col">${item.product.price.toFixed(2)}</td>
-                      <td className="number-col">
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 20, padding: '4px 12px' }}>
-                          <span>{item.quantity}</span>
-                        </div>
-                      </td>
-                      <td className="number-col font-medium text-h">${(item.product.price * item.quantity).toFixed(2)}</td>
+                      <td className="number-col">{item.quantity}</td>
+                      <td className="number-col" style={{ fontWeight: 600 }}>${(item.product.price * item.quantity).toFixed(2)}</td>
                       <td style={{ textAlign: 'right' }}>
                         <button 
                           onClick={() => handleRemove(item.product.id)}
                           style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: 8 }}
-                          title="Remove item"
                         >
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                         </button>
@@ -406,29 +651,28 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
                   ))
                 )}
               </tbody>
-            </table>
-          </div>
+            </Table>
+          </TableWrapper>
 
-          <div className="order-summary">
+          <OrderSummary>
             <div className="summary-row">
               <span>Promo</span>
-              <span></span>
+              <span>-</span>
             </div>
             <div className="summary-row total">
               <span>Total</span>
               <span>${total.toFixed(2)}</span>
             </div>
             <Button 
-              className="checkout-btn" 
-              style={{ height: 48, fontSize: 16 }}
               disabled={items.length === 0}
               onClick={() => setIsPaymentModalOpen(true)}
+              style={{ height: 48, fontSize: '1rem' }}
             >
               Proceed to Payment
             </Button>
-          </div>
-        </section>
-      </main>
+          </OrderSummary>
+        </TablePanel>
+      </Main>
 
       <PaymentModal 
         isOpen={isPaymentModalOpen}
@@ -437,6 +681,6 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
         onPaymentSuccess={handlePaymentSuccess}
         onProcessPayment={handleProcessPayment}
       />
-    </div>
+    </Container>
   );
 };

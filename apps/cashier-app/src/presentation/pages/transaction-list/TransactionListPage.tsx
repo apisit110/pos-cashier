@@ -1,7 +1,152 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import './TransactionListPage.css';
+import styled, { keyframes } from 'styled-components';
 import type { GetTransactionsUseCase } from '../../../application/use-cases/GetTransactionsUseCase';
 import type { Transaction } from '../../../domain/repositories/TransactionRepository';
+
+const spin = keyframes`
+  to { transform: rotate(360deg); }
+`;
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: ${({ theme }) => theme.semantics.colors.bg.main};
+  color: ${({ theme }) => theme.semantics.colors.text.primary};
+  padding: 2rem;
+`;
+
+const Header = styled.header`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    h2 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+  }
+
+  .total-count {
+    font-size: 0.875rem;
+    color: ${({ theme }) => theme.semantics.colors.text.secondary};
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+  }
+`;
+
+const BackButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: ${({ theme }) => theme.semantics.colors.text.secondary};
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: ${({ theme }) => theme.transitions.default};
+
+  &:hover { color: ${({ theme }) => theme.semantics.colors.text.primary}; }
+  svg { width: 20px; height: 20px; }
+`;
+
+const Content = styled.main`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+`;
+
+const TableWrapper = styled.div`
+  background: ${({ theme }) => theme.semantics.colors.bg.card};
+  border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+  border-radius: ${({ theme }) => theme.borderRadius.xl};
+  overflow: hidden;
+`;
+
+const Table = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+
+  th, td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+  }
+
+  th {
+    background: rgba(255, 255, 255, 0.02);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: ${({ theme }) => theme.semantics.colors.text.secondary};
+  }
+
+  td { font-size: 0.875rem; }
+
+  tr:last-child td { border-bottom: none; }
+`;
+
+const MethodBadge = styled.span`
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: rgba(99, 102, 241, 0.1);
+  color: #818cf8;
+`;
+
+const StatusBadge = styled.span<{ $status: string }>`
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: ${({ $status }) => $status === 'SUCCESS' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'};
+  color: ${({ $status }) => $status === 'SUCCESS' ? '#22c55e' : '#ef4444'};
+`;
+
+const Pagination = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+
+  button {
+    background: ${({ theme }) => theme.semantics.colors.bg.card};
+    border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+    color: ${({ theme }) => theme.semantics.colors.text.primary};
+    padding: 0.5rem 1rem;
+    border-radius: ${({ theme }) => theme.borderRadius.md};
+    cursor: pointer;
+    transition: ${({ theme }) => theme.transitions.default};
+
+    &:hover:not(:disabled) { border-color: ${({ theme }) => theme.semantics.colors.accent.primary}; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+
+  .page-info { font-size: 0.875rem; color: ${({ theme }) => theme.semantics.colors.text.secondary}; }
+`;
+
+const Loader = styled.div`
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top-color: ${({ theme }) => theme.semantics.colors.accent.primary};
+  border-radius: 50%;
+  animation: ${spin} 1s linear infinite;
+  display: inline-block;
+  margin-right: 0.75rem;
+  vertical-align: middle;
+`;
 
 interface TransactionListPageProps {
   onBack: () => void;
@@ -28,33 +173,31 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
     }
   }, [getTransactionsUseCase, currentPage, limit]);
 
-  useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
+  useEffect(() => { fetchTransactions(); }, [fetchTransactions]);
 
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className="transaction-list-container">
-      <header className="transaction-list-header">
+    <Container>
+      <Header>
         <div className="header-left">
-          <button className="back-button" onClick={onBack}>
+          <BackButton onClick={onBack}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="19" y1="12" x2="5" y2="12" />
               <polyline points="12 19 5 12 12 5" />
             </svg>
             Back to Dashboard
-          </button>
+          </BackButton>
           <h2>Transactions History</h2>
         </div>
         <div className="header-right">
           <span className="total-count">Total: {total} Transactions</span>
         </div>
-      </header>
+      </Header>
 
-      <main className="transaction-list-content">
-        <div className="table-container">
-          <table className="transaction-table">
+      <Content>
+        <TableWrapper>
+          <Table>
             <thead>
               <tr>
                 <th>Order No.</th>
@@ -68,41 +211,40 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="loading-cell">
-                    <div className="table-loader"></div>
+                  <td colSpan={6} style={{ textAlign: 'center', padding: '3rem' }}>
+                    <Loader />
                     Loading transactions...
                   </td>
                 </tr>
               ) : transactions.length > 0 ? (
                 transactions.map((tx) => (
                   <tr key={tx.id}>
-                    <td className="orderNo-cell">{tx.orderNumber}</td>
-                    <td className="date-cell">{new Date(tx.createdAt).toLocaleString()}</td>
-                    <td className="staff-cell">{tx.staffName}</td>
-                    <td className="method-cell">
-                      <span className={`method-badge ${tx.paymentMethod}`}>
+                    <td style={{ fontFamily: 'monospace', fontWeight: 600 }}>{tx.orderNumber}</td>
+                    <td>{new Date(tx.createdAt).toLocaleString()}</td>
+                    <td>{tx.staffName}</td>
+                    <td>
+                      <MethodBadge>
                         {tx.paymentMethod.replace('_', ' ')}
-                      </span>
+                      </MethodBadge>
                     </td>
-                    <td className="amount-cell">฿{tx.amount.toFixed(2)}</td>
-                    <td className="status-cell">
-                      <span className={`status-badge ${tx.status}`}>{tx.status}</span>
+                    <td style={{ fontWeight: 700 }}>฿{tx.amount.toFixed(2)}</td>
+                    <td>
+                      <StatusBadge $status={tx.status}>{tx.status}</StatusBadge>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="empty-cell">No transactions found.</td>
+                  <td colSpan={6} style={{ textAlign: 'center', padding: '3rem', color: '#94a3b8' }}>No transactions found.</td>
                 </tr>
               )}
             </tbody>
-          </table>
-        </div>
+          </Table>
+        </TableWrapper>
 
         {totalPages > 1 && (
-          <div className="pagination">
+          <Pagination>
             <button 
-              className="page-btn" 
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1 || isLoading}
             >
@@ -112,15 +254,14 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
               Page {currentPage} of {totalPages}
             </div>
             <button 
-              className="page-btn" 
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages || isLoading}
             >
               Next
             </button>
-          </div>
+          </Pagination>
         )}
-      </main>
-    </div>
+      </Content>
+    </Container>
   );
 };

@@ -35,3 +35,40 @@
 
 - **Normal:** ขายจบ -> บันทึก Local -> ยิง API -> Server ตอบ OK -> เปลี่ยนสถานะเป็น Synced (ใช้เวลา < 1 วินาที)
 - **Offline:** ขายจบ -> บันทึก Local -> ยิง API (Fail) -> เก็บใน Queue -> (1 ชั่วโมงผ่านไป) -> เน็ตกลับมา -> Background Task ตรวจพบ -> ยิง API ซ้ำ -> Server ตอบ OK -> เปลี่ยนสถานะเป็น Synced
+
+[ ] - sync fail
+
+[ ] - users
+[ ] - transactions
+[ ] - products
+[ ] - promotions
+
+pin_hash ยังไม่ได้ hash
+
+1. center
+
+- ระบบกลางมีหลาย merchant
+- หนึ่ง merchant มีหลาย product
+- หนึ่ง merchant มีหลาย พนักงาน
+- หนึ่ง merchant มีหลาย store
+- หนึ่ง store มีหลาย สินค้า
+
+set up
+
+- สร้าง merchant
+- สร้าง product ใน merchant นั้นๆ
+- สร้าง store
+- map merchant กับ product
+
+หลังจากสร้าง store ต้อง generate secret key ใช้สำหรับ encrypt หรือ verify signature ของ store นั้นๆ
+
+2. cashier
+
+set up
+
+- set env & initial
+  - merchant
+  - store
+  - default user
+- sync product (download)
+- create user role staff

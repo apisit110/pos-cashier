@@ -1,9 +1,187 @@
 import React, { useState, useEffect } from 'react';
-import './CreateUserPage.css';
+import styled, { keyframes, css } from 'styled-components';
 import { Button } from '../../components/Button';
 import { PinInput } from '../../components/PinInput';
 import type { CreateUserUseCase } from '../../../application/use-cases/CreateUserUseCase';
 import type { SyncUserUseCase } from '../../../application/use-cases/SyncUserUseCase';
+
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: ${({ theme }) => theme.semantics.colors.bg.main};
+  color: ${({ theme }) => theme.semantics.colors.text.primary};
+  padding: 2rem;
+`;
+
+const Header = styled.header`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+
+    h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+  }
+`;
+
+const BackButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: ${({ theme }) => theme.semantics.colors.text.secondary};
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: ${({ theme }) => theme.transitions.default};
+
+  &:hover {
+    color: ${({ theme }) => theme.semantics.colors.text.primary};
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
+const FormContent = styled.main`
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background: ${({ theme }) => theme.semantics.colors.bg.card};
+  padding: 2rem;
+  border-radius: ${({ theme }) => theme.borderRadius.xxl};
+  border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+`;
+
+const FormGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: ${({ theme }) => theme.semantics.colors.text.secondary};
+  }
+
+  input[type="text"] {
+    padding: 0.75rem 1rem;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+    border-radius: ${({ theme }) => theme.borderRadius.lg};
+    color: ${({ theme }) => theme.semantics.colors.text.primary};
+    outline: none;
+    transition: ${({ theme }) => theme.transitions.default};
+
+    &:focus {
+      border-color: ${({ theme }) => theme.semantics.colors.accent.primary};
+      background: rgba(15, 23, 42, 0.8);
+    }
+  }
+`;
+
+const UserIdGroup = styled.div`
+  display: flex;
+  gap: 0.5rem;
+
+  input { flex: 1; }
+
+  .regenerate-button {
+    background: ${({ theme }) => theme.semantics.colors.bg.card};
+    border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+    border-radius: ${({ theme }) => theme.borderRadius.lg};
+    color: ${({ theme }) => theme.semantics.colors.text.secondary};
+    padding: 0 0.75rem;
+    cursor: pointer;
+    transition: ${({ theme }) => theme.transitions.default};
+
+    &:hover {
+      border-color: ${({ theme }) => theme.semantics.colors.accent.primary};
+      color: ${({ theme }) => theme.semantics.colors.text.primary};
+    }
+
+    svg { width: 18px; height: 18px; }
+  }
+`;
+
+const RoleOptions = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+`;
+
+const RoleOption = styled.label<{ $selected?: boolean }>`
+  cursor: pointer;
+  
+  input { display: none; }
+
+  .role-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+    border-radius: ${({ theme }) => theme.borderRadius.lg};
+    transition: ${({ theme }) => theme.transitions.default};
+
+    .role-icon { font-size: 1.5rem; }
+
+    .role-info {
+      display: flex;
+      flex-direction: column;
+      .role-name { font-weight: 600; }
+      .role-desc { font-size: 0.75rem; color: ${({ theme }) => theme.semantics.colors.text.secondary}; }
+    }
+  }
+
+  ${({ $selected, theme }) => $selected && css`
+    .role-card {
+      background: rgba(99, 102, 241, 0.1);
+      border-color: ${theme.semantics.colors.accent.primary};
+    }
+  `}
+
+  &:hover .role-card {
+    border-color: ${({ theme }) => theme.semantics.colors.accent.primary};
+  }
+`;
+
+const StatusMessage = styled.div<{ $type: 'success' | 'error' }>`
+  margin-top: 2rem;
+  padding: 1rem 1.5rem;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  font-weight: 500;
+  animation: ${fadeIn} 0.3s ease;
+  background-color: ${({ $type }) => $type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'};
+  color: ${({ $type }) => $type === 'success' ? '#16a34a' : '#dc2626'};
+  border: 1px solid ${({ $type }) => $type === 'success' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
+`;
 
 interface CreateUserPageProps {
   onBack: () => void;
@@ -15,7 +193,7 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
   const [fullName, setFullName] = useState('');
   const [userId, setUserId] = useState('');
   const [pin, setPin] = useState('');
-  const [roleId, setRoleId] = useState(2); // Default to Cashier
+  const [roleId, setRoleId] = useState(2);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
@@ -24,9 +202,7 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
     setUserId(id);
   };
 
-  useEffect(() => {
-    generateUserId();
-  }, []);
+  useEffect(() => { generateUserId(); }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +210,6 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
       setMessage({ text: 'Please enter a full name', type: 'error' });
       return;
     }
-
     if (!pin.trim() || pin.length < 4) {
       setMessage({ text: 'Please enter a valid PIN (at least 4 digits)', type: 'error' });
       return;
@@ -42,22 +217,14 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
 
     setIsLoading(true);
     setMessage(null);
-
     try {
-      // 1. Create User (Saves to local/mock repo)
       const newUser = await createUserUseCase.execute({ fullName, roleId, userId, pin });
-      
-      // 2. Sync User (Calls mock sync)
       await syncUserUseCase.execute();
-
       setMessage({ 
         text: `User "${newUser.fullName}" created successfully! User ID: ${newUser.userId}. Data synced to cloud.`, 
         type: 'success' 
       });
-      setFullName('');
-      setPin('');
-      setRoleId(2);
-      generateUserId(); // Generate next ID
+      setFullName(''); setPin(''); setRoleId(2); generateUserId();
     } catch (err: any) {
       setMessage({ text: err.message || 'Failed to create user', type: 'error' });
     } finally {
@@ -66,25 +233,25 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
   };
 
   return (
-    <div className="create-user-container">
-      <header className="create-user-header">
+    <Container>
+      <Header>
         <div className="header-left">
-          <button className="back-button" onClick={onBack}>
+          <BackButton onClick={onBack}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="19" y1="12" x2="5" y2="12" />
               <polyline points="12 19 5 12 12 5" />
             </svg>
             Back to Dashboard
-          </button>
+          </BackButton>
           <h2>Create New User</h2>
         </div>
-      </header>
+      </Header>
 
-      <main className="create-user-content">
-        <form className="create-user-form" onSubmit={handleSubmit}>
-          <div className="form-group">
+      <FormContent>
+        <Form onSubmit={handleSubmit}>
+          <FormGroup>
             <label htmlFor="userId">User ID (Generated)</label>
-            <div className="user-id-input-group">
+            <UserIdGroup>
               <input
                 id="userId"
                 type="text"
@@ -99,17 +266,16 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
                 className="regenerate-button" 
                 onClick={generateUserId}
                 disabled={isLoading}
-                title="Regenerate ID"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M23 4v6h-6" />
                   <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
                 </svg>
               </button>
-            </div>
-          </div>
+            </UserIdGroup>
+          </FormGroup>
 
-          <div className="form-group">
+          <FormGroup>
             <label htmlFor="fullName">Full Name</label>
             <input
               id="fullName"
@@ -120,9 +286,9 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
               disabled={isLoading}
               required
             />
-          </div>
+          </FormGroup>
 
-          <div className="form-group">
+          <FormGroup>
             <label>PIN Code (6 digits)</label>
             <PinInput
               length={6}
@@ -130,12 +296,12 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
               onChange={setPin}
               disabled={isLoading}
             />
-          </div>
+          </FormGroup>
 
-          <div className="form-group">
+          <FormGroup>
             <label>Role</label>
-            <div className="role-options">
-              <label className={`role-option ${roleId === 1 ? 'selected' : ''}`}>
+            <RoleOptions>
+              <RoleOption $selected={roleId === 1}>
                 <input
                   type="radio"
                   name="role"
@@ -148,12 +314,12 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
                   <span className="role-icon">🛡️</span>
                   <div className="role-info">
                     <span className="role-name">Manager</span>
-                    <span className="role-desc">Full access to dashboard and settings</span>
+                    <span className="role-desc">Full access to dashboard</span>
                   </div>
                 </div>
-              </label>
+              </RoleOption>
 
-              <label className={`role-option ${roleId === 2 ? 'selected' : ''}`}>
+              <RoleOption $selected={roleId === 2}>
                 <input
                   type="radio"
                   name="role"
@@ -166,27 +332,25 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
                   <span className="role-icon">💰</span>
                   <div className="role-info">
                     <span className="role-name">Cashier</span>
-                    <span className="role-desc">Access to POS and order processing</span>
+                    <span className="role-desc">Access to POS</span>
                   </div>
                 </div>
-              </label>
-            </div>
-          </div>
+              </RoleOption>
+            </RoleOptions>
+          </FormGroup>
 
-          <div className="form-actions">
-            <Button type="submit" variant="primary" disabled={isLoading}>
-              {isLoading ? 'Creating...' : 'Create & Sync User'}
-            </Button>
-          </div>
-        </form>
+          <Button type="submit" disabled={isLoading} style={{ marginTop: '1rem' }}>
+            {isLoading ? 'Creating...' : 'Create & Sync User'}
+          </Button>
+        </Form>
 
         {message && (
-          <div className={`status-message ${message.type}`}>
+          <StatusMessage $type={message.type}>
             {message.type === 'success' ? '✅ ' : '❌ '}
             {message.text}
-          </div>
+          </StatusMessage>
         )}
-      </main>
-    </div>
+      </FormContent>
+    </Container>
   );
 };

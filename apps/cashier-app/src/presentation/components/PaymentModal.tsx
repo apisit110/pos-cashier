@@ -1,7 +1,186 @@
 import React, { useState, useEffect } from 'react';
-import './PaymentModal.css';
+import styled, { keyframes, css } from 'styled-components';
 import { Button } from './Button';
 import { InputField } from './InputField';
+
+const fadeIn = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`;
+
+const scaleIn = keyframes`
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+`;
+
+const spin = keyframes`
+  to { transform: rotate(360deg); }
+`;
+
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: ${fadeIn} 0.2s ease-out;
+`;
+
+const ModalContent = styled.div`
+  width: 100%;
+  max-width: 480px;
+  background-color: ${({ theme }) => theme.semantics.colors.bg.card};
+  border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+  border-radius: ${({ theme }) => theme.borderRadius.xxl};
+  overflow: hidden;
+  box-shadow: ${({ theme }) => theme.shadows.premium};
+  animation: ${scaleIn} 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+`;
+
+const ModalHeader = styled.header`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+
+  h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    color: ${({ theme }) => theme.semantics.colors.text.secondary};
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+    &:hover { color: ${({ theme }) => theme.semantics.colors.text.primary}; }
+  }
+`;
+
+const ModalBody = styled.div`
+  padding: 1.5rem;
+`;
+
+const TotalToPay = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  margin-bottom: 1.5rem;
+
+  span {
+    color: ${({ theme }) => theme.semantics.colors.text.secondary};
+    font-size: 0.875rem;
+  }
+
+  .amount {
+    color: ${({ theme }) => theme.semantics.colors.text.primary};
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+`;
+
+const PaymentMethods = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+`;
+
+const MethodBtn = styled.button<{ $isActive?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: ${({ theme }) => theme.semantics.colors.bg.card};
+  border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  color: ${({ theme }) => theme.semantics.colors.text.primary};
+  cursor: pointer;
+  transition: ${({ theme }) => theme.transitions.default};
+  text-align: left;
+  font-weight: 500;
+
+  svg {
+    width: 24px;
+    height: 24px;
+    color: ${({ theme }) => theme.semantics.colors.text.secondary};
+    transition: ${({ theme }) => theme.transitions.default};
+  }
+
+  &:hover {
+    border-color: ${({ theme }) => theme.semantics.colors.accent.primary};
+    background: rgba(99, 102, 241, 0.05);
+  }
+
+  ${({ $isActive, theme }) => $isActive && css`
+    border-color: ${theme.semantics.colors.accent.primary};
+    background: rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 0 1px ${theme.semantics.colors.accent.primary};
+
+    svg {
+      color: ${theme.semantics.colors.accent.primary};
+    }
+  `}
+`;
+
+const SuccessView = styled.div`
+  text-align: center;
+  padding: 1rem 0;
+
+  .success-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    svg { width: 32px; height: 32px; }
+  }
+
+  h3 { margin-bottom: 1rem; font-size: 1.5rem; }
+
+  .change-display {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 2rem;
+    span { color: ${({ theme }) => theme.semantics.colors.text.secondary}; font-size: 0.875rem; }
+    .change-amount { color: #10b981; font-size: 2rem; font-weight: 700; }
+  }
+`;
+
+const ProcessingView = styled.div`
+  text-align: center;
+  padding: 2rem 0;
+
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: ${({ theme }) => theme.semantics.colors.accent.primary};
+    border-radius: 50%;
+    animation: ${spin} 1s linear infinite;
+    margin: 0 auto 1.5rem;
+  }
+
+  p { color: ${({ theme }) => theme.semantics.colors.text.secondary}; }
+`;
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -64,49 +243,49 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <header className="modal-header">
-          <h3>ชำระเงิน</h3>
+    <ModalOverlay onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <ModalContent>
+        <ModalHeader>
+          <h3>Payment</h3>
           <button className="close-btn" onClick={onClose}>&times;</button>
-        </header>
+        </ModalHeader>
 
-        <div className="modal-body">
+        <ModalBody>
           {step === 'selection' && (
-            <div className="selection-view">
-              <div className="total-to-pay">
-                <span>ยอดที่ต้องชำระ</span>
+            <div>
+              <TotalToPay>
+                <span>Amount Due</span>
                 <span className="amount">${totalAmount.toFixed(2)}</span>
-              </div>
+              </TotalToPay>
 
-              <div className="payment-methods">
-                <button 
-                  className={`method-btn ${paymentMethod === 'cash' ? 'active' : ''}`}
+              <PaymentMethods>
+                <MethodBtn 
+                  $isActive={paymentMethod === 'cash'}
                   onClick={() => setPaymentMethod('cash')}
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg>
                   Cash
-                </button>
-                <button 
-                  className={`method-btn ${paymentMethod === 'credit' ? 'active' : ''}`}
+                </MethodBtn>
+                <MethodBtn 
+                  $isActive={paymentMethod === 'credit'}
                   onClick={() => setPaymentMethod('credit')}
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
                   Credit Card (EDC)
-                </button>
-                <button 
-                  className={`method-btn ${paymentMethod === 'qr' ? 'active' : ''}`}
+                </MethodBtn>
+                <MethodBtn 
+                  $isActive={paymentMethod === 'qr'}
                   onClick={() => setPaymentMethod('qr')}
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                  QR PromptPay
-                </button>
-              </div>
+                  QR Code
+                </MethodBtn>
+              </PaymentMethods>
 
               {paymentMethod === 'cash' ? (
-                <form onSubmit={handleCashPayment} className="cash-form">
+                <form onSubmit={handleCashPayment}>
                   <InputField
-                    label="จำนวนเงินที่รับมา"
+                    label="Cash Received"
                     value={cashReceived}
                     onChange={(e) => setCashReceived(e.target.value)}
                     type="number"
@@ -114,14 +293,14 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                     autoFocus
                   />
                   <Button type="submit" disabled={!cashReceived || parseFloat(cashReceived) < totalAmount}>
-                    ตกลงเพื่อยืนยัน (เปิดลิ้นชัก)
+                    Confirm Payment
                   </Button>
                 </form>
               ) : (
-                <div className="other-payment-action">
-                  <p>Follow instructions on the device.</p>
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{ color: '#94a3b8', fontSize: '0.875rem', marginBottom: '1.5rem' }}>Please follow instructions on the payment device.</p>
                   <Button onClick={handleOtherPayment}>
-                    Start {paymentMethod === 'credit' ? 'EDC' : 'PromptPay'} Flow
+                    Start {paymentMethod === 'credit' ? 'EDC' : 'QR'} Flow
                   </Button>
                 </div>
               )}
@@ -129,31 +308,31 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           )}
 
           {step === 'processing' && (
-            <div className="processing-view">
+            <ProcessingView>
               <div className="spinner"></div>
-              <p>{paymentMethod === 'cash' ? 'กำลังเปิดลิ้นชัก...' : `กำลังดำเนินการ ${paymentMethod === 'credit' ? 'บัตรเครดิต' : 'QR PromptPay'}...`}</p>
-            </div>
+              <p>{paymentMethod === 'cash' ? 'Opening drawer...' : `Processing ${paymentMethod === 'credit' ? 'Credit Card' : 'QR Code'}...`}</p>
+            </ProcessingView>
           )}
 
           {step === 'success' && (
-            <div className="success-view">
+            <SuccessView>
               <div className="success-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
               </div>
-              <h3>ชำระเงินสำเร็จ</h3>
+              <h3>Payment Successful</h3>
               {paymentMethod === 'cash' && (
                 <div className="change-display">
-                  <span>เงินทอน</span>
+                  <span>Change Amount</span>
                   <span className="change-amount">${change.toFixed(2)}</span>
                 </div>
               )}
               <Button onClick={() => { onPaymentSuccess(); onClose(); }}>
-                เสร็จสิ้นและพิมพ์ใบเสร็จ
+                Complete & Print Receipt
               </Button>
-            </div>
+            </SuccessView>
           )}
-        </div>
-      </div>
-    </div>
+        </ModalBody>
+      </ModalContent>
+    </ModalOverlay>
   );
 };

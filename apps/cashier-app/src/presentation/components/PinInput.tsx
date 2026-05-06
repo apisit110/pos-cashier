@@ -1,5 +1,40 @@
 import React, { useRef, useEffect } from 'react';
-import './PinInput.css';
+import styled, { css } from 'styled-components';
+
+const PinInputGroup = styled.div`
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+`;
+
+const PinDigitInput = styled.input<{ $isFilled?: boolean }>`
+  width: 3.5rem;
+  height: 4rem;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  color: ${({ theme }) => theme.semantics.colors.text.primary};
+  transition: ${({ theme }) => theme.transitions.default};
+  outline: none;
+
+  &:focus {
+    border-color: ${({ theme }) => theme.semantics.colors.accent.primary};
+    background: rgba(15, 23, 42, 0.8);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  }
+
+  ${({ $isFilled, theme }) => $isFilled && css`
+    border-color: ${theme.semantics.colors.accent.primary};
+  `}
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
 
 interface PinInputProps {
   length?: number;
@@ -11,7 +46,6 @@ interface PinInputProps {
 export const PinInput: React.FC<PinInputProps> = ({ length = 6, value, onChange, disabled }) => {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // Initialize refs array
   useEffect(() => {
     inputRefs.current = inputRefs.current.slice(0, length);
   }, [length]);
@@ -26,7 +60,6 @@ export const PinInput: React.FC<PinInputProps> = ({ length = 6, value, onChange,
     
     onChange(finalValue);
 
-    // Focus next input
     if (char && index < length - 1) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -43,15 +76,14 @@ export const PinInput: React.FC<PinInputProps> = ({ length = 6, value, onChange,
     const pastedData = e.clipboardData.getData('text').slice(0, length).replace(/\D/g, '');
     onChange(pastedData);
     
-    // Focus last character input or next empty
     const nextIndex = Math.min(pastedData.length, length - 1);
     inputRefs.current[nextIndex]?.focus();
   };
 
   return (
-    <div className="pin-input-group">
+    <PinInputGroup>
       {Array.from({ length }).map((_, index) => (
-        <input
+        <PinDigitInput
           key={index}
           ref={(el) => { inputRefs.current[index] = el; }}
           type="text"
@@ -62,10 +94,10 @@ export const PinInput: React.FC<PinInputProps> = ({ length = 6, value, onChange,
           onKeyDown={(e) => handleKeyDown(e, index)}
           onPaste={handlePaste}
           disabled={disabled}
-          className={`pin-digit-input ${value[index] ? 'filled' : ''}`}
+          $isFilled={!!value[index]}
           autoComplete="one-time-code"
         />
       ))}
-    </div>
+    </PinInputGroup>
   );
 };

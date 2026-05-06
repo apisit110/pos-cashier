@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import { LoginPage } from './presentation/pages/login/LoginPage';
 import { CreateOrderPage } from './presentation/pages/create-order/CreateOrderPage';
 import { DashboardPage } from './presentation/pages/dashboard/DashboardPage';
@@ -13,7 +14,21 @@ import { GetTransactionsUseCase } from './application/use-cases/GetTransactionsU
 import { ApiAuthRepository } from './data/repositories/ApiAuthRepository';
 import { ApiUserRepository } from './data/repositories/ApiUserRepository';
 import { ApiTransactionRepository } from './data/repositories/ApiTransactionRepository';
-import './App.css';
+
+const AppContainer = styled.div`
+  width: 100%;
+  min-height: 100vh;
+  background-color: ${({ theme }) => theme.semantics.colors.bg.main};
+`;
+
+const InitializingLoader = styled.div`
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: ${({ theme }) => theme.semantics.colors.text.secondary};
+`;
 
 // For simplicity, instantiating dependencies here.
 const authRepository = new ApiAuthRepository();
@@ -97,11 +112,11 @@ function App() {
   };
 
   if (isInitializing) {
-    return <div className="initializing">Loading...</div>;
+    return <InitializingLoader>Loading Lightning POS...</InitializingLoader>;
   }
 
   return (
-    <div className="app">
+    <AppContainer>
       {currentView === 'login' && <LoginPage onLoginSuccess={handleLoginSuccess} />}
       {currentView === 'dashboard' && (
         <DashboardPage 
@@ -133,7 +148,7 @@ function App() {
           getTransactionsUseCase={getTransactionsUseCase}
         />
       )}
-    </div>
+    </AppContainer>
   );
 }
 
