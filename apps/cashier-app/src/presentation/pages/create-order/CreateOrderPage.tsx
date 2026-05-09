@@ -210,6 +210,11 @@ const Table = styled.table`
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 0.05em;
+    
+    &.qty-header {
+      text-align: center;
+      padding-right: 2rem; /* Align with controls */
+    }
   }
 
   td {
@@ -323,12 +328,15 @@ const OrderSummary = styled.div`
     color: ${({ theme }) => theme.semantics.colors.text.secondary};
     text-align: center;
     margin-top: 0.5rem;
-    opacity: 0.6;
+    opacity: 0.9; /* Increased for accessibility */
+    font-weight: 500;
     kbd {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       padding: 2px 6px;
       border-radius: 4px;
       font-family: inherit;
+      color: ${({ theme }) => theme.semantics.colors.text.primary};
     }
   }
 `;
@@ -612,7 +620,7 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
                     <th>Product</th>
                     <th>Barcode</th>
                     <th className="number-col">Price</th>
-                    <th className="number-col">Qty</th>
+                    <th className="number-col qty-header">Qty</th>
                     <th className="number-col">Total</th>
                     <th></th>
                   </tr>

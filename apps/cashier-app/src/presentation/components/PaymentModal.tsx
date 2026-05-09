@@ -161,8 +161,21 @@ const SuccessView = styled.div`
     gap: 0.25rem;
     margin-bottom: 2rem;
     span { color: ${({ theme }) => theme.semantics.colors.text.secondary}; font-size: 0.875rem; }
-    .change-amount { color: #10b981; font-size: 2rem; font-weight: 700; }
+    .change-amount { color: ${({ theme }) => theme.semantics.colors.text.success}; font-size: 2rem; font-weight: 700; }
   }
+`;
+
+const ErrorMessage = styled.div`
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid ${({ theme }) => theme.semantics.colors.text.error};
+  color: ${({ theme }) => theme.semantics.colors.text.error};
+  padding: 0.75rem 1rem;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  font-size: 0.875rem;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 `;
 
 const ProcessingView = styled.div`
@@ -201,40 +214,41 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   const [cashReceived, setCashReceived] = useState<string>('');
   const [step, setStep] = useState<'selection' | 'processing' | 'success'>('selection');
   const [change, setChange] = useState<number>(0);
-  const [isCalculated, setIsCalculated] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       setStep('selection');
       setCashReceived('');
       setPaymentMethod('cash');
-      setIsCalculated(false);
+      setError(null);
     }
   }, [isOpen]);
 
-  const handleCalculate = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleConfirmPayment = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     const received = parseFloat(cashReceived);
+    
     if (isNaN(received) || received < totalAmount) {
-      alert('จำนวนเงินไม่ถูกต้อง');
+      setError('Insufficient amount received.');
       return;
     }
-    setChange(received - totalAmount);
-    setIsCalculated(true);
-  };
 
-  const handleConfirmPayment = async () => {
-    const received = parseFloat(cashReceived);
     setStep('processing');
+    setError(null);
     try {
       const response = await onProcessPayment('CASH', received);
       setChange(response.changeAmount || (received - totalAmount));
       setStep('success');
     } catch (err: any) {
-      alert(`ชำระเงินไม่สำเร็จ: ${err.message}`);
+      setError(err.message || 'Payment failed.');
       setStep('selection');
     }
   };
+
+  const currentReceived = parseFloat(cashReceived);
+  const currentChange = !isNaN(currentReceived) ? Math.max(0, currentReceived - totalAmount) : 0;
+  const isValidAmount = !isNaN(currentReceived) && currentReceived >= totalAmount;
 
 
 
@@ -268,33 +282,38 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
 
               {paymentMethod === 'cash' && (
                 <div>
-                  <form onSubmit={handleCalculate}>
+                  <form onSubmit={handleConfirmPayment}>
                     <InputField
                       label="Cash Received"
                       value={cashReceived}
                       onChange={(e) => {
                         setCashReceived(e.target.value);
-                        setIsCalculated(false);
+                        setError(null);
                       }}
                       type="number"
                       placeholder="0.00"
                       autoFocus
                     />
-                    {!isCalculated ? (
-                      <Button type="submit" disabled={!cashReceived || parseFloat(cashReceived) < totalAmount}>
-                        Calculate Change
-                      </Button>
-                    ) : (
-                      <div style={{ marginTop: '1.5rem', animation: 'fadeIn 0.3s ease-out' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '12px', marginBottom: '1.5rem' }}>
-                          <span style={{ color: '#94a3b8' }}>Change to return</span>
-                          <span style={{ color: '#10b981', fontWeight: 700, fontSize: '1.25rem' }}>${change.toFixed(2)}</span>
-                        </div>
-                        <Button onClick={handleConfirmPayment}>
-                          Confirm Payment
-                        </Button>
-                      </div>
+                    
+                    {error && (
+                      <ErrorMessage>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        {error}
+                      </ErrorMessage>
                     )}
+
+                    <div style={{ marginTop: '1.5rem', opacity: isValidAmount ? 1 : 0.5, transition: 'all 0.3s' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', background: 'rgba(16, 185, 129, 0.05)', border: `1px solid ${isValidAmount ? 'rgba(16, 185, 129, 0.2)' : 'transparent'}`, borderRadius: '12px', marginBottom: '1.5rem' }}>
+                        <span style={{ color: 'var(--color-text-secondary, #94a3b8)' }}>Change to return</span>
+                        <span style={{ color: 'var(--color-success, #10b981)', fontWeight: 700, fontSize: '1.25rem' }}>
+                          ${currentChange.toFixed(2)}
+                        </span>
+                      </div>
+                      
+                      <Button type="submit" disabled={!isValidAmount}>
+                        Confirm Payment
+                      </Button>
+                    </div>
                   </form>
                 </div>
               )}

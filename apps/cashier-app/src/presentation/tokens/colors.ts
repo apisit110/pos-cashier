@@ -22,6 +22,9 @@ export const primitives = {
     },
     rose: {
       500: '#f43f5e',
+    },
+    emerald: {
+      500: '#10b981',
     }
   }
 };
@@ -36,6 +39,7 @@ export const semantics = {
       primary: primitives.colors.white,
       secondary: primitives.colors.slate[400],
       error: primitives.colors.rose[500],
+      success: primitives.colors.emerald[500],
     },
     accent: {
       primary: primitives.colors.indigo[500],
