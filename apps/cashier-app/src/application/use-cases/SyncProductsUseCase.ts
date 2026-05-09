@@ -7,7 +7,7 @@ export class SyncProductsUseCase {
     this.productRepository = productRepository;
   }
 
-  async execute(): Promise<{ success: boolean; count: number }> {
-    return await this.productRepository.syncProducts();
+  async execute(mid: string, sid: string): Promise<{ success: boolean; count: number }> {
+    return await this.productRepository.syncProducts(mid, sid);
   }
 }

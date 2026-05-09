@@ -41,9 +41,12 @@ export class ApiProductRepository implements ProductRepository {
     }
   }
 
-  async syncProducts(): Promise<{ success: boolean; count: number }> {
+  async syncProducts(mid: string, sid: string): Promise<{ success: boolean; count: number }> {
     try {
-      const response = await api.post(`${this.baseUrl}/products/sync`);
+      const response = await api.post(`${this.baseUrl}/products/sync`, {
+        mid,
+        sid,
+      });
       return response.data;
     } catch (error) {
       console.error('Error syncing products:', error);

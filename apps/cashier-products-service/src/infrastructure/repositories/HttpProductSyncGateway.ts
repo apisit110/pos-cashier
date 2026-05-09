@@ -1,35 +1,25 @@
 import { Injectable } from '@nestjs/common';
+import axios from 'axios';
 import { ProductSyncGateway } from '../../application/interfaces/ProductSyncGateway';
 import { Product } from '../../domain/entities/Product';
 
 @Injectable()
 export class HttpProductSyncGateway implements ProductSyncGateway {
   async fetchProducts(
-    merchantId: string,
-    storeId: string,
+    mid: string,
+    sid: string,
     lastSyncVersion: number,
   ): Promise<{ products: Product[]; syncVersion: number }> {
-    const url = 'http://localhost:4002/v1/sync/products';
+    const url = 'http://127.0.0.1:4002/v1/sync/products';
     
     try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          merchantId,
-          storeId,
-          syncVersion: lastSyncVersion,
-        }),
+      const response = await axios.post(url, {
+        mid,
+        sid,
+        syncVersion: lastSyncVersion,
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to fetch products: ${response.status} ${errorText}`);
-      }
-
-      const data = await response.json() as { 
+      const data = response.data as { 
         products: any[]; 
         count: number;
         message?: string;

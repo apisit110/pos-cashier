@@ -49,9 +49,21 @@ pin_hash ยังไม่ได้ hash
 
 - ระบบกลางมีหลาย merchant
 - หนึ่ง merchant มีหลาย product
-- หนึ่ง merchant มีหลาย พนักงาน
 - หนึ่ง merchant มีหลาย store
+- หนึ่ง merchant มีหลาย staff
 - หนึ่ง store มีหลาย สินค้า
+- หนึ่ง store มีหลาย terminal
+- staff 1 คนแต่ 1 role ระหว่าง
+  - manager
+  - cashier
+
+- สร้าง merchant
+  - generate mid
+- สร้าง product
+- สร้าง store ผูกกับ merchant
+  - generate sid
+- ผูก product กับ store
+- สร้าง terminal ผูกกับ store
 
 set up
 

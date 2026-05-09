@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, NotFoundException, InternalServerErrorException, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, NotFoundException, InternalServerErrorException, UseGuards } from '@nestjs/common';
 import { GetProductByBarcodeUseCase } from '../../application/use-cases/GetProductByBarcodeUseCase';
 import { SyncProductsUseCase } from '../../application/use-cases/SyncProductsUseCase';
 import { JwtAuthGuard } from '../../infrastructure/guards/JwtAuthGuard';
@@ -21,9 +21,12 @@ export class ProductController {
   }
 
   @Post('sync')
-  async syncProducts() {
+  async syncProducts(
+    @Body('mid') mid?: string,
+    @Body('sid') sid?: string,
+  ) {
     try {
-      return await this.syncProductsUseCase.execute();
+      return await this.syncProductsUseCase.execute(mid, sid);
     } catch (error) {
       throw new InternalServerErrorException((error as Error).message);
     }

@@ -149,7 +149,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     setIsLoading(true);
     setMessage(null);
     try {
-      const result = await syncProductUseCase.execute();
+      const mid = import.meta.env.VITE_MID;
+      const sid = import.meta.env.VITE_SID;
+      
+      if (!mid || !sid) {
+        throw new Error('MID or SID not configured in environment');
+      }
+
+      const result = await syncProductUseCase.execute(mid, sid);
       setMessage({ text: `Products synced! ${result.count} items updated.`, type: 'success' });
     } catch (err: any) {
       setMessage({ text: err.message || 'Failed to sync products', type: 'error' });

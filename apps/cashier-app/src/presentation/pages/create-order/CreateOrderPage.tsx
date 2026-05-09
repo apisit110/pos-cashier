@@ -426,7 +426,14 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
     setError(null);
     setSyncMessage(null);
     try {
-      const result = await syncUseCase.execute();
+      const mid = import.meta.env.VITE_MID;
+      const sid = import.meta.env.VITE_SID;
+      
+      if (!mid || !sid) {
+        throw new Error('MID or SID not configured in environment');
+      }
+
+      const result = await syncUseCase.execute(mid, sid);
       if (result.success) {
         setSyncMessage(`Sync successful! ${result.count} products updated.`);
         setTimeout(() => setSyncMessage(null), 3000);

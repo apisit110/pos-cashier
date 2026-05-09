@@ -5,8 +5,6 @@ import type { ProductSyncGateway } from '../interfaces/ProductSyncGateway';
 
 @Injectable()
 export class SyncProductsUseCase {
-  private readonly MERCHANT_ID = 'f19bd616-43d2-4bd2-9a84-fbd77cfab778';
-  private readonly STORE_ID = 'S-001';
 
   constructor(
     @Inject('ProductRepository')
@@ -17,8 +15,12 @@ export class SyncProductsUseCase {
     private readonly productSyncGateway: ProductSyncGateway,
   ) {}
 
-  async execute(): Promise<{ success: boolean; count: number }> {
+  async execute(mid?: string, sid?: string): Promise<{ success: boolean; count: number }> {
     try {
+      if (!mid || !sid) {
+        throw new Error('MID and SID are required for product synchronization');
+      }
+
       // 1. Get current sync metadata
       const metadata = await this.syncMetadataRepository.getLatest();
       const lastSyncVersion = metadata?.lastProductSyncVersion ?? 0;
@@ -28,8 +30,8 @@ export class SyncProductsUseCase {
 
       // 3. Fetch products from gateway
       const { products, syncVersion } = await this.productSyncGateway.fetchProducts(
-        this.MERCHANT_ID,
-        this.STORE_ID,
+        mid,
+        sid,
         lastSyncVersion,
       );
 
