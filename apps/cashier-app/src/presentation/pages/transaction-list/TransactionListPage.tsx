@@ -149,7 +149,7 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
   return (
     <Container>
       <PageHeader
-        title="Transactions History"
+        title="Sales History"
         onBack={onBack}
         extraContent={<span className="total-count">Total: {total} Transactions</span>}
       />

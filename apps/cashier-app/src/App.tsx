@@ -6,14 +6,18 @@ import { DashboardPage } from './presentation/pages/dashboard/DashboardPage';
 import { CreateUserPage } from './presentation/pages/create-user/CreateUserPage';
 import { UserListPage } from './presentation/pages/user-list/UserListPage';
 import { TransactionListPage } from './presentation/pages/transaction-list/TransactionListPage';
+import { ProductListPage } from './presentation/pages/product-list/ProductListPage';
 import { GetSessionUseCase } from './domain/use-cases/GetSessionUseCase';
 import { CreateUserUseCase } from './application/use-cases/CreateUserUseCase';
 import { SyncUserUseCase } from './application/use-cases/SyncUserUseCase';
 import { GetUsersUseCase } from './application/use-cases/GetUsersUseCase';
 import { GetTransactionsUseCase } from './application/use-cases/GetTransactionsUseCase';
+import { GetProductsUseCase } from './application/use-cases/GetProductsUseCase';
 import { ApiAuthRepository } from './data/repositories/ApiAuthRepository';
 import { ApiUserRepository } from './data/repositories/ApiUserRepository';
 import { ApiTransactionRepository } from './data/repositories/ApiTransactionRepository';
+import { ApiProductRepository } from './data/repositories/ApiProductRepository';
+import { MainLayout } from './presentation/components/MainLayout';
 
 const AppContainer = styled.div`
   width: 100%;
@@ -34,15 +38,17 @@ const InitializingLoader = styled.div`
 const authRepository = new ApiAuthRepository();
 const userRepository = new ApiUserRepository();
 const transactionRepository = new ApiTransactionRepository();
+const productRepository = new ApiProductRepository();
 
 const getSessionUseCase = new GetSessionUseCase(authRepository);
 const createUserUseCase = new CreateUserUseCase(userRepository);
 const syncUserUseCase = new SyncUserUseCase(userRepository);
 const getUsersUseCase = new GetUsersUseCase(userRepository);
 const getTransactionsUseCase = new GetTransactionsUseCase(transactionRepository);
+const getProductsUseCase = new GetProductsUseCase(productRepository);
 
 function App() {
-  const [currentView, setCurrentView] = useState<'login' | 'create-order' | 'dashboard' | 'create-user' | 'user-list' | 'transaction-list'>('login');
+  const [currentView, setCurrentView] = useState<'login' | 'create-order' | 'dashboard' | 'create-user' | 'user-list' | 'transaction-list' | 'product-list'>('login');
   const [user, setUser] = useState<{ uid: string; username: string; role: string; roleId: number; accessToken: string; refreshToken?: string } | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
 
@@ -117,36 +123,59 @@ function App() {
 
   return (
     <AppContainer>
-      {currentView === 'login' && <LoginPage onLoginSuccess={handleLoginSuccess} />}
-      {currentView === 'dashboard' && (
-        <DashboardPage 
-          onLogout={handleLogout} 
-          onNavigateToSell={handleNavigateToSell} 
-          onNavigateToCreateUser={() => setCurrentView('create-user')}
-          onNavigateToUserList={() => setCurrentView('user-list')}
-          onNavigateToTransactionList={() => setCurrentView('transaction-list')}
+      {currentView === 'login' ? (
+        <LoginPage onLoginSuccess={handleLoginSuccess} />
+      ) : (
+        <MainLayout 
+          currentView={currentView} 
           user={user} 
-        />
-      )}
-      {currentView === 'create-order' && <CreateOrderPage onLogout={handleLogout} user={user} />}
-      {currentView === 'create-user' && (
-        <CreateUserPage 
-          onBack={() => setCurrentView('dashboard')}
-          createUserUseCase={createUserUseCase}
-          syncUserUseCase={syncUserUseCase}
-        />
-      )}
-      {currentView === 'user-list' && (
-        <UserListPage 
-          onBack={() => setCurrentView('dashboard')}
-          getUsersUseCase={getUsersUseCase}
-        />
-      )}
-      {currentView === 'transaction-list' && (
-        <TransactionListPage 
-          onBack={() => setCurrentView('dashboard')}
-          getTransactionsUseCase={getTransactionsUseCase}
-        />
+          onNavigate={setCurrentView}
+          onLogout={handleLogout}
+        >
+          {currentView === 'dashboard' && (
+            <DashboardPage 
+              onLogout={handleLogout} 
+              onNavigateToSell={handleNavigateToSell} 
+              onNavigateToCreateUser={() => setCurrentView('create-user')}
+              onNavigateToUserList={() => setCurrentView('user-list')}
+              onNavigateToTransactionList={() => setCurrentView('transaction-list')}
+              user={user} 
+            />
+          )}
+          {currentView === 'create-order' && (
+            <CreateOrderPage 
+              onBack={() => setCurrentView('dashboard')}
+              onLogout={handleLogout} 
+              user={user} 
+            />
+          )}
+          {currentView === 'create-user' && (
+            <CreateUserPage 
+              onBack={() => setCurrentView('user-list')}
+              createUserUseCase={createUserUseCase}
+              syncUserUseCase={syncUserUseCase}
+            />
+          )}
+          {currentView === 'user-list' && (
+            <UserListPage 
+              onBack={() => setCurrentView('dashboard')}
+              onNavigateToCreateUser={() => setCurrentView('create-user')}
+              getUsersUseCase={getUsersUseCase}
+            />
+          )}
+          {currentView === 'transaction-list' && (
+            <TransactionListPage 
+              onBack={() => setCurrentView('dashboard')}
+              getTransactionsUseCase={getTransactionsUseCase}
+            />
+          )}
+          {currentView === 'product-list' && (
+            <ProductListPage 
+              onBack={() => setCurrentView('dashboard')}
+              getProductsUseCase={getProductsUseCase}
+            />
+          )}
+        </MainLayout>
       )}
     </AppContainer>
   );

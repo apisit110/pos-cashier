@@ -357,11 +357,12 @@ const scanUseCase = new ScanProductUseCase(productRepository);
 const identifyMemberUseCase = new IdentifyMemberUseCase(memberRepository);
 
 interface CreateOrderPageProps {
+  onBack: () => void;
   onLogout?: () => void;
   user: { uid: string; username: string; role: string; accessToken: string } | null;
 }
 
-export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user }) => {
+export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogout, user }) => {
   const [items, setItems] = useState<OrderItem[]>([]);
   const [barcodeInput, setBarcodeInput] = useState('');
   const [memberInput, setMemberInput] = useState('');
@@ -537,9 +538,8 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
   return (
     <Container>
       <PageHeader
-        title="Lightning POS"
-        user={user}
-        onLogout={onLogout}
+        title="POS Terminal"
+        onBack={onBack}
         extraContent={null}
       />
 

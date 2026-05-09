@@ -167,51 +167,17 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
   return (
     <DashboardContainer>
-      <PageHeader 
-        title="Lightning POS Dashboard"
-        user={user}
-        onLogout={onLogout}
-      />
+      <header style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+          Welcome back, {user?.username || 'Admin'}
+        </h1>
+        <p style={{ color: '#94a3b8', marginTop: '0.5rem' }}>
+          Here's what's happening with your store today.
+        </p>
+      </header>
 
       <DashboardContent>
         <DashboardGrid>
-          <DashboardCard onClick={onNavigateToCreateUser}>
-            <div className="card-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                <circle cx="8.5" cy="7" r="4" />
-                <line x1="20" y1="8" x2="20" y2="14" />
-                <line x1="23" y1="11" x2="17" y2="11" />
-              </svg>
-            </div>
-            <h3>Create New User</h3>
-            <p>Generate a temporary user ID for new employees.</p>
-          </DashboardCard>
-
-          <DashboardCard onClick={onNavigateToUserList}>
-            <div className="card-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-              </svg>
-            </div>
-            <h3>Manage Users</h3>
-            <p>View and manage all employees in the system.</p>
-          </DashboardCard>
-
-          <DashboardCard onClick={onNavigateToTransactionList}>
-            <div className="card-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="5" width="20" height="14" rx="2" />
-                <line x1="2" y1="10" x2="22" y2="10" />
-              </svg>
-            </div>
-            <h3>Transactions</h3>
-            <p>View sales history, payment methods, and statuses.</p>
-          </DashboardCard>
-
           <DashboardCard onClick={handleSyncProduct}>
             <div className="card-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -220,20 +186,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 <line x1="12" y1="22.08" x2="12" y2="12" />
               </svg>
             </div>
-            <h3>Sync Product</h3>
-            <p>Update product list and pricing from the server.</p>
-          </DashboardCard>
-
-          <DashboardCard $isHighlight onClick={onNavigateToSell}>
-            <div className="card-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="9" cy="21" r="1" />
-                <circle cx="20" cy="21" r="1" />
-                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-              </svg>
-            </div>
-            <h3>Sell</h3>
-            <p>Switch to Cashier mode and start processing orders.</p>
+            <h3>Inventory Sync</h3>
+            <p>Pull latest product data and pricing from the central server.</p>
           </DashboardCard>
         </DashboardGrid>
 
@@ -243,7 +197,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </StatusMessage>
         )}
 
-        {isLoading && <LoadingOverlay>Processing...</LoadingOverlay>}
+        {isLoading && <LoadingOverlay>Synchronizing data...</LoadingOverlay>}
       </DashboardContent>
     </DashboardContainer>
   );
