@@ -20,8 +20,8 @@ const StyledHeader = styled.header`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 2rem;
-  padding: 1rem 0 1.5rem 0;
+  margin-bottom: 1rem;
+  padding: 0.75rem 0 0.75rem 0;
   border-bottom: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
 
   @media (max-width: 768px) {
