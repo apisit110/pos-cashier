@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { Button } from '../../components/Button';
-import { PinInput } from '../../components/PinInput';
+import { PageHeader } from '../../components/PageHeader';
+import { PinInputField } from '../../components/PinInputField';
 import type { CreateUserUseCase } from '../../../application/use-cases/CreateUserUseCase';
 import type { SyncUserUseCase } from '../../../application/use-cases/SyncUserUseCase';
 
@@ -17,49 +18,6 @@ const Container = styled.div`
   background-color: ${({ theme }) => theme.semantics.colors.bg.main};
   color: ${({ theme }) => theme.semantics.colors.text.primary};
   padding: 2rem;
-`;
-
-const Header = styled.header`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 3rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-
-    h2 {
-      margin: 0;
-      font-size: 1.5rem;
-      font-weight: 600;
-    }
-  }
-`;
-
-const BackButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: none;
-  border: none;
-  color: ${({ theme }) => theme.semantics.colors.text.secondary};
-  cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: ${({ theme }) => theme.transitions.default};
-
-  &:hover {
-    color: ${({ theme }) => theme.semantics.colors.text.primary};
-  }
-
-  svg {
-    width: 20px;
-    height: 20px;
-  }
 `;
 
 const FormContent = styled.main`
@@ -234,18 +192,10 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
 
   return (
     <Container>
-      <Header>
-        <div className="header-left">
-          <BackButton onClick={onBack}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12" />
-              <polyline points="12 19 5 12 12 5" />
-            </svg>
-            Back to Dashboard
-          </BackButton>
-          <h2>Create New User</h2>
-        </div>
-      </Header>
+      <PageHeader 
+        title="Create New User"
+        onBack={onBack}
+      />
 
       <FormContent>
         <Form onSubmit={handleSubmit}>
@@ -288,15 +238,13 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
             />
           </FormGroup>
 
-          <FormGroup>
-            <label>PIN Code (6 digits)</label>
-            <PinInput
-              length={6}
-              value={pin}
-              onChange={setPin}
-              disabled={isLoading}
-            />
-          </FormGroup>
+          <PinInputField
+            label="PIN Code (6 digits)"
+            length={6}
+            value={pin}
+            onChange={setPin}
+            disabled={isLoading}
+          />
 
           <FormGroup>
             <label>Role</label>

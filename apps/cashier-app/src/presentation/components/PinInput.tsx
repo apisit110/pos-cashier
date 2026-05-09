@@ -7,11 +7,11 @@ const PinInputGroup = styled.div`
   justify-content: center;
 `;
 
-const PinDigitInput = styled.input<{ $isFilled?: boolean }>`
-  width: 3.5rem;
-  height: 4rem;
+const PinDigitInput = styled.input<{ $isFilled?: boolean; $size?: string }>`
+  width: ${({ $size }) => $size || '3.5rem'};
+  height: ${({ $size }) => ($size ? `calc(${$size} * 1.15)` : '4rem')};
   text-align: center;
-  font-size: 1.5rem;
+  font-size: ${({ $size }) => ($size ? `calc(${$size} * 0.4)` : '1.5rem')};
   font-weight: 700;
   background: rgba(15, 23, 42, 0.6);
   border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
@@ -41,9 +41,16 @@ interface PinInputProps {
   value: string;
   onChange: (value: string) => void;
   disabled?: boolean;
+  boxSize?: string;
 }
 
-export const PinInput: React.FC<PinInputProps> = ({ length = 6, value, onChange, disabled }) => {
+export const PinInput: React.FC<PinInputProps> = ({ 
+  length = 6, 
+  value, 
+  onChange, 
+  disabled,
+  boxSize
+}) => {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -95,6 +102,7 @@ export const PinInput: React.FC<PinInputProps> = ({ length = 6, value, onChange,
           onPaste={handlePaste}
           disabled={disabled}
           $isFilled={!!value[index]}
+          $size={boxSize}
           autoComplete="one-time-code"
         />
       ))}

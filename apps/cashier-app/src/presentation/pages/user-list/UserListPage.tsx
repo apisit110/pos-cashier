@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
+import { PageHeader } from '../../components/PageHeader';
 import type { GetUsersUseCase } from '../../../application/use-cases/GetUsersUseCase';
 import type { User } from '../../../domain/repositories/UserRepository';
 
@@ -14,22 +15,6 @@ const Container = styled.div`
   background-color: ${({ theme }) => theme.semantics.colors.bg.main};
   color: ${({ theme }) => theme.semantics.colors.text.primary};
   padding: 2rem;
-`;
-
-const Header = styled.header`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    h2 { margin: 0; font-size: 1.5rem; font-weight: 600; }
-  }
 
   .total-count {
     font-size: 0.875rem;
@@ -38,22 +23,6 @@ const Header = styled.header`
     padding: 0.25rem 0.75rem;
     border-radius: 20px;
   }
-`;
-
-const BackButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: none;
-  border: none;
-  color: ${({ theme }) => theme.semantics.colors.text.secondary};
-  cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: ${({ theme }) => theme.transitions.default};
-
-  &:hover { color: ${({ theme }) => theme.semantics.colors.text.primary}; }
-  svg { width: 20px; height: 20px; }
 `;
 
 const Content = styled.main`
@@ -182,21 +151,11 @@ export const UserListPage: React.FC<UserListPageProps> = ({ onBack, getUsersUseC
 
   return (
     <Container>
-      <Header>
-        <div className="header-left">
-          <BackButton onClick={onBack}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12" />
-              <polyline points="12 19 5 12 12 5" />
-            </svg>
-            Back to Dashboard
-          </BackButton>
-          <h2>Manage Users</h2>
-        </div>
-        <div className="header-right">
-          <span className="total-count">Total: {total} Users</span>
-        </div>
-      </Header>
+      <PageHeader
+        title="Manage Users"
+        onBack={onBack}
+        extraContent={<span className="total-count">Total: {total} Users</span>}
+      />
 
       <Content>
         <TableWrapper>

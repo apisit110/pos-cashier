@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { InputField } from '../../components/InputField';
 import { Button } from '../../components/Button';
+import { PageHeader } from '../../components/PageHeader';
 import { ApiProductRepository } from '../../../data/repositories/ApiProductRepository';
 import { ApiMemberRepository } from '../../../data/repositories/ApiMemberRepository';
 import { ApiOrderRepository } from '../../../data/repositories/ApiOrderRepository';
@@ -27,69 +28,6 @@ const Container = styled.div`
   color: ${({ theme }) => theme.semantics.colors.text.primary};
 `;
 
-const Header = styled.header`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-  background: ${({ theme }) => theme.semantics.colors.bg.main};
-
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-
-    h2 {
-      margin: 0;
-      font-size: 1.25rem;
-      letter-spacing: -0.5px;
-      font-weight: 600;
-    }
-  }
-`;
-
-const UserIndicator = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.375rem 0.75rem;
-  background: ${({ theme }) => theme.semantics.colors.bg.card};
-  border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-  border-radius: ${({ theme }) => theme.borderRadius.xl};
-  font-size: 0.875rem;
-
-  .user-icon {
-    font-size: 1rem;
-  }
-
-  .user-details {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2;
-  }
-
-  .username {
-    font-weight: 600;
-    color: ${({ theme }) => theme.semantics.colors.accent.primary};
-  }
-
-  .role-badge {
-    font-size: 0.625rem;
-    text-transform: uppercase;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    
-    &.manager {
-      color: ${({ theme }) => theme.semantics.colors.accent.primary};
-    }
-    
-    &.cashier {
-      color: ${({ theme }) => theme.semantics.colors.text.secondary};
-    }
-  }
-`;
-
 const Main = styled.main`
   display: flex;
   flex: 1;
@@ -104,6 +42,7 @@ const ScannerPanel = styled.aside`
   flex-direction: column;
   gap: 1.5rem;
   background: linear-gradient(to bottom, ${({ theme }) => theme.semantics.colors.bg.main} 0%, rgba(99, 102, 241, 0.05) 100%);
+  overflow-y: auto;
 
   h3 {
     color: ${({ theme }) => theme.semantics.colors.text.primary};
@@ -503,30 +442,19 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
 
   return (
     <Container>
-      <Header>
-        <div className="brand">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-          </svg>
-          <h2>Lightning POS</h2>
-        </div>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          {syncMessage && <SyncBadge>{syncMessage}</SyncBadge>}
-          <Button variant="secondary" onClick={handleSync} isLoading={isSyncing} disabled={isSyncing} style={{ width: 'auto' }}>
-            Sync Products
-          </Button>
-          {user && (
-            <UserIndicator>
-              <span className="user-icon">👤</span>
-              <div className="user-details">
-                <span className="username">{user.username}</span>
-                <span className={`role-badge ${user.role}`}>{user.role}</span>
-              </div>
-            </UserIndicator>
-          )}
-          <Button variant="danger" onClick={onLogout} style={{ width: 'auto' }}>Logout</Button>
-        </div>
-      </Header>
+      <PageHeader
+        title="Lightning POS"
+        user={user}
+        onLogout={onLogout}
+        extraContent={
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            {syncMessage && <SyncBadge>{syncMessage}</SyncBadge>}
+            <Button variant="secondary" onClick={handleSync} isLoading={isSyncing} disabled={isSyncing} style={{ width: 'auto' }}>
+              Sync Products
+            </Button>
+          </div>
+        }
+      />
 
       <Main>
         <ScannerPanel>

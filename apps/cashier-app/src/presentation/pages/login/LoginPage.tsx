@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { InputField } from '../../components/InputField';
 import { Button } from '../../components/Button';
+import { PinInputField } from '../../components/PinInputField';
 import { LoginUseCase } from '../../../domain/use-cases/LoginUseCase';
 import { ApiAuthRepository } from '../../../data/repositories/ApiAuthRepository';
 
@@ -243,13 +244,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             disabled={isLoading}
           />
           
-          <InputField
-            label="PIN"
-            type="password"
+          <PinInputField
+            label="PIN Code"
+            length={6}
             value={pin}
-            onChange={(e) => setPin(e.target.value)}
-            placeholder="••••••"
+            onChange={setPin}
             disabled={isLoading}
+            boxSize="2.75rem"
           />
           
           <FormActions>

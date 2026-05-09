@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { Button } from '../../components/Button';
+import { PageHeader } from '../../components/PageHeader';
 import { SyncProductUseCase } from '../../../application/use-cases/SyncProductUseCase';
 import { ApiProductRepository } from '../../../data/repositories/ApiProductRepository';
 
@@ -28,73 +28,6 @@ const DashboardContainer = styled.div`
   min-height: 100vh;
   background-color: ${({ theme }) => theme.semantics.colors.bg.main};
   padding: 2rem;
-`;
-
-const DashboardHeader = styled.header`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 3rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-
-    h2 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: ${({ theme }) => theme.semantics.colors.text.primary};
-    }
-  }
-
-  .user-info {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-  }
-`;
-
-const UserIndicator = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 1rem;
-  background: ${({ theme }) => theme.semantics.colors.bg.card};
-  border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-  border-radius: ${({ theme }) => theme.borderRadius.xl};
-
-  .user-icon {
-    font-size: 1.25rem;
-  }
-
-  .user-details {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .username {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: ${({ theme }) => theme.semantics.colors.text.primary};
-  }
-
-  .role-badge {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 700;
-    
-    &.manager {
-      color: ${({ theme }) => theme.semantics.colors.accent.primary};
-    }
-    
-    &.cashier {
-      color: ${({ theme }) => theme.semantics.colors.text.secondary};
-    }
-  }
 `;
 
 const DashboardContent = styled.main`
@@ -227,26 +160,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
   return (
     <DashboardContainer>
-      <DashboardHeader>
-        <div className="brand">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-          </svg>
-          <h2>Lightning POS Dashboard</h2>
-        </div>
-        <div className="user-info">
-          {user && (
-            <UserIndicator>
-              <span className="user-icon">👤</span>
-              <div className="user-details">
-                <span className="username">{user.username}</span>
-                <span className={`role-badge ${user.role}`}>{user.role}</span>
-              </div>
-            </UserIndicator>
-          )}
-          <Button variant="danger" onClick={onLogout} style={{ width: 'auto' }}>Logout</Button>
-        </div>
-      </DashboardHeader>
+      <PageHeader 
+        title="Lightning POS Dashboard"
+        user={user}
+        onLogout={onLogout}
+      />
 
       <DashboardContent>
         <DashboardGrid>
