@@ -7,7 +7,6 @@ import { ApiProductRepository } from '../../../data/repositories/ApiProductRepos
 import { ApiMemberRepository } from '../../../data/repositories/ApiMemberRepository';
 import { ApiOrderRepository } from '../../../data/repositories/ApiOrderRepository';
 import { ScanProductUseCase } from '../../../application/use-cases/ScanProductUseCase';
-import { SyncProductsUseCase } from '../../../application/use-cases/SyncProductsUseCase';
 import { Product } from '../../../domain/entities/Product';
 import { Member } from '../../../domain/entities/Member';
 import { IdentifyMemberUseCase } from '../../../application/use-cases/IdentifyMemberUseCase';
@@ -256,15 +255,7 @@ const OrderSummary = styled.div`
   }
 `;
 
-const SyncBadge = styled.span`
-  font-size: 0.8125rem;
-  color: #10b981;
-  font-weight: 500;
-  background: rgba(16, 185, 129, 0.1);
-  padding: 0.375rem 0.75rem;
-  border-radius: 20px;
-  animation: ${fadeIn} 0.3s ease-out;
-`;
+
 
 interface OrderItem {
   product: Product;
@@ -278,7 +269,6 @@ const orderRepository = new ApiOrderRepository();
 
 const scanUseCase = new ScanProductUseCase(productRepository);
 const identifyMemberUseCase = new IdentifyMemberUseCase(memberRepository);
-const syncUseCase = new SyncProductsUseCase(productRepository);
 
 interface CreateOrderPageProps {
   onLogout?: () => void;
@@ -292,11 +282,9 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
   const [member, setMember] = useState<Member | null>(null);
   const [promotionResult, setPromotionResult] = useState<PromotionResult | null>(null);
   const [isScanning, setIsScanning] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
   const [isIdentifyingMember, setIsIdentifyingMember] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [syncMessage, setSyncMessage] = useState<string | null>(null);
   
   const inputRef = useRef<HTMLInputElement>(null);
   const memberInputRef = useRef<HTMLInputElement>(null);
@@ -407,7 +395,7 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
     setError(null);
   };
 
-  const handleProcessPayment = async (method: 'CASH' | 'CREDIT' | 'QR', receivedAmount?: number) => {
+  const handleProcessPayment = async (method: 'CASH', receivedAmount?: number) => {
     const itemDtos = items.map(i => ({
       productId: i.product.id,
       quantity: i.quantity,
@@ -421,29 +409,7 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
     });
   };
 
-  const handleSync = async () => {
-    setIsSyncing(true);
-    setError(null);
-    setSyncMessage(null);
-    try {
-      const mid = import.meta.env.VITE_MID;
-      const sid = import.meta.env.VITE_SID;
-      
-      if (!mid || !sid) {
-        throw new Error('MID or SID not configured in environment');
-      }
 
-      const result = await syncUseCase.execute(mid, sid);
-      if (result.success) {
-        setSyncMessage(`Sync successful! ${result.count} products updated.`);
-        setTimeout(() => setSyncMessage(null), 3000);
-      } else setError('Sync failed.');
-    } catch (err: any) {
-      setError(err.message || 'Error during sync.');
-    } finally {
-      setIsSyncing(false);
-    }
-  };
 
   const total = promotionResult?.finalTotal ?? items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
 
@@ -453,14 +419,7 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
         title="Lightning POS"
         user={user}
         onLogout={onLogout}
-        extraContent={
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            {syncMessage && <SyncBadge>{syncMessage}</SyncBadge>}
-            <Button variant="secondary" onClick={handleSync} isLoading={isSyncing} disabled={isSyncing} style={{ width: 'auto' }}>
-              Sync Products
-            </Button>
-          </div>
-        }
+        extraContent={null}
       />
 
       <Main>

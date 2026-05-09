@@ -187,7 +187,7 @@ interface PaymentModalProps {
   onClose: () => void;
   totalAmount: number;
   onPaymentSuccess: () => void;
-  onProcessPayment: (method: 'CASH' | 'CREDIT' | 'QR', receivedAmount?: number) => Promise<any>;
+  onProcessPayment: (method: 'CASH', receivedAmount?: number) => Promise<any>;
 }
 
 export const PaymentModal: React.FC<PaymentModalProps> = ({ 
@@ -197,27 +197,34 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   onPaymentSuccess,
   onProcessPayment 
 }) => {
-  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'credit' | 'qr'>('cash');
+  const [paymentMethod, setPaymentMethod] = useState<'cash'>('cash');
   const [cashReceived, setCashReceived] = useState<string>('');
   const [step, setStep] = useState<'selection' | 'processing' | 'success'>('selection');
   const [change, setChange] = useState<number>(0);
+  const [isCalculated, setIsCalculated] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setStep('selection');
       setCashReceived('');
       setPaymentMethod('cash');
+      setIsCalculated(false);
     }
   }, [isOpen]);
 
-  const handleCashPayment = async (e: React.FormEvent) => {
+  const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
     const received = parseFloat(cashReceived);
     if (isNaN(received) || received < totalAmount) {
       alert('จำนวนเงินไม่ถูกต้อง');
       return;
     }
-    
+    setChange(received - totalAmount);
+    setIsCalculated(true);
+  };
+
+  const handleConfirmPayment = async () => {
+    const received = parseFloat(cashReceived);
     setStep('processing');
     try {
       const response = await onProcessPayment('CASH', received);
@@ -229,16 +236,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
     }
   };
 
-  const handleOtherPayment = async () => {
-    setStep('processing');
-    try {
-      await onProcessPayment(paymentMethod === 'credit' ? 'CREDIT' : 'QR');
-      setStep('success');
-    } catch (err: any) {
-      alert(`ชำระเงินไม่สำเร็จ: ${err.message}`);
-      setStep('selection');
-    }
-  };
+
 
   if (!isOpen) return null;
 
@@ -266,42 +264,38 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg>
                   Cash
                 </MethodBtn>
-                <MethodBtn 
-                  $isActive={paymentMethod === 'credit'}
-                  onClick={() => setPaymentMethod('credit')}
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                  Credit Card (EDC)
-                </MethodBtn>
-                <MethodBtn 
-                  $isActive={paymentMethod === 'qr'}
-                  onClick={() => setPaymentMethod('qr')}
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                  QR Code
-                </MethodBtn>
               </PaymentMethods>
 
-              {paymentMethod === 'cash' ? (
-                <form onSubmit={handleCashPayment}>
-                  <InputField
-                    label="Cash Received"
-                    value={cashReceived}
-                    onChange={(e) => setCashReceived(e.target.value)}
-                    type="number"
-                    placeholder="0.00"
-                    autoFocus
-                  />
-                  <Button type="submit" disabled={!cashReceived || parseFloat(cashReceived) < totalAmount}>
-                    Confirm Payment
-                  </Button>
-                </form>
-              ) : (
-                <div style={{ textAlign: 'center' }}>
-                  <p style={{ color: '#94a3b8', fontSize: '0.875rem', marginBottom: '1.5rem' }}>Please follow instructions on the payment device.</p>
-                  <Button onClick={handleOtherPayment}>
-                    Start {paymentMethod === 'credit' ? 'EDC' : 'QR'} Flow
-                  </Button>
+              {paymentMethod === 'cash' && (
+                <div>
+                  <form onSubmit={handleCalculate}>
+                    <InputField
+                      label="Cash Received"
+                      value={cashReceived}
+                      onChange={(e) => {
+                        setCashReceived(e.target.value);
+                        setIsCalculated(false);
+                      }}
+                      type="number"
+                      placeholder="0.00"
+                      autoFocus
+                    />
+                    {!isCalculated ? (
+                      <Button type="submit" disabled={!cashReceived || parseFloat(cashReceived) < totalAmount}>
+                        Calculate Change
+                      </Button>
+                    ) : (
+                      <div style={{ marginTop: '1.5rem', animation: 'fadeIn 0.3s ease-out' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '12px', marginBottom: '1.5rem' }}>
+                          <span style={{ color: '#94a3b8' }}>Change to return</span>
+                          <span style={{ color: '#10b981', fontWeight: 700, fontSize: '1.25rem' }}>${change.toFixed(2)}</span>
+                        </div>
+                        <Button onClick={handleConfirmPayment}>
+                          Confirm Payment
+                        </Button>
+                      </div>
+                    )}
+                  </form>
                 </div>
               )}
             </div>
@@ -310,7 +304,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           {step === 'processing' && (
             <ProcessingView>
               <div className="spinner"></div>
-              <p>{paymentMethod === 'cash' ? 'Opening drawer...' : `Processing ${paymentMethod === 'credit' ? 'Credit Card' : 'QR Code'}...`}</p>
+              <p>Opening drawer...</p>
             </ProcessingView>
           )}
 
@@ -320,12 +314,10 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
               </div>
               <h3>Payment Successful</h3>
-              {paymentMethod === 'cash' && (
-                <div className="change-display">
-                  <span>Change Amount</span>
-                  <span className="change-amount">${change.toFixed(2)}</span>
-                </div>
-              )}
+              <div className="change-display">
+                <span>Change Amount</span>
+                <span className="change-amount">${change.toFixed(2)}</span>
+              </div>
               <Button onClick={() => { onPaymentSuccess(); onClose(); }}>
                 Complete & Print Receipt
               </Button>
