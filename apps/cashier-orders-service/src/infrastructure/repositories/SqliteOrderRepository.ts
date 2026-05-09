@@ -14,25 +14,25 @@ export class SqliteOrderRepository implements OrderRepository {
   ) {}
 
   async save(order: Order): Promise<void> {
-    await this.db.transaction(async (tx) => {
-      await tx.insert(schema.orders).values({
+    this.db.transaction((tx) => {
+      tx.insert(schema.orders).values({
         id: order.id,
         totalAmount: order.totalAmount,
         staffId: order.staffId,
         memberId: order.memberId,
         status: order.status,
         createdAt: order.createdAt,
-      });
+      }).run();
 
       if (order.items.length > 0) {
-        await tx.insert(schema.orderItems).values(
+        tx.insert(schema.orderItems).values(
           order.items.map((item) => ({
             orderId: order.id,
             productId: item.productId,
             quantity: item.quantity,
             price: item.price,
           })),
-        );
+        ).run();
       }
     });
   }

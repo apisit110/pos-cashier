@@ -1,23 +1,23 @@
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from './schema';
 
-export async function seedRoles(db: BetterSQLite3Database<typeof schema>) {
+export function seedRoles(db: any) {
   const roles = [
     { id: 1, roleName: 'manager' },
     { id: 2, roleName: 'cashier' },
   ];
 
   for (const role of roles) {
-    await db.insert(schema.roles)
+    db.insert(schema.roles)
       .values(role)
       .onConflictDoUpdate({ 
         target: schema.roles.id, 
         set: { roleName: role.roleName } 
-      });
+      }).run();
   }
 }
 
-export async function seedPermissions(db: BetterSQLite3Database<typeof schema>) {
+export function seedPermissions(db: any) {
   const permissions = [
     // Manager permissions
     ...['manage_users', 'manage_products', 'view_transactions', 'void_orders'].map(p => ({
@@ -35,13 +35,14 @@ export async function seedPermissions(db: BetterSQLite3Database<typeof schema>) 
 
   for (const perm of permissions) {
     // For many-to-many or reference tables, we can use onConflictDoNothing or a custom check
-    await db.insert(schema.rolePermissions)
+    db.insert(schema.rolePermissions)
       .values(perm)
-      .onConflictDoNothing();
+      .onConflictDoNothing()
+      .run();
   }
 }
 
-export async function seedUsers(db: BetterSQLite3Database<typeof schema>) {
+export function seedUsers(db: any) {
   const managerUserId = process.env.MANAGER_USER_ID;
   const managerName = process.env.MANAGER_NAME;
   const managerPin = process.env.MANAGER_PIN;
@@ -50,7 +51,7 @@ export async function seedUsers(db: BetterSQLite3Database<typeof schema>) {
     throw new Error('MANAGER_USER_ID, MANAGER_NAME, and MANAGER_PIN must be defined in environment variables');
   }
 
-  await db.insert(schema.users)
+  db.insert(schema.users)
     .values({
       userId: managerUserId,
       roleId: 1,
@@ -66,19 +67,19 @@ export async function seedUsers(db: BetterSQLite3Database<typeof schema>) {
         pinHash: managerPin,
         updatedAt: new Date(),
       },
-    });
+    }).run();
 }
 
 /**
  * Main seed function wrapped in a transaction for safety
  */
-export async function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
+export function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
   try {
-    await db.transaction(async (tx) => {
+    db.transaction((tx) => {
       console.log('🌱 Seeding database...');
-      await seedRoles(tx);
-      await seedPermissions(tx);
-      await seedUsers(tx);
+      seedRoles(tx);
+      seedPermissions(tx);
+      seedUsers(tx);
       console.log('✅ Seeding completed successfully.');
     });
   } catch (error) {

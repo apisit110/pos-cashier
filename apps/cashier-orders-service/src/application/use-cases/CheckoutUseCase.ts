@@ -65,7 +65,7 @@ export class CheckoutUseCase {
       // 4. Update Order to PAID only if payment is SUCCESS
       if (paymentData.status === 'SUCCESS') {
         order.markAsPaid();
-        await this.orderRepository.save(order);
+        await this.orderRepository.update(order);
         console.log(`Order ${order.id} updated to PAID status.`);
       } else {
         console.log(`Order ${order.id} remains PENDING (waiting for payment confirmation)`);
