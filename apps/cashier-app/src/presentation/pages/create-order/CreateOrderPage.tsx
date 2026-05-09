@@ -370,6 +370,7 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
   const [isScanning, setIsScanning] = useState(false);
   const [scanFlash, setScanFlash] = useState(false);
   const [lastScannedId, setLastScannedId] = useState<string | null>(null);
+  const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
   const [isIdentifyingMember, setIsIdentifyingMember] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -406,6 +407,12 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
 
   const performScan = async (barcode: string) => {
     if (!barcode.trim()) return;
+
+    // If a new item is scanned while the success modal is open, auto-reset and continue.
+    if (isPaymentModalOpen && isPaymentSuccess) {
+      handlePaymentSuccess();
+    }
+
     setIsScanning(true);
     setError(null);
     try {
@@ -448,9 +455,10 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
         return;
       }
 
-      // Scanner Logic
-      if (target.tagName === 'INPUT' && target !== inputRef.current) return;
-      if (isPaymentModalOpen) return;
+      // Scanner Logic: If focused on any input, let the browser/form handle the keys.
+      if (target.tagName === 'INPUT') return;
+      
+      if (isPaymentModalOpen && !isPaymentSuccess) return;
       
       const currentTime = Date.now();
       if (currentTime - lastKeyTime > 50) buffer = '';
@@ -705,6 +713,7 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onLogout, user
         totalAmount={total}
         onPaymentSuccess={handlePaymentSuccess}
         onProcessPayment={handleProcessPayment}
+        onStepChange={(step) => setIsPaymentSuccess(step === 'success')}
       />
     </Container>
   );

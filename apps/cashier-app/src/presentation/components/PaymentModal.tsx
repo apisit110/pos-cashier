@@ -201,6 +201,7 @@ interface PaymentModalProps {
   totalAmount: number;
   onPaymentSuccess: () => void;
   onProcessPayment: (method: 'CASH', receivedAmount?: number) => Promise<any>;
+  onStepChange?: (step: 'selection' | 'processing' | 'success') => void;
 }
 
 export const PaymentModal: React.FC<PaymentModalProps> = ({ 
@@ -208,17 +209,20 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   onClose, 
   totalAmount, 
   onPaymentSuccess,
-  onProcessPayment 
+  onProcessPayment,
+  onStepChange
 }) => {
   const [paymentMethod, setPaymentMethod] = useState<'cash'>('cash');
   const [cashReceived, setCashReceived] = useState<string>('');
   const [step, setStep] = useState<'selection' | 'processing' | 'success'>('selection');
   const [change, setChange] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
     if (isOpen) {
       setStep('selection');
+      onStepChange?.('selection');
       setCashReceived('');
       setPaymentMethod('cash');
       setError(null);
@@ -240,11 +244,46 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
       const response = await onProcessPayment('CASH', received);
       setChange(response.changeAmount || (received - totalAmount));
       setStep('success');
+      onStepChange?.('success');
+      setCountdown(5); // Reset countdown
     } catch (err: any) {
       setError(err.message || 'Payment failed.');
       setStep('selection');
     }
   };
+
+  const handleComplete = () => {
+    onPaymentSuccess();
+    onClose();
+  };
+
+  useEffect(() => {
+    if (step !== 'success') return;
+
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          handleComplete();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    const handleSuccessKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        handleComplete();
+      }
+    };
+
+    window.addEventListener('keydown', handleSuccessKeyDown);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('keydown', handleSuccessKeyDown);
+    };
+  }, [step]);
 
   const currentReceived = parseFloat(cashReceived);
   const currentChange = !isNaN(currentReceived) ? Math.max(0, currentReceived - totalAmount) : 0;
@@ -337,9 +376,12 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                 <span>Change Amount</span>
                 <span className="change-amount">${change.toFixed(2)}</span>
               </div>
-              <Button onClick={() => { onPaymentSuccess(); onClose(); }}>
-                Complete & Print Receipt
+              <Button onClick={handleComplete}>
+                Next Order
               </Button>
+              <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--color-text-secondary, #94a3b8)', opacity: 0.7 }}>
+                Auto-closing in {countdown}s or press Enter
+              </div>
             </SuccessView>
           )}
         </ModalBody>
