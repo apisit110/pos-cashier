@@ -12,7 +12,7 @@ export class ApiTransactionRepository implements TransactionRepository {
     return {
       transactions: response.data.transactions.map((t: any) => ({
         id: t.id.toString(),
-        orderNumber: t.orderNumber,
+        orderId: t.orderId,
         amount: t.amount,
         paymentMethod: t.paymentMethod,
         status: t.status,

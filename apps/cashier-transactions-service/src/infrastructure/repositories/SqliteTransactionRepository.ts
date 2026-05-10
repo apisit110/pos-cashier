@@ -32,7 +32,7 @@ export class SqliteTransactionRepository implements TransactionRepository {
 
   async save(transaction: Transaction): Promise<void> {
     await this.db.insert(schema.transactions).values({
-      orderNumber: transaction.orderNumber,
+      orderId: transaction.orderId,
       amount: transaction.amount,
       paymentMethod: transaction.paymentMethod,
       status: transaction.status,
@@ -44,7 +44,7 @@ export class SqliteTransactionRepository implements TransactionRepository {
   private mapToEntity(result: any): Transaction {
     return new Transaction(
       result.id,
-      result.orderNumber,
+      result.orderId,
       result.amount,
       result.paymentMethod,
       result.status,

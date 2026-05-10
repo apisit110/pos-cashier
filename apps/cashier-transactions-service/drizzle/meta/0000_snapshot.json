@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "6e81b1c5-2084-476b-a4b3-01316f083d73",
+  "id": "6367a786-b68d-4334-b08a-89c58b6f8482",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "transactions": {
@@ -14,8 +14,8 @@
           "notNull": true,
           "autoincrement": true
         },
-        "order_number": {
-          "name": "order_number",
+        "order_id": {
+          "name": "order_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -58,10 +58,10 @@
         }
       },
       "indexes": {
-        "transactions_order_number_unique": {
-          "name": "transactions_order_number_unique",
+        "transactions_order_id_unique": {
+          "name": "transactions_order_id_unique",
           "columns": [
-            "order_number"
+            "order_id"
           ],
           "isUnique": true
         }

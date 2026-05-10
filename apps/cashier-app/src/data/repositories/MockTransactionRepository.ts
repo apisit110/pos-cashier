@@ -4,7 +4,7 @@ export class MockTransactionRepository implements TransactionRepository {
   private transactions: Transaction[] = [
     {
       id: '1',
-      orderNumber: 'ORD-001',
+      orderId: 'ORD-001',
       amount: 150.50,
       paymentMethod: 'cash',
       status: 'success',
@@ -13,7 +13,7 @@ export class MockTransactionRepository implements TransactionRepository {
     },
     {
       id: '2',
-      orderNumber: 'ORD-002',
+      orderId: 'ORD-002',
       amount: 45.00,
       paymentMethod: 'qr_promptpay',
       status: 'success',
@@ -22,7 +22,7 @@ export class MockTransactionRepository implements TransactionRepository {
     },
     {
       id: '3',
-      orderNumber: 'ORD-003',
+      orderId: 'ORD-003',
       amount: 220.00,
       paymentMethod: 'credit_card',
       status: 'success',
@@ -31,7 +31,7 @@ export class MockTransactionRepository implements TransactionRepository {
     },
     {
       id: '4',
-      orderNumber: 'ORD-004',
+      orderId: 'ORD-004',
       amount: 89.90,
       paymentMethod: 'cash',
       status: 'failed',
@@ -40,7 +40,7 @@ export class MockTransactionRepository implements TransactionRepository {
     },
     {
       id: '5',
-      orderNumber: 'ORD-005',
+      orderId: 'ORD-005',
       amount: 1200.00,
       paymentMethod: 'credit_card',
       status: 'success',

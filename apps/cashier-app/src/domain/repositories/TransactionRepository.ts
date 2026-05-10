@@ -1,6 +1,6 @@
 export interface Transaction {
   id: string;
-  orderNumber: string;
+  orderId: string;
   amount: number;
   paymentMethod: 'cash' | 'credit_card' | 'qr_promptpay';
   status: 'success' | 'failed' | 'refunded';

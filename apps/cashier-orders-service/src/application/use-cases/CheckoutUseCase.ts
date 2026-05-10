@@ -73,7 +73,7 @@ export class CheckoutUseCase {
 
         // 5. Create Transaction record
         await this.transactionService.createTransaction({
-          orderNumber: order.id,
+          orderId: order.id,
           amount: order.totalAmount,
           paymentMethod: data.paymentMethod,
           status: 'SUCCESS',

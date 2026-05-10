@@ -1,5 +1,5 @@
 export interface TransactionData {
-  orderNumber: string;
+  orderId: string;
   amount: number;
   paymentMethod: string;
   status: string;

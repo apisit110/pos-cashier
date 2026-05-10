@@ -181,7 +181,7 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
               ) : transactions.length > 0 ? (
                 transactions.map((tx) => (
                   <tr key={tx.id}>
-                    <td style={{ fontFamily: 'monospace', fontWeight: 600 }}>{tx.orderNumber}</td>
+                    <td style={{ fontFamily: 'monospace', fontWeight: 600 }}>{tx.orderId}</td>
                     <td>{formatDateTime(tx.createdAt)}</td>
                     <td>{tx.staffName}</td>
                     <td>
