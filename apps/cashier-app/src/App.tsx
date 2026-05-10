@@ -89,6 +89,15 @@ function App() {
     checkSession();
   }, []);
 
+  useEffect(() => {
+    if (user && user.role === 'cashier') {
+      const restrictedViews = ['dashboard', 'create-user', 'user-list', 'product-list', 'transaction-list', 'transaction-detail'];
+      if (restrictedViews.includes(currentView)) {
+        setCurrentView('create-order');
+      }
+    }
+  }, [currentView, user]);
+
   const handleLoginSuccess = (userData: { uid: string; username: string; roleId: number; accessToken: string; refreshToken: string }) => {
     const mappedUser = {
       uid: userData.uid.toString(),
@@ -143,7 +152,7 @@ function App() {
           )}
           {currentView === 'create-order' && (
             <CreateOrderPage 
-              onBack={() => setCurrentView('dashboard')}
+              onBack={user?.role === 'manager' ? () => setCurrentView('dashboard') : undefined}
               onLogout={handleLogout} 
               user={user} 
             />
@@ -157,14 +166,14 @@ function App() {
           )}
           {currentView === 'user-list' && (
             <UserListPage 
-              onBack={() => setCurrentView('dashboard')}
+              onBack={user?.role === 'manager' ? () => setCurrentView('dashboard') : () => setCurrentView('create-order')}
               onNavigateToCreateUser={() => setCurrentView('create-user')}
               getUsersUseCase={getUsersUseCase}
             />
           )}
           {currentView === 'transaction-list' && (
             <TransactionListPage 
-              onBack={() => setCurrentView('dashboard')}
+              onBack={user?.role === 'manager' ? () => setCurrentView('dashboard') : () => setCurrentView('create-order')}
               onViewDetail={(id: string) => {
                 setSelectedTransactionId(id);
                 setCurrentView('transaction-detail');
@@ -181,7 +190,7 @@ function App() {
           )}
           {currentView === 'product-list' && (
             <ProductListPage 
-              onBack={() => setCurrentView('dashboard')}
+              onBack={user?.role === 'manager' ? () => setCurrentView('dashboard') : () => setCurrentView('create-order')}
               getProductsUseCase={getProductsUseCase}
               syncProductsUseCase={syncProductsAppUseCase}
             />
