@@ -122,10 +122,11 @@ const Loader = styled.div`
 
 interface TransactionListPageProps {
   onBack: () => void;
+  onViewDetail: (id: number) => void;
   getTransactionsUseCase: GetTransactionsUseCase;
 }
 
-export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack, getTransactionsUseCase }) => {
+export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack, onViewDetail, getTransactionsUseCase }) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -168,12 +169,13 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
                 <th>Method</th>
                 <th>Amount</th>
                 <th>Status</th>
+                <th style={{ textAlign: 'right' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', padding: '3rem' }}>
+                  <td colSpan={7} style={{ textAlign: 'center', padding: '3rem' }}>
                     <Loader />
                     Loading transactions...
                   </td>
@@ -193,11 +195,31 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
                     <td>
                       <StatusBadge $status={tx.status}>{tx.status}</StatusBadge>
                     </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <button 
+                        onClick={() => onViewDetail(parseInt(tx.id))}
+                        style={{ 
+                          background: 'none', 
+                          border: '1px solid rgba(255,255,255,0.1)', 
+                          color: '#818cf8', 
+                          padding: '0.4rem 0.8rem', 
+                          borderRadius: '6px',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                        onMouseOver={(e) => { e.currentTarget.style.borderColor = '#818cf8'; e.currentTarget.style.background = 'rgba(129, 140, 248, 0.05)'; }}
+                        onMouseOut={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'none'; }}
+                      >
+                        View Details
+                      </button>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', padding: '3rem', color: '#94a3b8' }}>No transactions found.</td>
+                  <td colSpan={7} style={{ textAlign: 'center', padding: '3rem', color: '#94a3b8' }}>No transactions found.</td>
                 </tr>
               )}
             </tbody>

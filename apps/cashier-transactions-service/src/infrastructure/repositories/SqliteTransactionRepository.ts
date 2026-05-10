@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { eq } from 'drizzle-orm';
 import { Transaction } from '../../domain/entities/Transaction';
 import { TransactionRepository } from '../../domain/repositories/TransactionRepository';
 import { DATABASE_CONNECTION } from '../database/database.provider';
@@ -28,6 +29,22 @@ export class SqliteTransactionRepository implements TransactionRepository {
       transactions: results.map(r => this.mapToEntity(r)),
       total: totalCount,
     };
+  }
+  
+  async findById(id: number): Promise<Transaction | null> {
+    const results = await this.db
+      .select()
+      .from(schema.transactions)
+      .where(eq(schema.transactions.id, id))
+      .limit(1);
+
+    const result = results[0];
+
+    if (!result) {
+      return null;
+    }
+
+    return this.mapToEntity(result);
   }
 
   async save(transaction: Transaction): Promise<void> {

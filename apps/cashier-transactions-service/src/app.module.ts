@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TransactionController } from './presentation/controllers/TransactionController';
 import { GetTransactionsUseCase } from './application/use-cases/GetTransactionsUseCase';
+import { GetTransactionByIdUseCase } from './application/use-cases/GetTransactionByIdUseCase';
 import { CreateTransactionUseCase } from './application/use-cases/CreateTransactionUseCase';
 import { TransactionRepository } from './domain/repositories/TransactionRepository';
 import { SqliteTransactionRepository } from './infrastructure/repositories/SqliteTransactionRepository';
@@ -22,6 +23,7 @@ import { LoggingInterceptor } from './presentation/interceptors/LoggingIntercept
       useClass: LoggingInterceptor,
     },
     GetTransactionsUseCase,
+    GetTransactionByIdUseCase,
     CreateTransactionUseCase,
   ],
 })

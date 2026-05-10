@@ -57,4 +57,12 @@ export class MockTransactionRepository implements TransactionRepository {
       total: this.transactions.length
     };
   }
+
+  async getTransactionById(id: number): Promise<Transaction> {
+    const transaction = this.transactions.find(t => parseInt(t.id) === id);
+    if (!transaction) {
+      throw new Error(`Transaction with ID ${id} not found`);
+    }
+    return transaction;
+  }
 }

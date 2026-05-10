@@ -12,6 +12,7 @@ import { CreateUserUseCase } from './application/use-cases/CreateUserUseCase';
 import { SyncUserUseCase } from './application/use-cases/SyncUserUseCase';
 import { GetUsersUseCase } from './application/use-cases/GetUsersUseCase';
 import { GetTransactionsUseCase } from './application/use-cases/GetTransactionsUseCase';
+import { GetTransactionByIdUseCase } from './application/use-cases/GetTransactionByIdUseCase';
 import { GetProductsUseCase } from './application/use-cases/GetProductsUseCase';
 import { SyncProductsUseCase as SyncProductsAppUseCase } from './application/use-cases/SyncProductsUseCase';
 import { ApiAuthRepository } from './data/repositories/ApiAuthRepository';
@@ -19,6 +20,7 @@ import { ApiUserRepository } from './data/repositories/ApiUserRepository';
 import { ApiTransactionRepository } from './data/repositories/ApiTransactionRepository';
 import { ApiProductRepository } from './data/repositories/ApiProductRepository';
 import { MainLayout } from './presentation/components/MainLayout';
+import { TransactionDetailPage } from './presentation/pages/transaction-detail/TransactionDetailPage';
 
 const AppContainer = styled.div`
   width: 100%;
@@ -46,12 +48,14 @@ const createUserUseCase = new CreateUserUseCase(userRepository);
 const syncUserUseCase = new SyncUserUseCase(userRepository);
 const getUsersUseCase = new GetUsersUseCase(userRepository);
 const getTransactionsUseCase = new GetTransactionsUseCase(transactionRepository);
+const getTransactionByIdUseCase = new GetTransactionByIdUseCase(transactionRepository);
 const getProductsUseCase = new GetProductsUseCase(productRepository);
 const syncProductsAppUseCase = new SyncProductsAppUseCase(productRepository);
 
 function App() {
-  const [currentView, setCurrentView] = useState<'login' | 'create-order' | 'dashboard' | 'create-user' | 'user-list' | 'transaction-list' | 'product-list'>('login');
+  const [currentView, setCurrentView] = useState<'login' | 'create-order' | 'dashboard' | 'create-user' | 'user-list' | 'transaction-list' | 'transaction-detail' | 'product-list'>('login');
   const [user, setUser] = useState<{ uid: string; username: string; role: string; roleId: number; accessToken: string; refreshToken?: string } | null>(null);
+  const [selectedTransactionId, setSelectedTransactionId] = useState<number | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
@@ -168,7 +172,18 @@ function App() {
           {currentView === 'transaction-list' && (
             <TransactionListPage 
               onBack={() => setCurrentView('dashboard')}
+              onViewDetail={(id) => {
+                setSelectedTransactionId(id);
+                setCurrentView('transaction-detail');
+              }}
               getTransactionsUseCase={getTransactionsUseCase}
+            />
+          )}
+          {currentView === 'transaction-detail' && selectedTransactionId && (
+            <TransactionDetailPage 
+              transactionId={selectedTransactionId}
+              onBack={() => setCurrentView('transaction-list')}
+              getTransactionByIdUseCase={getTransactionByIdUseCase}
             />
           )}
           {currentView === 'product-list' && (
