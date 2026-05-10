@@ -10,9 +10,27 @@ export interface OrderItemDto {
 export class ApiOrderRepository {
   private readonly baseUrl = 'http://localhost:3002/v1/orders';
 
+  private getAuthHeaders() {
+    const sessionStr = localStorage.getItem('lightning_pos_session');
+    if (sessionStr) {
+      try {
+        const session = JSON.parse(sessionStr);
+        if (session.accessToken) {
+          return { 'Authorization': `Bearer ${session.accessToken}` };
+        }
+      } catch (e) {
+        console.error('Error parsing session for auth headers', e);
+      }
+    }
+    return {};
+  }
+
   async calculatePromotions(items: OrderItemDto[], memberId?: string): Promise<PromotionResult> {
     try {
-      const response = await api.post(`${this.baseUrl}/calculate`, { items, memberId });
+      const response = await api.post(`${this.baseUrl}/calculate`, 
+        { items, memberId }, 
+        { headers: this.getAuthHeaders() }
+      );
       const data = response.data;
       return {
         appliedPromotions: data.appliedPromotions,
@@ -31,7 +49,9 @@ export class ApiOrderRepository {
     receivedAmount?: number;
   }): Promise<any> {
     try {
-      const response = await api.post(`${this.baseUrl}/checkout`, data);
+      const response = await api.post(`${this.baseUrl}/checkout`, data, { 
+        headers: this.getAuthHeaders() 
+      });
       return response.data;
     } catch (error: any) {
       console.error('Error during checkout:', error);

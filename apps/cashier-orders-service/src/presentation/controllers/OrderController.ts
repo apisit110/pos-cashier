@@ -4,8 +4,6 @@ import { UpdateOrderStatusUseCase, UpdateOrderStatusDto } from '../../applicatio
 import { CalculateOrderUseCase, CalculateOrderDto } from '../../application/use-cases/CalculateOrderUseCase';
 import { CheckoutUseCase, CheckoutDto } from '../../application/use-cases/CheckoutUseCase';
 import { JwtAuthGuard } from '../../infrastructure/guards/JwtAuthGuard';
-import { Inject } from '@nestjs/common';
-import { StaffService } from '../../application/interfaces/StaffService';
 
 @Controller('v1/orders')
 @UseGuards(JwtAuthGuard)
@@ -29,8 +27,8 @@ export class OrderController {
   @Post('checkout')
   async checkout(@Body() checkoutDto: CheckoutDto, @Req() req: any) {
     try {
-      const staffId = req.user.sub;
-      const staffName = req.user.fullName || `Staff ${staffId}`;
+      const staffId = req.user.sub.toString();
+      const staffName = req.user.fullName;
       
       return await this.checkoutUseCase.execute(checkoutDto, staffId, staffName);
     } catch (error) {
@@ -41,7 +39,7 @@ export class OrderController {
   @Post()
   async createOrder(@Body() createOrderDto: CreateOrderDto, @Req() req: any) {
     try {
-      return await this.createOrderUseCase.execute(createOrderDto, req.user.sub);
+      return await this.createOrderUseCase.execute(createOrderDto, req.user.sub.toString());
     } catch (error) {
       throw new InternalServerErrorException((error as Error).message);
     }

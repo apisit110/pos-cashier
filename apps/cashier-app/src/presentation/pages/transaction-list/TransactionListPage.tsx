@@ -4,6 +4,8 @@ import { PageHeader } from '../../components/PageHeader';
 import type { GetTransactionsUseCase } from '../../../application/use-cases/GetTransactionsUseCase';
 import type { Transaction } from '../../../domain/repositories/TransactionRepository';
 
+import { formatDateTime } from '../../utils/date';
+
 const spin = keyframes`
   to { transform: rotate(360deg); }
 `;
@@ -180,7 +182,7 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
                 transactions.map((tx) => (
                   <tr key={tx.id}>
                     <td style={{ fontFamily: 'monospace', fontWeight: 600 }}>{tx.orderNumber}</td>
-                    <td>{new Date(tx.createdAt).toLocaleString()}</td>
+                    <td>{formatDateTime(tx.createdAt)}</td>
                     <td>{tx.staffName}</td>
                     <td>
                       <MethodBadge>
