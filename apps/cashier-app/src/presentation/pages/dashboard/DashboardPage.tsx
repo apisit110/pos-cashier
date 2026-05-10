@@ -1,26 +1,13 @@
-import React, { useState } from 'react';
-import styled, { keyframes } from 'styled-components';
-import { PageHeader } from '../../components/PageHeader';
-import { SyncProductUseCase } from '../../../application/use-cases/SyncProductUseCase';
-import { ApiProductRepository } from '../../../data/repositories/ApiProductRepository';
-
-// For simplicity, instantiating dependencies here.
-const productRepository = new ApiProductRepository();
-const syncProductUseCase = new SyncProductUseCase(productRepository);
+import React from 'react';
+import styled from 'styled-components';
 
 interface DashboardPageProps {
-  onLogout: () => void;
   onNavigateToSell: () => void;
-  onNavigateToCreateUser: () => void;
   onNavigateToUserList: () => void;
   onNavigateToTransactionList: () => void;
   user: { uid: string; username: string; role: string; accessToken: string } | null;
 }
 
-const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-`;
 
 const DashboardContainer = styled.div`
   display: flex;
@@ -107,63 +94,13 @@ const DashboardCard = styled.div<{ $isHighlight?: boolean }>`
   }
 `;
 
-const StatusMessage = styled.div<{ $type: 'success' | 'error' }>`
-  margin-top: 2rem;
-  padding: 1rem 1.5rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  font-weight: 500;
-  animation: ${fadeIn} 0.3s ease;
-  background-color: ${({ $type }) => $type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'};
-  color: ${({ $type }) => $type === 'success' ? '#16a34a' : '#dc2626'};
-  border: 1px solid ${({ $type }) => $type === 'success' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
-`;
-
-const LoadingOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(15, 23, 42, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  backdrop-filter: blur(4px);
-  font-weight: 600;
-  color: ${({ theme }) => theme.semantics.colors.accent.primary};
-`;
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({ 
-  onLogout, 
   onNavigateToSell, 
-  onNavigateToCreateUser,
   onNavigateToUserList,
   onNavigateToTransactionList,
-  user 
+  user
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
-
-  const handleSyncProduct = async () => {
-    setIsLoading(true);
-    setMessage(null);
-    try {
-      const mid = import.meta.env.VITE_MID;
-      const sid = import.meta.env.VITE_SID;
-      
-      if (!mid || !sid) {
-        throw new Error('MID or SID not configured in environment');
-      }
-
-      const result = await syncProductUseCase.execute(mid, sid);
-      setMessage({ text: `Products synced! ${result.count} items updated.`, type: 'success' });
-    } catch (err: any) {
-      setMessage({ text: err.message || 'Failed to sync products', type: 'error' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <DashboardContainer>
@@ -214,27 +151,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             <p>Add new cashiers, update permissions, and monitor activity.</p>
           </DashboardCard>
 
-          <DashboardCard onClick={handleSyncProduct}>
-            <div className="card-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-                <line x1="12" y1="22.08" x2="12" y2="12" />
-              </svg>
-            </div>
-            <h3>Inventory Sync</h3>
-            <p>Pull latest product data and pricing from the central server.</p>
-          </DashboardCard>
         </DashboardGrid>
-
-
-        {message && (
-          <StatusMessage $type={message.type}>
-            {message.text}
-          </StatusMessage>
-        )}
-
-        {isLoading && <LoadingOverlay>Synchronizing data...</LoadingOverlay>}
       </DashboardContent>
     </DashboardContainer>
   );

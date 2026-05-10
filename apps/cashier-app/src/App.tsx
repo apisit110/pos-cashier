@@ -140,9 +140,7 @@ function App() {
         >
           {currentView === 'dashboard' && (
             <DashboardPage 
-              onLogout={handleLogout} 
               onNavigateToSell={handleNavigateToSell} 
-              onNavigateToCreateUser={() => setCurrentView('create-user')}
               onNavigateToUserList={() => setCurrentView('user-list')}
               onNavigateToTransactionList={() => setCurrentView('transaction-list')}
               user={user} 

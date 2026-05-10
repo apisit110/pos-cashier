@@ -116,6 +116,33 @@ const Loader = styled.div`
   vertical-align: middle;
 `;
 
+const LoadingOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+  font-weight: 600;
+  color: ${({ theme }) => theme.semantics.colors.accent.primary};
+`;
+
+const StatusMessage = styled.div<{ $type: 'success' | 'error' }>`
+  margin-bottom: 1.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  font-weight: 500;
+  font-size: 0.875rem;
+  background-color: ${({ $type }) => $type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'};
+  color: ${({ $type }) => $type === 'success' ? '#16a34a' : '#dc2626'};
+  border: 1px solid ${({ $type }) => $type === 'success' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
+`;
+
 interface ProductListPageProps {
   onBack: () => void;
   getProductsUseCase: GetProductsUseCase;
@@ -126,6 +153,7 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   const fetchProducts = useCallback(async () => {
     setIsLoading(true);
@@ -143,14 +171,21 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
 
   const handleSync = async () => {
     setIsSyncing(true);
+    setMessage(null);
     try {
-      // These would ideally come from context/settings
-      const mid = 'M001'; 
-      const sid = 'S001';
-      await syncProductsUseCase.execute(mid, sid);
+      const mid = import.meta.env.VITE_MID;
+      const sid = import.meta.env.VITE_SID;
+
+      if (!mid || !sid) {
+        throw new Error('MID or SID not configured in environment');
+      }
+
+      const result = await syncProductsUseCase.execute(mid, sid);
+      setMessage({ text: `Products synced! ${result.count} items updated.`, type: 'success' });
       await fetchProducts();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to sync products:', error);
+      setMessage({ text: error.message || 'Failed to sync products', type: 'error' });
     } finally {
       setIsSyncing(false);
     }
@@ -173,6 +208,11 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
       />
 
       <Content>
+        {message && (
+          <StatusMessage $type={message.type}>
+            {message.text}
+          </StatusMessage>
+        )}
         <TableWrapper>
           <Table>
             <thead>
@@ -216,6 +256,7 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
             </tbody>
           </Table>
         </TableWrapper>
+        {isSyncing && <LoadingOverlay>Synchronizing data...</LoadingOverlay>}
       </Content>
     </Container>
   );
