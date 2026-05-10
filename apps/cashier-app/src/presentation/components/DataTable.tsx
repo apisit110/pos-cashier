@@ -1,8 +1,21 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 
-const spin = keyframes`
-  to { transform: rotate(360deg); }
+const shimmer = keyframes`
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+`;
+
+const SkeletonBase = styled.div`
+  height: 1rem;
+  background: linear-gradient(90deg, 
+    ${({ theme }) => theme.semantics.colors.border.subtle} 25%, 
+    rgba(255, 255, 255, 0.08) 50%, 
+    ${({ theme }) => theme.semantics.colors.border.subtle} 75%
+  );
+  background-size: 200% 100%;
+  animation: ${shimmer} 2s infinite linear;
+  border-radius: 4px;
 `;
 
 const TableWrapper = styled.div`
@@ -157,17 +170,6 @@ const PageNumber = styled.button<{ $active?: boolean }>`
   }
 `;
 
-const Loader = styled.div`
-  width: 24px;
-  height: 24px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-top-color: ${({ theme }) => theme.semantics.colors.accent.primary};
-  border-radius: 50%;
-  animation: ${spin} 1s linear infinite;
-  display: inline-block;
-  margin-right: 0.75rem;
-  vertical-align: middle;
-`;
 
 export interface Column<T> {
   header: string;
@@ -224,12 +226,20 @@ export function DataTable<T extends { id: string | number }>({
         </thead>
         <tbody>
           {isLoading ? (
-            <tr>
-              <td colSpan={columns.length} style={{ textAlign: 'center', padding: '3rem' }}>
-                <Loader />
-                {loadingMessage}
-              </td>
-            </tr>
+            Array.from({ length: Math.min(pageSize, 10) }).map((_, rowIndex) => (
+              <tr key={`skeleton-${rowIndex}`}>
+                {columns.map((col, colIndex) => (
+                  <td key={`skeleton-${rowIndex}-${colIndex}`}>
+                    <SkeletonBase 
+                      style={{ 
+                        width: col.width || '80%', 
+                        margin: col.textAlign === 'right' ? '0 0 0 auto' : col.textAlign === 'center' ? '0 auto' : '0' 
+                      }} 
+                    />
+                  </td>
+                ))}
+              </tr>
+            ))
           ) : data.length > 0 ? (
             data.map((item) => (
               <tr key={item.id}>
