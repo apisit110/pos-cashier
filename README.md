@@ -102,8 +102,18 @@ pnpm run dev
 
 todo
 
-[ ] - list transaction
-[ ] - transaction detail + order
-[ ] - list product
+[ ] - report summary daily
+[ ] - report summary weekly
+[ ] - report summary monthly
+[ ] - report summary yearly
+
+[ ] - theme light
+[x] - theme dark
+
+[ ] - sync order (upload)
+[ ] - sync transaction (upload)
+[ ] - sync user (upload)
+[ ] - sync promotion (download)
+
 [ ] - receipt
 [ ] - void (HOLD)

@@ -3,6 +3,9 @@ import { z } from 'zod';
 
 export const CreateTransactionSchema = z.object({
   orderId: z.string().min(1, 'Order ID is required'),
+  merchantId: z.string().min(1, 'Merchant ID is required'),
+  storeId: z.string().min(1, 'Store ID is required'),
+  terminalId: z.string().optional(),
   amount: z.number().positive('Amount must be positive'),
   paymentMethod: z.enum(['CASH', 'CREDIT', 'QR']),
   status: z.enum(['SUCCESS', 'FAILED', 'REFUNDED']),

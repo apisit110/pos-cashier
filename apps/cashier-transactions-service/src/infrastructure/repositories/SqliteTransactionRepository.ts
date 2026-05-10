@@ -93,23 +93,41 @@ export class SqliteTransactionRepository implements TransactionRepository {
     await this.db.insert(schema.transactions).values({
       id: transaction.id,
       orderId: transaction.orderId,
+      merchantId: transaction.merchantId,
+      storeId: transaction.storeId,
+      terminalId: transaction.terminalId,
       amount: transaction.amount,
       paymentMethod: transaction.paymentMethod,
       status: transaction.status,
       staffName: transaction.staffName,
+      isSynced: transaction.isSynced,
       createdAt: transaction.createdAt,
     });
+  }
+  
+  async update(transaction: Transaction): Promise<void> {
+    await this.db
+      .update(schema.transactions)
+      .set({
+        isSynced: transaction.isSynced,
+        status: transaction.status,
+      })
+      .where(eq(schema.transactions.id, transaction.id));
   }
 
   private mapToEntity(result: any): Transaction {
     return new Transaction(
       result.id,
       result.orderId,
+      result.merchantId,
+      result.storeId,
       result.amount,
       result.paymentMethod,
       result.status,
       result.staffName,
       result.createdAt,
+      result.terminalId || undefined,
+      result.isSynced,
     );
   }
 }

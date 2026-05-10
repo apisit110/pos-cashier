@@ -13,4 +13,5 @@ export abstract class TransactionRepository {
   abstract findAll(page: number, limit: number, filter?: TransactionFilter): Promise<{ transactions: Transaction[]; total: number }>;
   abstract findById(id: string): Promise<Transaction | null>;
   abstract save(transaction: Transaction): Promise<void>;
+  abstract update(transaction: Transaction): Promise<void>;
 }

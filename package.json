@@ -20,5 +20,9 @@
       "better-sqlite3",
       "esbuild"
     ]
+  },
+  "dependencies": {
+    "bullmq": "^5.76.6",
+    "ioredis": "^5.10.1"
   }
 }

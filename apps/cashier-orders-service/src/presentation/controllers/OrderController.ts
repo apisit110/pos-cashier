@@ -12,7 +12,7 @@ export class OrderController {
     private readonly createOrderUseCase: CreateOrderUseCase,
     private readonly updateOrderStatusUseCase: UpdateOrderStatusUseCase,
     private readonly calculateOrderUseCase: CalculateOrderUseCase,
-    private readonly checkoutUseCase: CheckoutUseCase
+    private readonly checkoutUseCase: CheckoutUseCase,
   ) {}
 
   @Post('calculate')

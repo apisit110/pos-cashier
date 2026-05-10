@@ -1,9 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Order, OrderItem, OrderStatus } from '../../domain/entities/Order';
 import type { OrderRepository } from '../interfaces/OrderRepository';
 import type { PaymentService } from '../interfaces/PaymentService';
 import { PaymentMethod } from '../interfaces/PaymentService';
 import type { TransactionService } from '../interfaces/TransactionService';
+import { SyncQueueService } from '../../infrastructure/queue/SyncQueueService';
 
 export class CheckoutDto {
   items: { productId: string; quantity: number; price: number }[];
@@ -21,7 +23,9 @@ export class CheckoutUseCase {
     @Inject('PaymentService')
     private readonly paymentService: PaymentService,
     @Inject('TransactionService')
-    private readonly transactionService: TransactionService
+    private readonly transactionService: TransactionService,
+    private readonly syncQueueService: SyncQueueService,
+    private readonly configService: ConfigService,
   ) {}
 
   async execute(data: CheckoutDto, staffId: string, staffName: string): Promise<Order> {
@@ -38,13 +42,21 @@ export class CheckoutUseCase {
       (item) => new OrderItem(item.productId, item.quantity, item.price)
     );
 
+    const merchantId = this.configService.get<string>('MERCHANT_ID', 'DEFAULT_MERCHANT');
+    const storeId = this.configService.get<string>('STORE_ID', 'DEFAULT_STORE');
+    const terminalId = this.configService.get<string>('TERMINAL_ID', 'DEFAULT_TERMINAL');
+
     const order = new Order(
       Math.random().toString(36).substring(2, 9),
+      merchantId,
+      storeId,
       items,
       totalAmount,
       staffId,
       new Date(),
+      terminalId,
       OrderStatus.PENDING,
+      false,
       data.memberId
     );
 
@@ -69,11 +81,15 @@ export class CheckoutUseCase {
       if (paymentData.status === 'SUCCESS') {
         order.markAsPaid();
         await this.orderRepository.update(order);
-        console.log(`Order ${order.id} updated to PAID status.`);
+        await this.syncQueueService.addOrderSyncJob(order.id);
+        console.log(`Order ${order.id} updated to PAID status and queued for sync.`);
 
         // 5. Create Transaction record
         await this.transactionService.createTransaction({
           orderId: order.id,
+          merchantId: order.merchantId,
+          storeId: order.storeId,
+          terminalId: order.terminalId,
           amount: order.totalAmount,
           paymentMethod: data.paymentMethod,
           status: 'SUCCESS',

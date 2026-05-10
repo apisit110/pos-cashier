@@ -17,10 +17,14 @@ export class SqliteOrderRepository implements OrderRepository {
     this.db.transaction((tx) => {
       tx.insert(schema.orders).values({
         id: order.id,
+        merchantId: order.merchantId,
+        storeId: order.storeId,
+        terminalId: order.terminalId,
         totalAmount: order.totalAmount,
         staffId: order.staffId,
         memberId: order.memberId,
         status: order.status,
+        isSynced: order.isSynced,
         createdAt: order.createdAt,
       }).run();
 
@@ -55,11 +59,15 @@ export class SqliteOrderRepository implements OrderRepository {
 
     return new Order(
       result.id,
+      result.merchantId,
+      result.storeId,
       items,
       result.totalAmount,
       result.staffId,
       result.createdAt,
+      result.terminalId || undefined,
       result.status as OrderStatus,
+      result.isSynced,
       result.memberId || undefined,
     );
   }
@@ -69,6 +77,7 @@ export class SqliteOrderRepository implements OrderRepository {
       .update(schema.orders)
       .set({
         status: order.status,
+        isSynced: order.isSynced,
       })
       .where(eq(schema.orders.id, order.id));
   }

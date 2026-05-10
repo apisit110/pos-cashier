@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { BullModule } from '@nestjs/bullmq';
 import { TransactionController } from './presentation/controllers/TransactionController';
 import { GetTransactionsUseCase } from './application/use-cases/GetTransactionsUseCase';
 import { GetTransactionByIdUseCase } from './application/use-cases/GetTransactionByIdUseCase';
@@ -8,10 +9,24 @@ import { SqliteTransactionRepository } from './infrastructure/repositories/Sqlit
 import { DatabaseProvider } from './infrastructure/database/database.provider';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './presentation/interceptors/LoggingInterceptor';
+import { SyncQueueService } from './infrastructure/queue/SyncQueueService';
+import { MarkTransactionSyncedUseCase } from './application/use-cases/MarkTransactionSyncedUseCase';
+import { SYNC_QUEUE_NAME } from './infrastructure/queue/sync-queue.constants';
+import { InternalTransactionController } from './presentation/controllers/InternalTransactionController';
 
 @Module({
-  imports: [],
-  controllers: [TransactionController],
+  imports: [
+    BullModule.forRoot({
+      connection: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
+    BullModule.registerQueue({
+      name: SYNC_QUEUE_NAME,
+    }),
+  ],
+  controllers: [TransactionController, InternalTransactionController],
   providers: [
     DatabaseProvider,
     {
@@ -25,6 +40,8 @@ import { LoggingInterceptor } from './presentation/interceptors/LoggingIntercept
     GetTransactionsUseCase,
     GetTransactionByIdUseCase,
     CreateTransactionUseCase,
+    SyncQueueService,
+    MarkTransactionSyncedUseCase,
   ],
 })
 export class AppModule {}
