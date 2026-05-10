@@ -183,29 +183,44 @@ interface DataTableProps<T> {
   columns: Column<T>[];
   data: T[];
   isLoading?: boolean;
-  totalItems: number;
-  currentPage: number;
-  pageSize: number;
-  onPageChange: (page: number) => void;
-  onPageSizeChange: (size: number) => void;
+  totalItems?: number;
+  currentPage?: number;
+  pageSize?: number;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (size: number) => void;
   emptyMessage?: string;
+  emptyState?: React.ReactNode;
+  rowKey?: keyof T | ((item: T) => string | number);
+  getRowClassName?: (item: T) => string;
+  stickyHeader?: boolean;
 }
 
-export function DataTable<T extends { id: string | number }>({
+export function DataTable<T>({
   columns,
   data,
   isLoading,
-  totalItems,
-  currentPage,
-  pageSize,
+  totalItems = 0,
+  currentPage = 1,
+  pageSize = 10,
   onPageChange,
   onPageSizeChange,
   emptyMessage = 'No data found.',
+  emptyState,
+  rowKey = 'id' as keyof T,
+  getRowClassName,
+  stickyHeader = false,
 }: DataTableProps<T>) {
   const totalPages = Math.ceil(totalItems / pageSize);
   
   const startItem = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
   const endItem = Math.min(currentPage * pageSize, totalItems);
+
+  const getKeyValue = (item: T): string | number => {
+    if (typeof rowKey === 'function') return rowKey(item);
+    return (item as any)[rowKey];
+  };
+
+  const isPaginated = !!onPageChange && !!onPageSizeChange;
 
   return (
     <TableWrapper>
@@ -215,7 +230,15 @@ export function DataTable<T extends { id: string | number }>({
             {columns.map((col) => (
               <th 
                 key={col.key} 
-                style={{ width: col.width, textAlign: col.textAlign || 'left' }}
+                style={{ 
+                  width: col.width, 
+                  textAlign: col.textAlign || 'left',
+                  position: stickyHeader ? 'sticky' : 'relative',
+                  top: stickyHeader ? 0 : 'auto',
+                  zIndex: stickyHeader ? 10 : 1,
+                  background: stickyHeader ? 'rgba(15, 23, 42, 0.95)' : 'transparent',
+                  backdropFilter: stickyHeader ? 'blur(8px)' : 'none',
+                }}
               >
                 {col.header}
               </th>
@@ -239,32 +262,36 @@ export function DataTable<T extends { id: string | number }>({
               </tr>
             ))
           ) : data.length > 0 ? (
-            data.map((item) => (
-              <tr key={item.id}>
-                {columns.map((col) => (
-                  <td 
-                    key={`${item.id}-${col.key}`} 
-                    style={{ textAlign: col.textAlign || 'left' }}
-                  >
-                    {col.render ? col.render(item) : (item as any)[col.key]}
-                  </td>
-                ))}
-              </tr>
-            ))
+            data.map((item) => {
+              const key = getKeyValue(item);
+              const className = getRowClassName ? getRowClassName(item) : '';
+              return (
+                <tr key={key} className={className}>
+                  {columns.map((col) => (
+                    <td 
+                      key={`${key}-${col.key}`} 
+                      style={{ textAlign: col.textAlign || 'left' }}
+                    >
+                      {col.render ? col.render(item) : (item as any)[col.key]}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })
           ) : (
             <tr>
               <td 
                 colSpan={columns.length} 
                 style={{ textAlign: 'center', padding: '3rem', color: '#94a3b8' }}
               >
-                {emptyMessage}
+                {emptyState || emptyMessage}
               </td>
             </tr>
           )}
         </tbody>
       </Table>
 
-      {!isLoading && totalItems > 0 && (
+      {isPaginated && !isLoading && totalItems > 0 && (
         <PaginationContainer>
           <PaginationLeft>
             <RowsPerPage>

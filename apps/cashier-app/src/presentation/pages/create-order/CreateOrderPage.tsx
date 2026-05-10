@@ -12,12 +12,10 @@ import { Member } from '../../../domain/entities/Member';
 import { IdentifyMemberUseCase } from '../../../application/use-cases/IdentifyMemberUseCase';
 import type { PromotionResult } from '../../../application/use-cases/CalculatePromotionUseCase';
 import { PaymentModal } from '../../components/PaymentModal';
+import { DataTable, type Column } from '../../components/DataTable';
 
 // Styled Components
-const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-`;
+
 
 const scanSuccess = keyframes`
   0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
@@ -158,7 +156,8 @@ const TablePanel = styled.section`
   display: flex;
   flex-direction: column;
   background: ${({ theme }) => theme.semantics.colors.bg.main};
-  overflow: hidden; /* Summary will be fixed at bottom */
+  overflow: hidden; 
+  min-height: 0; /* Crucial: allows flex child to shrink and scroll */
 
   .table-header {
     padding: 1.5rem 1.5rem 1rem;
@@ -176,103 +175,58 @@ const TablePanel = styled.section`
       color: ${({ theme }) => theme.semantics.colors.text.secondary};
     }
   }
+
+  /* Row animations for the DataTable */
+  tr.new-item {
+    animation: ${rowIn} 0.5s ease-out;
+  }
 `;
 
 const ScrollArea = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding: 0 1.5rem;
+  min-height: 0;
+  padding: 0 1.5rem 2rem;
+
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: ${({ theme }) => theme.semantics.colors.border.subtle};
+    border-radius: 10px;
+    &:hover { background: ${({ theme }) => theme.semantics.colors.text.secondary}; }
+  }
+`;
+
+const QtyControls = styled.div`
   display: flex;
-  flex-direction: column;
-`;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
 
-const TableWrapper = styled.div`
-  background: ${({ theme }) => theme.semantics.colors.bg.card};
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
-  border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-  overflow: hidden;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-
-  th, td {
-    padding: 1rem;
-    border-bottom: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-  }
-
-  th {
-    font-weight: 500;
-    color: ${({ theme }) => theme.semantics.colors.text.secondary};
-    background: rgba(255, 255, 255, 0.02);
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
-    
-    &.qty-header {
-      text-align: center;
-      padding-right: 2rem; /* Align with controls */
-    }
-  }
-
-  td {
+  .qty-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+    background: rgba(255, 255, 255, 0.03);
     color: ${({ theme }) => theme.semantics.colors.text.primary};
-    font-size: 0.875rem;
-    vertical-align: middle;
-  }
+    cursor: pointer;
+    transition: all 0.2s;
 
-  .product-cell {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-weight: 500;
-  }
-
-  .number-col {
-    text-align: right;
-  }
-
-  .qty-controls {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 0.75rem;
-
-    .qty-btn {
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 6px;
-      border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-      background: rgba(255, 255, 255, 0.03);
-      color: ${({ theme }) => theme.semantics.colors.text.primary};
-      cursor: pointer;
-      transition: all 0.2s;
-
-      &:hover {
-        background: ${({ theme }) => theme.semantics.colors.accent.primary};
-        border-color: ${({ theme }) => theme.semantics.colors.accent.primary};
-        color: white;
-      }
-    }
-
-    .qty-val {
-      min-width: 20px;
-      text-align: center;
-      font-weight: 600;
+    &:hover {
+      background: ${({ theme }) => theme.semantics.colors.accent.primary};
+      border-color: ${({ theme }) => theme.semantics.colors.accent.primary};
+      color: white;
     }
   }
 
-  tr.new-item {
-    animation: ${rowIn} 0.5s ease-out;
-  }
-
-  tr:last-child td {
-    border-bottom: none;
+  .qty-val {
+    min-width: 20px;
+    text-align: center;
+    font-weight: 600;
   }
 `;
 
@@ -291,13 +245,14 @@ const EmptyState = styled.div`
 `;
 
 const OrderSummary = styled.div`
-  padding: 1.5rem;
+  padding: 1rem 1.5rem; /* Reduced vertical padding to maximize list space */
   background: ${({ theme }) => theme.semantics.colors.bg.card};
   border-top: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  gap: 0.5rem;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.15); /* Stronger shadow to define the 'top' layer */
+  z-index: 10; /* Ensure it stays above the scroll area visually */
 
   .summary-content {
     display: flex;
@@ -378,6 +333,21 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
   
   const inputRef = useRef<HTMLInputElement>(null);
   const memberInputRef = useRef<HTMLInputElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  // Senior UX: Auto-scroll to bottom when items are added
+  useEffect(() => {
+    if (scrollAreaRef.current && items.length > 0) {
+      const scrollContainer = scrollAreaRef.current;
+      // Use requestAnimationFrame to ensure DOM is updated and animation frame is ready
+      requestAnimationFrame(() => {
+        scrollContainer.scrollTo({
+          top: scrollContainer.scrollHeight,
+          behavior: 'smooth'
+        });
+      });
+    }
+  }, [items.length]);
 
   useEffect(() => {
     if (items.length === 0) {
@@ -531,6 +501,65 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
     });
   };
 
+  const columns: Column<OrderItem>[] = [
+    {
+      header: 'Product',
+      key: 'product',
+      render: (item) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: 500 }}>
+          <div style={{ width: 40, height: 40, background: 'rgba(99, 102, 241, 0.1)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6366f1' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          </div>
+          {item.product.name}
+        </div>
+      )
+    },
+    {
+      header: 'Barcode',
+      key: 'barcode',
+      render: (item) => <code style={{ background: 'rgba(255,255,255,0.05)', padding: '2px 4px', borderRadius: 4 }}>{item.product.barcode}</code>
+    },
+    {
+      header: 'Price',
+      key: 'price',
+      textAlign: 'right',
+      render: (item) => `$${item.product.price.toFixed(2)}`
+    },
+    {
+      header: 'Qty',
+      key: 'quantity',
+      textAlign: 'right',
+      width: '120px',
+      render: (item) => (
+        <QtyControls>
+          <button className="qty-btn" onClick={() => handleUpdateQty(item.product.id, -1)}>−</button>
+          <span className="qty-val">{item.quantity}</span>
+          <button className="qty-btn" onClick={() => handleUpdateQty(item.product.id, 1)}>+</button>
+        </QtyControls>
+      )
+    },
+    {
+      header: 'Total',
+      key: 'total',
+      textAlign: 'right',
+      render: (item) => <span style={{ fontWeight: 600 }}>${(item.product.price * item.quantity).toFixed(2)}</span>
+    },
+    {
+      header: '',
+      key: 'actions',
+      textAlign: 'right',
+      width: '50px',
+      render: (item) => (
+        <button 
+          onClick={() => handleRemove(item.product.id)}
+          style={{ background: 'none', border: 'none', color: 'var(--color-error, #ef4444)', cursor: 'pointer', padding: 8 }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        </button>
+      )
+    }
+  ];
+
 
 
   const total = promotionResult?.finalTotal ?? items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
@@ -540,6 +569,8 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
       <PageHeader
         title="POS Terminal"
         onBack={onBack}
+        user={user}
+        onLogout={onLogout}
         extraContent={null}
       />
 
@@ -620,66 +651,24 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
             <span className="item-count">{items.length} items</span>
           </div>
 
-          <ScrollArea>
-            <TableWrapper>
-              <Table>
-                <thead>
-                  <tr>
-                    <th>Product</th>
-                    <th>Barcode</th>
-                    <th className="number-col">Price</th>
-                    <th className="number-col qty-header">Qty</th>
-                    <th className="number-col">Total</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.length === 0 ? (
-                    <tr>
-                      <td colSpan={6}>
-                        <EmptyState>
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="9" cy="21" r="1"></circle>
-                            <circle cx="20" cy="21" r="1"></circle>
-                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                          </svg>
-                          <p>No products added yet. Scan a product to begin.</p>
-                        </EmptyState>
-                      </td>
-                    </tr>
-                  ) : (
-                    items.map((item) => (
-                      <tr key={item.product.id} className={lastScannedId === item.product.id ? 'new-item' : ''}>
-                        <td className="product-cell">
-                          <div style={{ width: 40, height: 40, background: 'rgba(99, 102, 241, 0.1)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6366f1' }}>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-                          </div>
-                          {item.product.name}
-                        </td>
-                        <td><code style={{ background: 'rgba(255,255,255,0.05)', padding: '2px 4px', borderRadius: 4 }}>{item.product.barcode}</code></td>
-                        <td className="number-col">${item.product.price.toFixed(2)}</td>
-                        <td className="number-col">
-                          <div className="qty-controls">
-                            <button className="qty-btn" onClick={() => handleUpdateQty(item.product.id, -1)}>−</button>
-                            <span className="qty-val">{item.quantity}</span>
-                            <button className="qty-btn" onClick={() => handleUpdateQty(item.product.id, 1)}>+</button>
-                          </div>
-                        </td>
-                        <td className="number-col" style={{ fontWeight: 600 }}>${(item.product.price * item.quantity).toFixed(2)}</td>
-                        <td style={{ textAlign: 'right' }}>
-                          <button 
-                            onClick={() => handleRemove(item.product.id)}
-                            style={{ background: 'none', border: 'none', color: 'var(--color-error, #ef4444)', cursor: 'pointer', padding: 8 }}
-                          >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </Table>
-            </TableWrapper>
+          <ScrollArea ref={scrollAreaRef}>
+            <DataTable
+              columns={columns}
+              data={items}
+              rowKey={(item) => item.product.id}
+              getRowClassName={(item) => lastScannedId === item.product.id ? 'new-item' : ''}
+              stickyHeader
+              emptyState={
+                <EmptyState>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                  </svg>
+                  <p>No products added yet. Scan a product to begin.</p>
+                </EmptyState>
+              }
+            />
           </ScrollArea>
 
           <OrderSummary>
