@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
 import { Product } from '../../domain/entities/Product';
-import { ProductRepository } from '../../application/interfaces/ProductRepository';
+import type { ProductRepository } from '../../application/interfaces/ProductRepository';
 import { DATABASE_CONNECTION } from '../database/database.provider';
 import * as schema from '../database/schema';
 
@@ -31,6 +31,20 @@ export class SqliteProductRepository implements ProductRepository {
       result.unitName,
       result.brand,
     );
+  }
+
+  async findAll(): Promise<Product[]> {
+    const results = await this.db.query.products.findMany();
+
+    return results.map(result => new Product(
+      result.id,
+      result.barcode,
+      result.name,
+      result.price,
+      result.imageUrl,
+      result.unitName,
+      result.brand,
+    ));
   }
 
   async upsertMany(products: Product[]): Promise<void> {

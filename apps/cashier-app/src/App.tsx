@@ -13,6 +13,7 @@ import { SyncUserUseCase } from './application/use-cases/SyncUserUseCase';
 import { GetUsersUseCase } from './application/use-cases/GetUsersUseCase';
 import { GetTransactionsUseCase } from './application/use-cases/GetTransactionsUseCase';
 import { GetProductsUseCase } from './application/use-cases/GetProductsUseCase';
+import { SyncProductsUseCase as SyncProductsAppUseCase } from './application/use-cases/SyncProductsUseCase';
 import { ApiAuthRepository } from './data/repositories/ApiAuthRepository';
 import { ApiUserRepository } from './data/repositories/ApiUserRepository';
 import { ApiTransactionRepository } from './data/repositories/ApiTransactionRepository';
@@ -46,6 +47,7 @@ const syncUserUseCase = new SyncUserUseCase(userRepository);
 const getUsersUseCase = new GetUsersUseCase(userRepository);
 const getTransactionsUseCase = new GetTransactionsUseCase(transactionRepository);
 const getProductsUseCase = new GetProductsUseCase(productRepository);
+const syncProductsAppUseCase = new SyncProductsAppUseCase(productRepository);
 
 function App() {
   const [currentView, setCurrentView] = useState<'login' | 'create-order' | 'dashboard' | 'create-user' | 'user-list' | 'transaction-list' | 'product-list'>('login');
@@ -173,6 +175,7 @@ function App() {
             <ProductListPage 
               onBack={() => setCurrentView('dashboard')}
               getProductsUseCase={getProductsUseCase}
+              syncProductsUseCase={syncProductsAppUseCase}
             />
           )}
         </MainLayout>

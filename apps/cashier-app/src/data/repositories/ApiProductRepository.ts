@@ -14,7 +14,7 @@ export class ApiProductRepository implements ProductRepository {
         data.barcode,
         data.name,
         data.price,
-        data.image
+        data.imageUrl
       );
     } catch (error: any) {
       if (error.response?.status === 404) {
@@ -33,7 +33,7 @@ export class ApiProductRepository implements ProductRepository {
         item.barcode,
         item.name,
         item.price,
-        item.image
+        item.imageUrl
       ));
     } catch (error) {
       console.error('Error fetching all products:', error);

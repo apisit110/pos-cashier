@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { PageHeader } from '../../components/PageHeader';
 import type { GetProductsUseCase } from '../../../application/use-cases/GetProductsUseCase';
+import type { SyncProductsUseCase } from '../../../application/use-cases/SyncProductsUseCase';
 import type { Product } from '../../../domain/entities/Product';
 
 const spin = keyframes`
@@ -67,11 +68,47 @@ const PriceTag = styled.span`
   color: ${({ theme }) => theme.semantics.colors.accent.primary};
 `;
 
+const ProductImage = styled.img`
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.05);
+`;
+
+const SyncButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: ${({ theme }) => theme.semantics.colors.accent.primary};
+  color: white;
+  border: none;
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
 const Loader = styled.div`
   width: 24px;
   height: 24px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-top-color: ${({ theme }) => theme.semantics.colors.accent.primary};
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #ffffff;
   border-radius: 50%;
   animation: ${spin} 1s linear infinite;
   display: inline-block;
@@ -82,11 +119,13 @@ const Loader = styled.div`
 interface ProductListPageProps {
   onBack: () => void;
   getProductsUseCase: GetProductsUseCase;
+  syncProductsUseCase: SyncProductsUseCase;
 }
 
-export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getProductsUseCase }) => {
+export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getProductsUseCase, syncProductsUseCase }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const fetchProducts = useCallback(async () => {
     setIsLoading(true);
@@ -102,12 +141,35 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
+  const handleSync = async () => {
+    setIsSyncing(true);
+    try {
+      // These would ideally come from context/settings
+      const mid = 'M001'; 
+      const sid = 'S001';
+      await syncProductsUseCase.execute(mid, sid);
+      await fetchProducts();
+    } catch (error) {
+      console.error('Failed to sync products:', error);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   return (
     <Container>
       <PageHeader
         title="Products Inventory"
         onBack={onBack}
-        extraContent={<span className="total-count">Total: {products.length} Products</span>}
+        extraContent={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <span className="total-count">Total: {products.length} Products</span>
+            <SyncButton onClick={handleSync} disabled={isSyncing || isLoading}>
+              {isSyncing ? <Loader style={{ width: 14, height: 14, margin: 0 }} /> : null}
+              {isSyncing ? 'Syncing...' : 'Sync Products'}
+            </SyncButton>
+          </div>
+        }
       />
 
       <Content>
@@ -115,6 +177,7 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
           <Table>
             <thead>
               <tr>
+                <th style={{ width: '60px' }}>Image</th>
                 <th>Barcode</th>
                 <th>Product Name</th>
                 <th>Price</th>
@@ -123,7 +186,7 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={3} style={{ textAlign: 'center', padding: '3rem' }}>
+                  <td colSpan={4} style={{ textAlign: 'center', padding: '3rem' }}>
                     <Loader />
                     Loading products...
                   </td>
@@ -131,6 +194,13 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
               ) : products.length > 0 ? (
                 products.map((product) => (
                   <tr key={product.id}>
+                    <td>
+                      {product.image ? (
+                        <ProductImage src={product.image} alt={product.name} />
+                      ) : (
+                        <div style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.05)', borderRadius: 8 }} />
+                      )}
+                    </td>
                     <td style={{ fontFamily: 'monospace', fontWeight: 600 }}>{product.barcode}</td>
                     <td>{product.name}</td>
                     <td>
@@ -140,7 +210,7 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
                 ))
               ) : (
                 <tr>
-                  <td colSpan={3} style={{ textAlign: 'center', padding: '3rem', color: '#94a3b8' }}>No products found.</td>
+                  <td colSpan={4} style={{ textAlign: 'center', padding: '3rem', color: '#94a3b8' }}>No products found.</td>
                 </tr>
               )}
             </tbody>

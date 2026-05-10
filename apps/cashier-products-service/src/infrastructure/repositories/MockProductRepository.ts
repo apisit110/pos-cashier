@@ -1,5 +1,5 @@
 import { Product } from '../../domain/entities/Product';
-import { ProductRepository } from '../../application/interfaces/ProductRepository';
+import type { ProductRepository } from '../../application/interfaces/ProductRepository';
 
 export class MockProductRepository implements ProductRepository {
   private products: Product[] = [
@@ -11,6 +11,10 @@ export class MockProductRepository implements ProductRepository {
   async findByBarcode(barcode: string): Promise<Product | null> {
     const product = this.products.find((p) => p.barcode === barcode);
     return product || null;
+  }
+
+  async findAll(): Promise<Product[]> {
+    return this.products;
   }
 
   async upsertMany(products: Product[]): Promise<void> {
