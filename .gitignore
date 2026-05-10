@@ -13,4 +13,4 @@ apps/**/cashier-products-service.db
 apps/**/cashier-members-service.db
 apps/**/cashier-transactions-service.db
 apps/**/cashier-orders-service.db
-apps/**/drizzle/*
+apps/**/drizzle
