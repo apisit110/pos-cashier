@@ -1,11 +1,11 @@
-import axios from 'axios';
+import api from '../../infrastructure/api/axiosInstance';
 import type { Transaction, TransactionRepository } from '../../domain/repositories/TransactionRepository';
 
 export class ApiTransactionRepository implements TransactionRepository {
   private readonly baseUrl = 'http://localhost:3006/v1/transactions';
 
   async getTransactions(page: number, limit: number): Promise<{ transactions: Transaction[]; total: number }> {
-    const response = await axios.get<{ transactions: any[]; total: number }>(this.baseUrl, {
+    const response = await api.get<{ transactions: any[]; total: number }>(this.baseUrl, {
       params: { page, limit }
     });
 
@@ -23,3 +23,4 @@ export class ApiTransactionRepository implements TransactionRepository {
     };
   }
 }
+

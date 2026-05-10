@@ -78,9 +78,10 @@ const StatusBadge = styled.span<{ $status: string }>`
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  background: ${({ $status }) => $status === 'SUCCESS' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'};
-  color: ${({ $status }) => $status === 'SUCCESS' ? '#22c55e' : '#ef4444'};
+  background: ${({ $status }) => $status.toLowerCase() === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'};
+  color: ${({ $status }) => $status.toLowerCase() === 'success' ? '#22c55e' : '#ef4444'};
 `;
+
 
 const Pagination = styled.div`
   display: flex;
