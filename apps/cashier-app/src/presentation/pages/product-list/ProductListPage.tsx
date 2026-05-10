@@ -217,7 +217,7 @@ const BrandBadge = styled.span`
 
 export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getProductsUseCase, syncProductsUseCase }) => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -253,6 +253,7 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
 
   // Debounced effect for filtering
   useEffect(() => {
+    setIsLoading(true);
     const timer = setTimeout(() => {
       fetchProducts();
     }, 500); // 500ms debounce

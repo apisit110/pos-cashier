@@ -136,7 +136,7 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [filters, setFilters] = useState<TransactionFilter>({});
 
   const fetchTransactions = useCallback(async () => {
@@ -165,6 +165,7 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
   useEffect(() => { fetchTransactions(); }, [fetchTransactions]);
 
   const handleFilterChange = (key: keyof TransactionFilter, value: string) => {
+    setIsLoading(true);
     setFilters(prev => {
       const newFilters = { ...prev, [key]: value || undefined };
       if (!value) delete newFilters[key];
@@ -174,6 +175,7 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
   };
 
   const clearFilters = () => {
+    setIsLoading(true);
     setFilters({});
     setCurrentPage(1);
   };

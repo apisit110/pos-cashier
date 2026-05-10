@@ -59,7 +59,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({ onBack, onNavigateTo
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
