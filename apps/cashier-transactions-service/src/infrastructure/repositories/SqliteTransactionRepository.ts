@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import { eq } from 'drizzle-orm';
+import { eq, and, gte, lte, SQL, count } from 'drizzle-orm';
 import { Transaction } from '../../domain/entities/Transaction';
-import { TransactionRepository } from '../../domain/repositories/TransactionRepository';
+import { TransactionRepository, TransactionFilter } from '../../domain/repositories/TransactionRepository';
 import { DATABASE_CONNECTION } from '../database/database.provider';
 import * as schema from '../database/schema';
 
@@ -13,17 +13,59 @@ export class SqliteTransactionRepository implements TransactionRepository {
     private readonly db: BetterSQLite3Database<typeof schema>,
   ) {}
 
-  async findAll(page: number, limit: number): Promise<{ transactions: Transaction[]; total: number }> {
+  async findAll(page: number, limit: number, filter?: TransactionFilter): Promise<{ transactions: Transaction[]; total: number }> {
     const offset = (page - 1) * limit;
+    const whereConditions: SQL[] = [];
+
+    if (filter) {
+      if (filter.id) {
+        whereConditions.push(eq(schema.transactions.id, filter.id));
+      }
+      if (filter.startDate) {
+        whereConditions.push(gte(schema.transactions.createdAt, filter.startDate));
+      }
+      if (filter.endDate) {
+        whereConditions.push(lte(schema.transactions.createdAt, filter.endDate));
+      }
+      if (filter.method) {
+        whereConditions.push(eq(schema.transactions.paymentMethod, filter.method));
+      }
+      if (filter.status) {
+        whereConditions.push(eq(schema.transactions.status, filter.status));
+      }
+      if (filter.amountRange) {
+        switch (filter.amountRange) {
+          case '0-99':
+            whereConditions.push(and(gte(schema.transactions.amount, 0), lte(schema.transactions.amount, 99))!);
+            break;
+          case '100-299':
+            whereConditions.push(and(gte(schema.transactions.amount, 100), lte(schema.transactions.amount, 299))!);
+            break;
+          case '300-499':
+            whereConditions.push(and(gte(schema.transactions.amount, 300), lte(schema.transactions.amount, 499))!);
+            break;
+          case '500+':
+            whereConditions.push(gte(schema.transactions.amount, 500));
+            break;
+        }
+      }
+    }
+
+    const where = whereConditions.length > 0 ? and(...whereConditions) : undefined;
 
     const results = await this.db.query.transactions.findMany({
+      where,
       limit,
       offset,
       orderBy: (transactions, { desc }) => [desc(transactions.createdAt)],
     });
 
-    const allTransactions = this.db.select().from(schema.transactions).all();
-    const totalCount = allTransactions.length;
+    const totalCountResult = await this.db
+      .select({ count: count() })
+      .from(schema.transactions)
+      .where(where);
+    
+    const totalCount = totalCountResult[0]?.count || 0;
 
     return {
       transactions: results.map(r => this.mapToEntity(r)),

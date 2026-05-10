@@ -38,6 +38,7 @@ export const semantics = {
     text: {
       primary: primitives.colors.white,
       secondary: primitives.colors.slate[400],
+      disabled: primitives.colors.slate[600],
       error: primitives.colors.rose[500],
       success: primitives.colors.emerald[500],
     },

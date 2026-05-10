@@ -16,8 +16,25 @@ export class TransactionController {
   async getTransactions(
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
+    @Query('id') id?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+    @Query('method') method?: string,
+    @Query('amountRange') amountRange?: '0-99' | '100-299' | '300-499' | '500+',
+    @Query('status') status?: string,
   ) {
-    return this.getTransactionsUseCase.execute(parseInt(page), parseInt(limit));
+    return this.getTransactionsUseCase.execute(
+      parseInt(page),
+      parseInt(limit),
+      {
+        id: id ? parseInt(id) : undefined,
+        startDate: startDate ? new Date(startDate) : undefined,
+        endDate: endDate ? new Date(endDate) : undefined,
+        method,
+        amountRange,
+        status,
+      }
+    );
   }
 
   @Get(':id')

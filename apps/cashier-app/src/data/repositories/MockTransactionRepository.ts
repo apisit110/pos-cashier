@@ -1,4 +1,4 @@
-import type { Transaction, TransactionRepository } from '../../domain/repositories/TransactionRepository';
+import type { Transaction, TransactionRepository, TransactionFilter } from '../../domain/repositories/TransactionRepository';
 
 export class MockTransactionRepository implements TransactionRepository {
   private transactions: Transaction[] = [
@@ -49,12 +49,43 @@ export class MockTransactionRepository implements TransactionRepository {
     }
   ];
 
-  async getTransactions(page: number, limit: number): Promise<{ transactions: Transaction[]; total: number }> {
+  async getTransactions(page: number, limit: number, filter?: TransactionFilter): Promise<{ transactions: Transaction[]; total: number }> {
+    let filtered = [...this.transactions];
+
+    if (filter) {
+      if (filter.id) {
+        filtered = filtered.filter(t => t.id.includes(filter.id!));
+      }
+      if (filter.startDate) {
+        filtered = filtered.filter(t => new Date(t.createdAt) >= new Date(filter.startDate!));
+      }
+      if (filter.endDate) {
+        filtered = filtered.filter(t => new Date(t.createdAt) <= new Date(filter.endDate!));
+      }
+      if (filter.method) {
+        filtered = filtered.filter(t => t.paymentMethod === filter.method);
+      }
+      if (filter.status) {
+        filtered = filtered.filter(t => t.status === filter.status);
+      }
+      if (filter.amountRange) {
+        filtered = filtered.filter(t => {
+          switch (filter.amountRange) {
+            case '0-99': return t.amount >= 0 && t.amount <= 99;
+            case '100-299': return t.amount >= 100 && t.amount <= 299;
+            case '300-499': return t.amount >= 300 && t.amount <= 499;
+            case '500+': return t.amount >= 500;
+            default: return true;
+          }
+        });
+      }
+    }
+
     const start = (page - 1) * limit;
     const end = start + limit;
     return {
-      transactions: this.transactions.slice(start, end),
-      total: this.transactions.length
+      transactions: filtered.slice(start, end),
+      total: filtered.length
     };
   }
 

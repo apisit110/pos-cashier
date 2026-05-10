@@ -1,12 +1,16 @@
 import api from '../../infrastructure/api/axiosInstance';
-import type { Transaction, TransactionRepository } from '../../domain/repositories/TransactionRepository';
+import type { Transaction, TransactionRepository, TransactionFilter } from '../../domain/repositories/TransactionRepository';
 
 export class ApiTransactionRepository implements TransactionRepository {
   private readonly baseUrl = 'http://localhost:3006/v1/transactions';
 
-  async getTransactions(page: number, limit: number): Promise<{ transactions: Transaction[]; total: number }> {
+  async getTransactions(page: number, limit: number, filter?: TransactionFilter): Promise<{ transactions: Transaction[]; total: number }> {
     const response = await api.get<{ transactions: any[]; total: number }>(this.baseUrl, {
-      params: { page, limit }
+      params: { 
+        page, 
+        limit,
+        ...filter
+      }
     });
 
     return {
