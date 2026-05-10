@@ -27,7 +27,7 @@ export class ApiTransactionRepository implements TransactionRepository {
     };
   }
 
-  async getTransactionById(id: number): Promise<Transaction> {
+  async getTransactionById(id: string): Promise<Transaction> {
     const response = await api.get<any>(`${this.baseUrl}/${id}`);
     const t = response.data;
     

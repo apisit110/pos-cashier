@@ -5,7 +5,7 @@ import { TransactionRepository } from '../../domain/repositories/TransactionRepo
 export class GetTransactionByIdUseCase {
   constructor(private readonly transactionRepository: TransactionRepository) {}
 
-  async execute(id: number) {
+  async execute(id: string) {
     const transaction = await this.transactionRepository.findById(id);
     if (!transaction) {
       throw new NotFoundException(`Transaction with ID ${id} not found`);

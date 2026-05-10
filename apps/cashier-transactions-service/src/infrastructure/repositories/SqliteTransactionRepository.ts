@@ -28,10 +28,10 @@ export class SqliteTransactionRepository implements TransactionRepository {
         whereConditions.push(lte(schema.transactions.createdAt, filter.endDate));
       }
       if (filter.method) {
-        whereConditions.push(eq(schema.transactions.paymentMethod, filter.method));
+        whereConditions.push(eq(schema.transactions.paymentMethod, filter.method.toUpperCase()));
       }
       if (filter.status) {
-        whereConditions.push(eq(schema.transactions.status, filter.status));
+        whereConditions.push(eq(schema.transactions.status, filter.status.toUpperCase()));
       }
       if (filter.amountRange) {
         switch (filter.amountRange) {
@@ -73,7 +73,7 @@ export class SqliteTransactionRepository implements TransactionRepository {
     };
   }
   
-  async findById(id: number): Promise<Transaction | null> {
+  async findById(id: string): Promise<Transaction | null> {
     const results = await this.db
       .select()
       .from(schema.transactions)
@@ -91,6 +91,7 @@ export class SqliteTransactionRepository implements TransactionRepository {
 
   async save(transaction: Transaction): Promise<void> {
     await this.db.insert(schema.transactions).values({
+      id: transaction.id,
       orderId: transaction.orderId,
       amount: transaction.amount,
       paymentMethod: transaction.paymentMethod,

@@ -19,5 +19,5 @@ export interface TransactionFilter {
 
 export interface TransactionRepository {
   getTransactions(page: number, limit: number, filter?: TransactionFilter): Promise<{ transactions: Transaction[]; total: number }>;
-  getTransactionById(id: number): Promise<Transaction>;
+  getTransactionById(id: string): Promise<Transaction>;
 }

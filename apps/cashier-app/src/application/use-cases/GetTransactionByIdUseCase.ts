@@ -7,7 +7,7 @@ export class GetTransactionByIdUseCase {
     this.transactionRepository = transactionRepository;
   }
 
-  async execute(id: number) {
+  async execute(id: string) {
     return this.transactionRepository.getTransactionById(id);
   }
 }

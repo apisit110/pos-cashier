@@ -55,7 +55,7 @@ const syncProductsAppUseCase = new SyncProductsAppUseCase(productRepository);
 function App() {
   const [currentView, setCurrentView] = useState<'login' | 'create-order' | 'dashboard' | 'create-user' | 'user-list' | 'transaction-list' | 'transaction-detail' | 'product-list'>('login');
   const [user, setUser] = useState<{ uid: string; username: string; role: string; roleId: number; accessToken: string; refreshToken?: string } | null>(null);
-  const [selectedTransactionId, setSelectedTransactionId] = useState<number | null>(null);
+  const [selectedTransactionId, setSelectedTransactionId] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
@@ -89,7 +89,7 @@ function App() {
     checkSession();
   }, []);
 
-  const handleLoginSuccess = (userData: { uid: number; username: string; roleId: number; accessToken: string; refreshToken: string }) => {
+  const handleLoginSuccess = (userData: { uid: string; username: string; roleId: number; accessToken: string; refreshToken: string }) => {
     const mappedUser = {
       uid: userData.uid.toString(),
       username: userData.username,
@@ -172,7 +172,7 @@ function App() {
           {currentView === 'transaction-list' && (
             <TransactionListPage 
               onBack={() => setCurrentView('dashboard')}
-              onViewDetail={(id) => {
+              onViewDetail={(id: string) => {
                 setSelectedTransactionId(id);
                 setCurrentView('transaction-detail');
               }}

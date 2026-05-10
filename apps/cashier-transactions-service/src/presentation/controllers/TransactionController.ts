@@ -1,9 +1,12 @@
-import { Controller, Get, Post, Body, Query, HttpCode, HttpStatus, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, HttpCode, HttpStatus, Param, UsePipes } from '@nestjs/common';
+import { ZodValidationPipe } from 'nestjs-zod';
 import { GetTransactionsUseCase } from '../../application/use-cases/GetTransactionsUseCase';
 import { GetTransactionByIdUseCase } from '../../application/use-cases/GetTransactionByIdUseCase';
-import { CreateTransactionUseCase, CreateTransactionDto } from '../../application/use-cases/CreateTransactionUseCase';
+import { CreateTransactionUseCase } from '../../application/use-cases/CreateTransactionUseCase';
+import { CreateTransactionDto, GetTransactionsFilterDto } from '../dto/transaction.dto';
 
 @Controller('v1/transactions')
+@UsePipes(ZodValidationPipe)
 export class TransactionController {
   constructor(
     private readonly getTransactionsUseCase: GetTransactionsUseCase,
@@ -13,34 +16,15 @@ export class TransactionController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getTransactions(
-    @Query('page') page: string = '1',
-    @Query('limit') limit: string = '10',
-    @Query('id') id?: string,
-    @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string,
-    @Query('method') method?: string,
-    @Query('amountRange') amountRange?: '0-99' | '100-299' | '300-499' | '500+',
-    @Query('status') status?: string,
-  ) {
-    return this.getTransactionsUseCase.execute(
-      parseInt(page),
-      parseInt(limit),
-      {
-        id: id ? parseInt(id) : undefined,
-        startDate: startDate ? new Date(startDate) : undefined,
-        endDate: endDate ? new Date(endDate) : undefined,
-        method,
-        amountRange,
-        status,
-      }
-    );
+  async getTransactions(@Query() query: GetTransactionsFilterDto) {
+    const { page, limit, ...filter } = query;
+    return this.getTransactionsUseCase.execute(page, limit, filter);
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async getTransactionById(@Param('id') id: string) {
-    return this.getTransactionByIdUseCase.execute(parseInt(id));
+    return this.getTransactionByIdUseCase.execute(id);
   }
 
   @Post()

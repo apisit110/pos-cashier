@@ -113,7 +113,7 @@ const Spinner = styled.div`
 `;
 
 interface TransactionDetailPageProps {
-  transactionId: number;
+  transactionId: string;
   onBack: () => void;
   getTransactionByIdUseCase: GetTransactionByIdUseCase;
 }

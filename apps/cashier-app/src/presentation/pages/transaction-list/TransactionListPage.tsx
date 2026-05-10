@@ -195,7 +195,7 @@ const Loader = styled.div`
 
 interface TransactionListPageProps {
   onBack: () => void;
-  onViewDetail: (id: number) => void;
+  onViewDetail: (id: string) => void;
   getTransactionsUseCase: GetTransactionsUseCase;
 }
 
@@ -293,9 +293,9 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
               onChange={(e) => handleFilterChange('method', e.target.value)}
             >
               <option value="">All Methods</option>
-              <option value="cash">Cash</option>
-              <option value="credit_card">Credit Card</option>
-              <option value="qr_promptpay">QR PromptPay</option>
+              <option value="CASH">Cash</option>
+              <option value="CREDIT">Credit Card</option>
+              <option value="QR">QR PromptPay</option>
             </select>
           </FormGroup>
 
@@ -320,9 +320,9 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
               onChange={(e) => handleFilterChange('status', e.target.value)}
             >
               <option value="">All Status</option>
-              <option value="success">Success</option>
-              <option value="failed">Failed</option>
-              <option value="refunded">Refunded</option>
+              <option value="SUCCESS">Success</option>
+              <option value="FAILED">Failed</option>
+              <option value="REFUNDED">Refunded</option>
             </select>
           </FormGroup>
 
@@ -367,7 +367,7 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
                     </td>
                     <td style={{ textAlign: 'right' }}>
                       <button 
-                        onClick={() => onViewDetail(parseInt(tx.id))}
+                        onClick={() => onViewDetail(tx.id)}
                         style={{ 
                           background: 'none', 
                           border: '1px solid rgba(255,255,255,0.1)', 

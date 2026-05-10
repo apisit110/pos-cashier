@@ -1,7 +1,7 @@
 import { Transaction } from '../entities/Transaction';
 
 export interface TransactionFilter {
-  id?: number;
+  id?: string;
   startDate?: Date;
   endDate?: Date;
   method?: string;
@@ -11,6 +11,6 @@ export interface TransactionFilter {
 
 export abstract class TransactionRepository {
   abstract findAll(page: number, limit: number, filter?: TransactionFilter): Promise<{ transactions: Transaction[]; total: number }>;
-  abstract findById(id: number): Promise<Transaction | null>;
+  abstract findById(id: string): Promise<Transaction | null>;
   abstract save(transaction: Transaction): Promise<void>;
 }
