@@ -140,9 +140,6 @@ function App() {
         >
           {currentView === 'dashboard' && (
             <DashboardPage 
-              onNavigateToSell={handleNavigateToSell} 
-              onNavigateToUserList={() => setCurrentView('user-list')}
-              onNavigateToTransactionList={() => setCurrentView('transaction-list')}
               user={user} 
             />
           )}
