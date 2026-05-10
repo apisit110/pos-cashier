@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { PageHeader } from '../../components/PageHeader';
+import { DataTable, type Column } from '../../components/DataTable';
 import type { GetProductsUseCase } from '../../../application/use-cases/GetProductsUseCase';
 import type { SyncProductsUseCase } from '../../../application/use-cases/SyncProductsUseCase';
 import type { Product } from '../../../domain/entities/Product';
@@ -32,35 +33,15 @@ const Content = styled.main`
   flex-direction: column;
 `;
 
-const TableWrapper = styled.div`
-  background: ${({ theme }) => theme.semantics.colors.bg.card};
-  border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-  border-radius: ${({ theme }) => theme.borderRadius.xl};
-  overflow: hidden;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-
-  th, td {
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-  }
-
-  th {
-    background: rgba(255, 255, 255, 0.02);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: ${({ theme }) => theme.semantics.colors.text.secondary};
-  }
-
-  td { font-size: 0.875rem; }
-
-  tr:last-child td { border-bottom: none; }
+const StatusMessage = styled.div<{ $type: 'success' | 'error' }>`
+  margin-bottom: 1.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  font-weight: 500;
+  font-size: 0.875rem;
+  background-color: ${({ $type }) => $type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'};
+  color: ${({ $type }) => $type === 'success' ? '#16a34a' : '#dc2626'};
+  border: 1px solid ${({ $type }) => $type === 'success' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
 `;
 
 const PriceTag = styled.span`
@@ -132,17 +113,6 @@ const LoadingOverlay = styled.div`
   color: ${({ theme }) => theme.semantics.colors.accent.primary};
 `;
 
-const StatusMessage = styled.div<{ $type: 'success' | 'error' }>`
-  margin-bottom: 1.5rem;
-  padding: 0.75rem 1.25rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  font-weight: 500;
-  font-size: 0.875rem;
-  background-color: ${({ $type }) => $type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'};
-  color: ${({ $type }) => $type === 'success' ? '#16a34a' : '#dc2626'};
-  border: 1px solid ${({ $type }) => $type === 'success' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
-`;
-
 interface ProductListPageProps {
   onBack: () => void;
   getProductsUseCase: GetProductsUseCase;
@@ -154,6 +124,8 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
   const [isLoading, setIsLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const fetchProducts = useCallback(async () => {
     setIsLoading(true);
@@ -191,6 +163,32 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
     }
   };
 
+  const columns: Column<Product>[] = [
+    { 
+      header: 'Image', 
+      key: 'image', 
+      width: '60px',
+      render: (product) => product.image ? (
+        <ProductImage src={product.image} alt={product.name} />
+      ) : (
+        <div style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.05)', borderRadius: 8 }} />
+      )
+    },
+    { 
+      header: 'Barcode', 
+      key: 'barcode',
+      render: (product) => <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>{product.barcode}</span>
+    },
+    { header: 'Product Name', key: 'name' },
+    { 
+      header: 'Price', 
+      key: 'price',
+      render: (product) => <PriceTag>฿{product.price.toFixed(2)}</PriceTag>
+    },
+  ];
+
+  const paginatedProducts = products.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
   return (
     <Container>
       <PageHeader
@@ -213,49 +211,23 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
             {message.text}
           </StatusMessage>
         )}
-        <TableWrapper>
-          <Table>
-            <thead>
-              <tr>
-                <th style={{ width: '60px' }}>Image</th>
-                <th>Barcode</th>
-                <th>Product Name</th>
-                <th>Price</th>
-              </tr>
-            </thead>
-            <tbody>
-              {isLoading ? (
-                <tr>
-                  <td colSpan={4} style={{ textAlign: 'center', padding: '3rem' }}>
-                    <Loader />
-                    Loading products...
-                  </td>
-                </tr>
-              ) : products.length > 0 ? (
-                products.map((product) => (
-                  <tr key={product.id}>
-                    <td>
-                      {product.image ? (
-                        <ProductImage src={product.image} alt={product.name} />
-                      ) : (
-                        <div style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.05)', borderRadius: 8 }} />
-                      )}
-                    </td>
-                    <td style={{ fontFamily: 'monospace', fontWeight: 600 }}>{product.barcode}</td>
-                    <td>{product.name}</td>
-                    <td>
-                      <PriceTag>฿{product.price.toFixed(2)}</PriceTag>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={4} style={{ textAlign: 'center', padding: '3rem', color: '#94a3b8' }}>No products found.</td>
-                </tr>
-              )}
-            </tbody>
-          </Table>
-        </TableWrapper>
+        
+        <DataTable
+          columns={columns}
+          data={paginatedProducts}
+          isLoading={isLoading}
+          totalItems={products.length}
+          currentPage={currentPage}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setCurrentPage(1);
+          }}
+          loadingMessage="Loading products..."
+          emptyMessage="No products found."
+        />
+        
         {isSyncing && <LoadingOverlay>Synchronizing data...</LoadingOverlay>}
       </Content>
     </Container>

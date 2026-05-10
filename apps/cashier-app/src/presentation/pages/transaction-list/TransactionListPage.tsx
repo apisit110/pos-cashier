@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import dayjs, { formatDateTime } from '../../utils/date';
 import { PageHeader } from '../../components/PageHeader';
+import { DataTable } from '../../components/DataTable';
 import type { GetTransactionsUseCase } from '../../../application/use-cases/GetTransactionsUseCase';
 import type { Transaction, TransactionFilter } from '../../../domain/repositories/TransactionRepository';
 
-const spin = keyframes`
-  to { transform: rotate(360deg); }
-`;
+
 
 const Container = styled.div`
   display: flex;
@@ -32,37 +31,6 @@ const Content = styled.main`
   flex-direction: column;
 `;
 
-const TableWrapper = styled.div`
-  background: ${({ theme }) => theme.semantics.colors.bg.card};
-  border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-  border-radius: ${({ theme }) => theme.borderRadius.xl};
-  overflow: hidden;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-
-  th, td {
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-  }
-
-  th {
-    background: rgba(255, 255, 255, 0.02);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: ${({ theme }) => theme.semantics.colors.text.secondary};
-  }
-
-  td { font-size: 0.875rem; }
-
-  tr:last-child td { border-bottom: none; }
-`;
-
 const MethodBadge = styled.span`
   padding: 0.25rem 0.75rem;
   border-radius: 4px;
@@ -81,30 +49,6 @@ const StatusBadge = styled.span<{ $status: string }>`
   text-transform: uppercase;
   background: ${({ $status }) => $status.toLowerCase() === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'};
   color: ${({ $status }) => $status.toLowerCase() === 'success' ? '#22c55e' : '#ef4444'};
-`;
-
-
-const Pagination = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
-  margin-top: 2rem;
-
-  button {
-    background: ${({ theme }) => theme.semantics.colors.bg.card};
-    border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-    color: ${({ theme }) => theme.semantics.colors.text.primary};
-    padding: 0.5rem 1rem;
-    border-radius: ${({ theme }) => theme.borderRadius.md};
-    cursor: pointer;
-    transition: ${({ theme }) => theme.transitions.default};
-
-    &:hover:not(:disabled) { border-color: ${({ theme }) => theme.semantics.colors.accent.primary}; }
-    &:disabled { opacity: 0.5; cursor: not-allowed; }
-  }
-
-  .page-info { font-size: 0.875rem; color: ${({ theme }) => theme.semantics.colors.text.secondary}; }
 `;
 
 const FilterBar = styled.div`
@@ -181,18 +125,6 @@ const ClearButton = styled.button`
   }
 `;
 
-const Loader = styled.div`
-  width: 24px;
-  height: 24px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-top-color: ${({ theme }) => theme.semantics.colors.accent.primary};
-  border-radius: 50%;
-  animation: ${spin} 1s linear infinite;
-  display: inline-block;
-  margin-right: 0.75rem;
-  vertical-align: middle;
-`;
-
 interface TransactionListPageProps {
   onBack: () => void;
   onViewDetail: (id: string) => void;
@@ -203,9 +135,9 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState<TransactionFilter>({});
-  const limit = 10;
 
   const fetchTransactions = useCallback(async () => {
     setIsLoading(true);
@@ -220,7 +152,7 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
         apiFilters.endDate = dayjs.tz(apiFilters.endDate, 'Asia/Bangkok').endOf('day').utc().toISOString();
       }
 
-      const result = await getTransactionsUseCase.execute(currentPage, limit, apiFilters);
+      const result = await getTransactionsUseCase.execute(currentPage, pageSize, apiFilters);
       setTransactions(result.transactions);
       setTotal(result.total);
     } catch (error) {
@@ -228,7 +160,7 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
     } finally {
       setIsLoading(false);
     }
-  }, [getTransactionsUseCase, currentPage, limit, filters]);
+  }, [getTransactionsUseCase, currentPage, pageSize, filters]);
 
   useEffect(() => { fetchTransactions(); }, [fetchTransactions]);
 
@@ -245,8 +177,6 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
     setFilters({});
     setCurrentPage(1);
   };
-
-  const totalPages = Math.ceil(total / limit);
 
   return (
     <Container>
@@ -329,92 +259,77 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
           <ClearButton onClick={clearFilters}>Clear Filters</ClearButton>
         </FilterBar>
 
-        <TableWrapper>
-          <Table>
-            <thead>
-              <tr>
-                <th>Order No.</th>
-                <th>Date & Time</th>
-                <th>Staff</th>
-                <th>Method</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {isLoading ? (
-                <tr>
-                  <td colSpan={7} style={{ textAlign: 'center', padding: '3rem' }}>
-                    <Loader />
-                    Loading transactions...
-                  </td>
-                </tr>
-              ) : transactions.length > 0 ? (
-                transactions.map((tx) => (
-                  <tr key={tx.id}>
-                    <td style={{ fontFamily: 'monospace', fontWeight: 600 }}>{tx.orderId}</td>
-                    <td>{formatDateTime(tx.createdAt)}</td>
-                    <td>{tx.staffName}</td>
-                    <td>
-                      <MethodBadge>
-                        {tx.paymentMethod.replace('_', ' ')}
-                      </MethodBadge>
-                    </td>
-                    <td style={{ fontWeight: 700 }}>฿{tx.amount.toFixed(2)}</td>
-                    <td>
-                      <StatusBadge $status={tx.status}>{tx.status}</StatusBadge>
-                    </td>
-                    <td style={{ textAlign: 'right' }}>
-                      <button 
-                        onClick={() => onViewDetail(tx.id)}
-                        style={{ 
-                          background: 'none', 
-                          border: '1px solid rgba(255,255,255,0.1)', 
-                          color: '#818cf8', 
-                          padding: '0.4rem 0.8rem', 
-                          borderRadius: '6px',
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                          transition: 'all 0.2s'
-                        }}
-                        onMouseOver={(e) => { e.currentTarget.style.borderColor = '#818cf8'; e.currentTarget.style.background = 'rgba(129, 140, 248, 0.05)'; }}
-                        onMouseOut={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'none'; }}
-                      >
-                        View Details
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={7} style={{ textAlign: 'center', padding: '3rem', color: '#94a3b8' }}>No transactions found.</td>
-                </tr>
-              )}
-            </tbody>
-          </Table>
-        </TableWrapper>
-
-        {totalPages > 1 && (
-          <Pagination>
-            <button 
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              disabled={currentPage === 1 || isLoading}
-            >
-              Previous
-            </button>
-            <div className="page-info">
-              Page {currentPage} of {totalPages}
-            </div>
-            <button 
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages || isLoading}
-            >
-              Next
-            </button>
-          </Pagination>
-        )}
+        <DataTable
+          columns={[
+            { 
+              header: 'Order No.', 
+              key: 'orderId',
+              render: (tx) => <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>{tx.orderId}</span>
+            },
+            { 
+              header: 'Date & Time', 
+              key: 'createdAt',
+              render: (tx) => formatDateTime(tx.createdAt)
+            },
+            { header: 'Staff', key: 'staffName' },
+            { 
+              header: 'Method', 
+              key: 'paymentMethod',
+              render: (tx) => (
+                <MethodBadge>
+                  {tx.paymentMethod.replace('_', ' ')}
+                </MethodBadge>
+              )
+            },
+            { 
+              header: 'Amount', 
+              key: 'amount',
+              render: (tx) => <span style={{ fontWeight: 700 }}>฿{tx.amount.toFixed(2)}</span>
+            },
+            { 
+              header: 'Status', 
+              key: 'status',
+              render: (tx) => <StatusBadge $status={tx.status}>{tx.status}</StatusBadge>
+            },
+            { 
+              header: 'Actions', 
+              key: 'actions', 
+              textAlign: 'right',
+              render: (tx) => (
+                <button 
+                  onClick={() => onViewDetail(tx.id)}
+                  style={{ 
+                    background: 'none', 
+                    border: '1px solid rgba(255,255,255,0.1)', 
+                    color: '#818cf8', 
+                    padding: '0.4rem 0.8rem', 
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseOver={(e) => { e.currentTarget.style.borderColor = '#818cf8'; e.currentTarget.style.background = 'rgba(129, 140, 248, 0.05)'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'none'; }}
+                >
+                  View Details
+                </button>
+              )
+            },
+          ]}
+          data={transactions}
+          isLoading={isLoading}
+          totalItems={total}
+          currentPage={currentPage}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setCurrentPage(1);
+          }}
+          loadingMessage="Loading transactions..."
+          emptyMessage="No transactions found."
+        />
       </Content>
     </Container>
   );
