@@ -50,11 +50,30 @@ const PriceTag = styled.span`
 `;
 
 const ProductImage = styled.img`
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
   object-fit: cover;
+  background: rgba(255, 255, 255, 0.03);
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+`;
+
+const ImageFallback = styled.div`
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.semantics.colors.text.secondary};
+  font-size: 1rem;
+  font-weight: 700;
+  border: 1px dashed ${({ theme }) => theme.semantics.colors.border.subtle};
 `;
 
 const SyncButton = styled.button`
@@ -113,6 +132,26 @@ const LoadingOverlay = styled.div`
   color: ${({ theme }) => theme.semantics.colors.accent.primary};
 `;
 
+const ProductImageCell: React.FC<{ product: Product }> = ({ product }) => {
+  const [error, setError] = React.useState(false);
+
+  if (product.image && !error) {
+    return (
+      <ProductImage 
+        src={product.image} 
+        alt={product.name} 
+        onError={() => setError(true)} 
+      />
+    );
+  }
+
+  return (
+    <ImageFallback>
+      {product.name.charAt(0).toUpperCase()}
+    </ImageFallback>
+  );
+};
+
 interface ProductListPageProps {
   onBack: () => void;
   getProductsUseCase: GetProductsUseCase;
@@ -167,22 +206,21 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
     { 
       header: 'Image', 
       key: 'image', 
-      width: '60px',
-      render: (product) => product.image ? (
-        <ProductImage src={product.image} alt={product.name} />
-      ) : (
-        <div style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.05)', borderRadius: 8 }} />
-      )
+      width: '80px',
+      render: (product) => <ProductImageCell product={product} />
     },
     { 
       header: 'Barcode', 
       key: 'barcode',
-      render: (product) => <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>{product.barcode}</span>
+      width: '200px',
+      render: (product) => <span style={{ fontFamily: 'monospace', fontWeight: 600, color: '#94a3b8' }}>{product.barcode}</span>
     },
     { header: 'Product Name', key: 'name' },
     { 
       header: 'Price', 
       key: 'price',
+      width: '150px',
+      textAlign: 'right',
       render: (product) => <PriceTag>฿{product.price.toFixed(2)}</PriceTag>
     },
   ];
