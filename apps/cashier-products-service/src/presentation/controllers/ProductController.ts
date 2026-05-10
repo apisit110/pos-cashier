@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, NotFoundException, InternalServerErrorException, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Query, NotFoundException, InternalServerErrorException, UseGuards } from '@nestjs/common';
 import { GetProductByBarcodeUseCase } from '../../application/use-cases/GetProductByBarcodeUseCase';
 import { GetProductsUseCase } from '../../application/use-cases/GetProductsUseCase';
 import { SyncProductsUseCase } from '../../application/use-cases/SyncProductsUseCase';
@@ -14,9 +14,20 @@ export class ProductController {
   ) {}
 
   @Get()
-  async getProducts() {
+  async getProducts(
+    @Query('barcode') barcode?: string,
+    @Query('name') name?: string,
+    @Query('brand') brand?: string,
+    @Query('price') price?: string,
+  ) {
     try {
-      return await this.getProductsUseCase.execute();
+      const filters = {
+        barcode,
+        name,
+        brand,
+        price: price ? Number(price) : undefined,
+      };
+      return await this.getProductsUseCase.execute(filters);
     } catch (error) {
       throw new InternalServerErrorException((error as Error).message);
     }

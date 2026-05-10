@@ -14,7 +14,8 @@ export class ApiProductRepository implements ProductRepository {
         data.barcode,
         data.name,
         data.price,
-        data.imageUrl
+        data.imageUrl,
+        data.brand
       );
     } catch (error: any) {
       if (error.response?.status === 404) {
@@ -25,15 +26,18 @@ export class ApiProductRepository implements ProductRepository {
     }
   }
 
-  async getAllProducts(): Promise<Product[]> {
+  async getAllProducts(filters?: any): Promise<Product[]> {
     try {
-      const response = await api.get(`${this.baseUrl}/products`);
+      const response = await api.get(`${this.baseUrl}/products`, {
+        params: filters,
+      });
       return response.data.map((item: any) => new Product(
         item.id,
         item.barcode,
         item.name,
         item.price,
-        item.imageUrl
+        item.imageUrl,
+        item.brand
       ));
     } catch (error) {
       console.error('Error fetching all products:', error);

@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import { eq } from 'drizzle-orm';
+import { and, like, eq, SQL } from 'drizzle-orm';
 import { Product } from '../../domain/entities/Product';
-import type { ProductRepository } from '../../application/interfaces/ProductRepository';
+import type { ProductRepository, ProductFilters } from '../../application/interfaces/ProductRepository';
 import { DATABASE_CONNECTION } from '../database/database.provider';
 import * as schema from '../database/schema';
 
@@ -33,8 +33,19 @@ export class SqliteProductRepository implements ProductRepository {
     );
   }
 
-  async findAll(): Promise<Product[]> {
-    const results = await this.db.query.products.findMany();
+  async findAll(filters?: ProductFilters): Promise<Product[]> {
+    const { barcode, name, brand, price } = filters || {};
+    
+    const results = await this.db.query.products.findMany({
+      where: (products) => {
+        const conditions: SQL[] = [];
+        if (barcode) conditions.push(like(products.barcode, `%${barcode}%`));
+        if (name) conditions.push(like(products.name, `%${name}%`));
+        if (brand) conditions.push(like(products.brand, `%${brand}%`));
+        if (price !== undefined) conditions.push(eq(products.price, price));
+        return conditions.length > 0 ? and(...conditions) : undefined;
+      },
+    });
 
     return results.map(result => new Product(
       result.id,

@@ -158,6 +158,63 @@ interface ProductListPageProps {
   syncProductsUseCase: SyncProductsUseCase;
 }
 
+const FilterSection = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 1.5rem;
+  border-radius: ${({ theme }) => theme.borderRadius.xl};
+  border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+`;
+
+const FilterGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: ${({ theme }) => theme.semantics.colors.text.secondary};
+  }
+
+  input {
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+    border-radius: ${({ theme }) => theme.borderRadius.lg};
+    padding: 0.625rem 1rem;
+    color: ${({ theme }) => theme.semantics.colors.text.primary};
+    font-size: 0.875rem;
+    transition: all 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: ${({ theme }) => theme.semantics.colors.accent.primary};
+      box-shadow: 0 0 0 2px ${({ theme }) => theme.semantics.colors.accent.primary}20;
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    &::placeholder {
+      color: ${({ theme }) => theme.semantics.colors.text.secondary}80;
+    }
+  }
+`;
+
+const BrandBadge = styled.span`
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: ${({ theme }) => theme.semantics.colors.text.secondary};
+`;
+
 export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getProductsUseCase, syncProductsUseCase }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -166,19 +223,42 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
+  // Filter states
+  const [filters, setFilters] = useState({
+    barcode: '',
+    name: '',
+    price: '',
+    brand: '',
+  });
+
   const fetchProducts = useCallback(async () => {
     setIsLoading(true);
     try {
-      const result = await getProductsUseCase.execute();
+      // Create a clean filter object (remove empty strings)
+      const activeFilters = Object.entries(filters).reduce((acc, [key, value]) => {
+        if (value !== '') {
+          acc[key as keyof typeof filters] = value;
+        }
+        return acc;
+      }, {} as any);
+
+      const result = await getProductsUseCase.execute(activeFilters);
       setProducts(result);
     } catch (error) {
       console.error('Failed to fetch products:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [getProductsUseCase]);
+  }, [getProductsUseCase, filters]);
 
-  useEffect(() => { fetchProducts(); }, [fetchProducts]);
+  // Debounced effect for filtering
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchProducts();
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [filters, fetchProducts]);
 
   const handleSync = async () => {
     setIsSyncing(true);
@@ -202,6 +282,11 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
     }
   };
 
+  const handleFilterChange = (key: keyof typeof filters, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+    setCurrentPage(1); // Reset to first page when filtering
+  };
+
   const columns: Column<Product>[] = [
     { 
       header: 'Image', 
@@ -212,10 +297,16 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
     { 
       header: 'Barcode', 
       key: 'barcode',
-      width: '200px',
+      width: '180px',
       render: (product) => <span style={{ fontFamily: 'monospace', fontWeight: 600, color: '#94a3b8' }}>{product.barcode}</span>
     },
     { header: 'Product Name', key: 'name' },
+    { 
+      header: 'Brand', 
+      key: 'brand',
+      width: '150px',
+      render: (product) => product.brand ? <BrandBadge>{product.brand}</BrandBadge> : '-'
+    },
     { 
       header: 'Price', 
       key: 'price',
@@ -234,7 +325,9 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
         onBack={onBack}
         extraContent={
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <span className="total-count">Total: {products.length} Products</span>
+            <span className="total-count">
+              Total: {products.length} Products
+            </span>
             <SyncButton onClick={handleSync} disabled={isSyncing || isLoading}>
               {isSyncing ? <Loader style={{ width: 14, height: 14, margin: 0 }} /> : null}
               {isSyncing ? 'Syncing...' : 'Sync Products'}
@@ -249,6 +342,49 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
             {message.text}
           </StatusMessage>
         )}
+
+        <FilterSection>
+          <FilterGroup>
+            <label htmlFor="filter-barcode">Barcode</label>
+            <input 
+              id="filter-barcode"
+              type="text" 
+              placeholder="Search barcode..." 
+              value={filters.barcode}
+              onChange={(e) => handleFilterChange('barcode', e.target.value)}
+            />
+          </FilterGroup>
+          <FilterGroup>
+            <label htmlFor="filter-name">Product Name</label>
+            <input 
+              id="filter-name"
+              type="text" 
+              placeholder="Search product name..." 
+              value={filters.name}
+              onChange={(e) => handleFilterChange('name', e.target.value)}
+            />
+          </FilterGroup>
+          <FilterGroup>
+            <label htmlFor="filter-brand">Brand</label>
+            <input 
+              id="filter-brand"
+              type="text" 
+              placeholder="Search brand..." 
+              value={filters.brand}
+              onChange={(e) => handleFilterChange('brand', e.target.value)}
+            />
+          </FilterGroup>
+          <FilterGroup>
+            <label htmlFor="filter-price">Price</label>
+            <input 
+              id="filter-price"
+              type="text" 
+              placeholder="Search price..." 
+              value={filters.price}
+              onChange={(e) => handleFilterChange('price', e.target.value)}
+            />
+          </FilterGroup>
+        </FilterSection>
         
         <DataTable
           columns={columns}
@@ -263,7 +399,7 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
             setCurrentPage(1);
           }}
           loadingMessage="Loading products..."
-          emptyMessage="No products found."
+          emptyMessage="No products found matching your filters."
         />
         
         {isSyncing && <LoadingOverlay>Synchronizing data...</LoadingOverlay>}

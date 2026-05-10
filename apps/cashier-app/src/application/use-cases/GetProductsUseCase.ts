@@ -1,5 +1,5 @@
 import { Product } from '../../domain/entities/Product';
-import type { ProductRepository } from '../../domain/repositories/ProductRepository';
+import type { ProductRepository, ProductFilters } from '../../domain/repositories/ProductRepository';
 
 export class GetProductsUseCase {
   private productRepository: ProductRepository;
@@ -8,7 +8,7 @@ export class GetProductsUseCase {
     this.productRepository = productRepository;
   }
 
-  async execute(): Promise<Product[]> {
-    return this.productRepository.getAllProducts();
+  async execute(filters?: ProductFilters): Promise<Product[]> {
+    return this.productRepository.getAllProducts(filters);
   }
 }
