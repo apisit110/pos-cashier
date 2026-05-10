@@ -97,3 +97,12 @@ pnpm --filter cashier-transactions-service exec drizzle-kit generate
 pnpm --filter cashier-orders-service exec drizzle-kit generate
 pnpm run dev
 ```
+
+
+todo
+
+[ ] - list transaction
+[ ] - transaction detail + order
+[ ] - list product
+[ ] - receipt
+[ ] - void (HOLD)

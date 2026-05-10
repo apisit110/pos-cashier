@@ -3,6 +3,7 @@ import { Order, OrderItem, OrderStatus } from '../../domain/entities/Order';
 import type { OrderRepository } from '../interfaces/OrderRepository';
 import type { PaymentService } from '../interfaces/PaymentService';
 import { PaymentMethod } from '../interfaces/PaymentService';
+import type { TransactionService } from '../interfaces/TransactionService';
 
 export class CheckoutDto {
   items: { productId: string; quantity: number; price: number }[];
@@ -18,10 +19,12 @@ export class CheckoutUseCase {
     @Inject('OrderRepository')
     private readonly orderRepository: OrderRepository,
     @Inject('PaymentService')
-    private readonly paymentService: PaymentService
+    private readonly paymentService: PaymentService,
+    @Inject('TransactionService')
+    private readonly transactionService: TransactionService
   ) {}
 
-  async execute(data: CheckoutDto, staffId: string): Promise<Order> {
+  async execute(data: CheckoutDto, staffId: string, staffName: string): Promise<Order> {
     // 1. Calculate final values
     const subtotal = data.items.reduce(
       (sum, item) => sum + item.price * item.quantity,
@@ -67,6 +70,15 @@ export class CheckoutUseCase {
         order.markAsPaid();
         await this.orderRepository.update(order);
         console.log(`Order ${order.id} updated to PAID status.`);
+
+        // 5. Create Transaction record
+        await this.transactionService.createTransaction({
+          orderNumber: order.id,
+          amount: order.totalAmount,
+          paymentMethod: data.paymentMethod,
+          status: 'SUCCESS',
+          staffName: staffName
+        });
       } else {
         console.log(`Order ${order.id} remains PENDING (waiting for payment confirmation)`);
       }

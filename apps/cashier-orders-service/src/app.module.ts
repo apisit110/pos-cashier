@@ -9,6 +9,8 @@ import { DatabaseProvider } from './infrastructure/database/database.provider';
 import { SqliteOrderRepository } from './infrastructure/repositories/SqliteOrderRepository';
 import { PaymentService } from './application/interfaces/PaymentService';
 import { ApiPaymentService } from './infrastructure/services/ApiPaymentService';
+import { TransactionService } from './application/interfaces/TransactionService';
+import { ApiTransactionService } from './infrastructure/services/ApiTransactionService';
 
 @Module({
   imports: [
@@ -28,6 +30,10 @@ import { ApiPaymentService } from './infrastructure/services/ApiPaymentService';
     {
       provide: 'PaymentService',
       useClass: ApiPaymentService
+    },
+    {
+      provide: 'TransactionService',
+      useClass: ApiTransactionService
     },
     CreateOrderUseCase,
     UpdateOrderStatusUseCase,

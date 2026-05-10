@@ -30,6 +30,17 @@ export class SqliteTransactionRepository implements TransactionRepository {
     };
   }
 
+  async save(transaction: Transaction): Promise<void> {
+    await this.db.insert(schema.transactions).values({
+      orderNumber: transaction.orderNumber,
+      amount: transaction.amount,
+      paymentMethod: transaction.paymentMethod,
+      status: transaction.status,
+      staffName: transaction.staffName,
+      createdAt: transaction.createdAt,
+    });
+  }
+
   private mapToEntity(result: any): Transaction {
     return new Transaction(
       result.id,
