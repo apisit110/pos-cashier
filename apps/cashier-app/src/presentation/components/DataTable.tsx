@@ -189,7 +189,6 @@ interface DataTableProps<T> {
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
   emptyMessage?: string;
-  loadingMessage?: string;
 }
 
 export function DataTable<T extends { id: string | number }>({
@@ -202,7 +201,6 @@ export function DataTable<T extends { id: string | number }>({
   onPageChange,
   onPageSizeChange,
   emptyMessage = 'No data found.',
-  loadingMessage = 'Loading data...',
 }: DataTableProps<T>) {
   const totalPages = Math.ceil(totalItems / pageSize);
   

@@ -119,9 +119,7 @@ function App() {
     }
   };
 
-  const handleNavigateToSell = () => {
-    setCurrentView('create-order');
-  };
+
 
   if (isInitializing) {
     return <InitializingLoader>Loading Lightning POS...</InitializingLoader>;

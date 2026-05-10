@@ -148,7 +148,6 @@ export const UserListPage: React.FC<UserListPageProps> = ({ onBack, onNavigateTo
             setPageSize(size);
             setCurrentPage(1);
           }}
-          loadingMessage="Loading users..."
           emptyMessage="No users found."
         />
       </Content>

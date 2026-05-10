@@ -399,7 +399,6 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
             setPageSize(size);
             setCurrentPage(1);
           }}
-          loadingMessage="Loading products..."
           emptyMessage="No products found matching your filters."
         />
         

@@ -329,7 +329,6 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
             setPageSize(size);
             setCurrentPage(1);
           }}
-          loadingMessage="Loading transactions..."
           emptyMessage="No transactions found."
         />
       </Content>
