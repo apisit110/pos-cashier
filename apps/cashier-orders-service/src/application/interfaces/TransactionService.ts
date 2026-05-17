@@ -10,5 +10,5 @@ export interface TransactionData {
 }
 
 export interface TransactionService {
-  createTransaction(data: TransactionData): Promise<void>;
+  createTransaction(data: TransactionData): Promise<string>;
 }

@@ -84,8 +84,8 @@ export class CheckoutUseCase {
         await this.syncQueueService.addOrderSyncJob(order.id);
         console.log(`Order ${order.id} updated to PAID status and queued for sync.`);
 
-        // 5. Create Transaction record
-        await this.transactionService.createTransaction({
+        // 5. Create Transaction record and queue sync
+        const transactionId = await this.transactionService.createTransaction({
           orderId: order.id,
           merchantId: order.merchantId,
           storeId: order.storeId,
@@ -95,6 +95,8 @@ export class CheckoutUseCase {
           status: 'SUCCESS',
           staffName: staffName
         });
+        await this.syncQueueService.addTransactionSyncJob(transactionId);
+        console.log(`Transaction ${transactionId} queued for sync.`);
       } else {
         console.log(`Order ${order.id} remains PENDING (waiting for payment confirmation)`);
       }

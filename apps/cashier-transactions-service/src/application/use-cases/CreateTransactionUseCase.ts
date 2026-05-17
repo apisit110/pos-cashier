@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Transaction } from '../../domain/entities/Transaction';
 import { TransactionRepository } from '../../domain/repositories/TransactionRepository';
 import { generateTransactionId } from '../utils/id-generator';
-import { SyncQueueService } from '../../infrastructure/queue/SyncQueueService';
 
 export interface CreateTransactionInput {
   orderId: string;
@@ -19,10 +18,9 @@ export interface CreateTransactionInput {
 export class CreateTransactionUseCase {
   constructor(
     private readonly transactionRepository: TransactionRepository,
-    private readonly syncQueueService: SyncQueueService,
   ) {}
 
-  async execute(data: CreateTransactionInput): Promise<void> {
+  async execute(data: CreateTransactionInput): Promise<string> {
     const transactionId = generateTransactionId();
 
     const transaction = new Transaction(
@@ -39,6 +37,6 @@ export class CreateTransactionUseCase {
     );
 
     await this.transactionRepository.save(transaction);
-    await this.syncQueueService.addTransactionSyncJob(transaction.id);
+    return transaction.id;
   }
 }
