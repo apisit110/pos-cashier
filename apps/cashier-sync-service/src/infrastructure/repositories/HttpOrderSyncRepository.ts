@@ -14,20 +14,17 @@ export class HttpOrderSyncRepository implements OrderSyncRepository {
       orders: [
         {
           posTempId: order.id,
-          orderNumber: order.id,
           merchantId: order.merchantId,
           storeId: order.storeId,
-          terminalId: order.terminalId,
+          terminalId: order.terminalId ?? null,
           staffId: order.staffId,
+          memberId: order.memberId ?? null,
           totalAmount: order.totalAmount,
           status: order.status,
           items: order.items.map((item: any) => ({
             productId: item.productId,
-            productUid: null,
-            name: `Product ${item.productId}`, // Placeholder for name if still not available
             quantity: item.quantity,
             price: item.price,
-            subtotal: item.quantity * item.price,
           })),
           createdAt: order.createdAt,
         },
