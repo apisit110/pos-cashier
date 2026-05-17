@@ -96,6 +96,7 @@ pnpm --filter cashier-products-service exec drizzle-kit generate --name cashier-
 pnpm --filter cashier-members-service exec drizzle-kit generate --name cashier-members-service.db
 pnpm --filter cashier-transactions-service exec drizzle-kit generate --name cashier-transactions-service.db
 pnpm --filter cashier-orders-service exec drizzle-kit generate --name cashier-orders-service.db
+pnpm --filter cashier-terminal-service exec drizzle-kit generate --name cashier-terminal-service.db
 pnpm run dev
 ```
 
