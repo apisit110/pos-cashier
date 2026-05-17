@@ -13,20 +13,20 @@ export class HttpOrderSyncRepository implements OrderSyncRepository {
     const payload = {
       orders: [
         {
-          posTempId: order.id,
-          merchantId: order.merchantId,
-          storeId: order.storeId,
-          terminalId: order.terminalId ?? null,
-          staffId: order.staffId,
-          memberId: order.memberId ?? null,
-          totalAmount: order.totalAmount,
+          order_id: order.id,
+          merchant_id: order.merchantId,
+          store_id: order.storeId,
+          terminal_id: order.terminalId ?? null,
+          staff_id: order.staffId,
+          member_id: order.memberId ?? null,
+          total_amount: order.totalAmount,
           status: order.status,
           items: order.items.map((item: any) => ({
-            productId: item.productId,
+            product_id: item.productId,
             quantity: item.quantity,
             price: item.price,
           })),
-          createdAt: order.createdAt,
+          created_at: order.createdAt,
         },
       ],
     };
