@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { LoginPage } from './presentation/pages/login/LoginPage';
+import { TerminalSetupPage } from './presentation/pages/terminal-setup/TerminalSetupPage';
 import { CreateOrderPage } from './presentation/pages/create-order/CreateOrderPage';
 import { DashboardPage } from './presentation/pages/dashboard/DashboardPage';
 import { CreateUserPage } from './presentation/pages/create-user/CreateUserPage';
@@ -52,7 +53,10 @@ const getTransactionByIdUseCase = new GetTransactionByIdUseCase(transactionRepos
 const getProductsUseCase = new GetProductsUseCase(productRepository);
 const syncProductsAppUseCase = new SyncProductsAppUseCase(productRepository);
 
+const TERMINAL_STORAGE_KEY = 'lightning_pos_terminal';
+
 function App() {
+  const [hasTerminal, setHasTerminal] = useState(() => !!localStorage.getItem(TERMINAL_STORAGE_KEY));
   const [currentView, setCurrentView] = useState<'login' | 'create-order' | 'dashboard' | 'create-user' | 'user-list' | 'transaction-list' | 'transaction-detail' | 'product-list'>('login');
   const [user, setUser] = useState<{ uid: string; username: string; role: string; roleId: number; accessToken: string; refreshToken?: string } | null>(null);
   const [selectedTransactionId, setSelectedTransactionId] = useState<string | null>(null);
@@ -129,6 +133,10 @@ function App() {
   };
 
 
+
+  if (!hasTerminal) {
+    return <TerminalSetupPage onComplete={() => setHasTerminal(true)} />;
+  }
 
   if (isInitializing) {
     return <InitializingLoader>Loading Lightning POS...</InitializingLoader>;

@@ -7,6 +7,22 @@ import { PaymentMethod } from '../interfaces/PaymentService';
 import type { TransactionService } from '../interfaces/TransactionService';
 import { SyncQueueService } from '../../infrastructure/queue/SyncQueueService';
 
+const ULID_ENCODING = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+
+function generateUlid(): string {
+  let ts = Date.now();
+  let timeStr = '';
+  for (let i = 9; i >= 0; i--) {
+    timeStr = ULID_ENCODING[ts % 32] + timeStr;
+    ts = Math.floor(ts / 32);
+  }
+  let randomStr = '';
+  for (let i = 0; i < 16; i++) {
+    randomStr += ULID_ENCODING[Math.floor(Math.random() * 32)];
+  }
+  return timeStr + randomStr;
+}
+
 export class CheckoutDto {
   items: { productId: string; quantity: number; price: number }[];
   memberId?: string;
@@ -47,7 +63,7 @@ export class CheckoutUseCase {
     const terminalId = this.configService.get<string>('TERMINAL_ID', 'DEFAULT_TERMINAL');
 
     const order = new Order(
-      Math.random().toString(36).substring(2, 9),
+      `${merchantId}${storeId}${terminalId}${generateUlid()}`,
       merchantId,
       storeId,
       items,
