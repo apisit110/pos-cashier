@@ -198,17 +198,17 @@ const MainContent = styled.main`
 interface MainLayoutProps {
   children: React.ReactNode;
   currentView: string;
-  user: { username: string; role: string } | null;
+  staff: { username: string; role: string } | null;
   onNavigate: (view: any) => void;
   onLogout: () => void;
 }
 
-export const MainLayout: React.FC<MainLayoutProps> = ({ 
-  children, 
-  currentView, 
-  user, 
+export const MainLayout: React.FC<MainLayoutProps> = ({
+  children,
+  currentView,
+  staff,
   onNavigate,
-  onLogout 
+  onLogout,
 }) => {
   return (
     <LayoutContainer>
@@ -224,7 +224,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
           </Logo>
 
           <Nav>
-            {user?.role === 'manager' && (
+            {staff?.role === 'manager' && (
               <NavItem 
                 $active={currentView === 'dashboard'} 
                 onClick={() => onNavigate('dashboard')}
@@ -251,7 +251,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
               <span className="nav-label">POS Terminal</span>
             </NavItem>
 
-            {user?.role === 'manager' && (
+            {staff?.role === 'manager' && (
               <NavItem 
                 $active={currentView === 'transaction-list'} 
                 onClick={() => onNavigate('transaction-list')}
@@ -264,7 +264,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
               </NavItem>
             )}
 
-            {user?.role === 'manager' && (
+            {staff?.role === 'manager' && (
               <>
                 <NavItem 
                   $active={currentView === 'product-list'} 
@@ -278,9 +278,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
                   <span className="nav-label">Products</span>
                 </NavItem>
 
-                <NavItem 
-                  $active={currentView === 'user-list' || currentView === 'create-user'} 
-                  onClick={() => onNavigate('user-list')}
+                <NavItem
+                  $active={currentView === 'staff-list' || currentView === 'create-staff'}
+                  onClick={() => onNavigate('staff-list')}
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -288,7 +288,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
                     <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                     <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                   </svg>
-                  <span className="nav-label">Users</span>
+                  <span className="nav-label">Staffs</span>
                 </NavItem>
               </>
             )}
@@ -297,11 +297,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
           <UserProfile>
             <UserInfo>
               <div className="avatar">
-                {user?.username?.charAt(0).toUpperCase() || 'U'}
+                {staff?.username?.charAt(0).toUpperCase() || 'U'}
               </div>
               <div className="details">
-                <span className="name">{user?.username}</span>
-                <span className="role">{user?.role}</span>
+                <span className="name">{staff?.username}</span>
+                <span className="role">{staff?.role}</span>
               </div>
             </UserInfo>
             <LogoutButton onClick={onLogout}>

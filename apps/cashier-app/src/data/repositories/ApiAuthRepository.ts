@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { AuthRepository } from '../../domain/repositories/AuthRepository';
-import type { AuthResponse } from '../../domain/entities/User';
+import type { AuthResponse } from '../../domain/entities/Staff';
 import type { LoginCredentials } from '../../domain/entities/Auth';
 
 export class ApiAuthRepository implements AuthRepository {
@@ -9,7 +9,7 @@ export class ApiAuthRepository implements AuthRepository {
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const response = await axios.post<AuthResponse>(`${this.baseUrl}/login`, {
-      userId: credentials.userId,
+      staffId: credentials.staffId,
       pin: credentials.pin,
     });
 

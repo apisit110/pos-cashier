@@ -1,5 +1,5 @@
-export interface SyncUserRequestDTO {
-  users: {
+export interface SyncStaffRequestDTO {
+  staffs: {
     posTempId: string;
     userId: string;
     fullName: string;
@@ -11,7 +11,7 @@ export interface SyncUserRequestDTO {
   }[];
 }
 
-export interface SyncUserResponseDTO {
+export interface SyncStaffResponseDTO {
   message: string;
   results: {
     posTempId: string;
@@ -21,6 +21,6 @@ export interface SyncUserResponseDTO {
   }[];
 }
 
-export interface UserSyncGateway {
-  syncUsers(data: SyncUserRequestDTO): Promise<SyncUserResponseDTO>;
+export interface StaffSyncGateway {
+  syncStaffs(data: SyncStaffRequestDTO): Promise<SyncStaffResponseDTO>;
 }

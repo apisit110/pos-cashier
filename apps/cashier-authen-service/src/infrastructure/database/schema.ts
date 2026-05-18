@@ -5,7 +5,7 @@ export const roles = sqliteTable('roles', {
   roleName: text('role_name').notNull(), // manager, cashier
 });
 
-export const users = sqliteTable('users', {
+export const staffs = sqliteTable('staffs', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   userId: text('user_id').notNull().unique(),
   roleId: integer('role_id').notNull().references(() => roles.id),

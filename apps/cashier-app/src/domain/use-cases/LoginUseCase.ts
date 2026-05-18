@@ -1,4 +1,4 @@
-import type { AuthResponse } from '../entities/User';
+import type { AuthResponse } from '../entities/Staff';
 import type { AuthRepository } from '../repositories/AuthRepository';
 import type { LoginCredentials } from '../entities/Auth';
 
@@ -10,11 +10,10 @@ export class LoginUseCase {
   }
 
   async execute(credentials: LoginCredentials): Promise<AuthResponse> {
-    // Basic validation logic
-    if (!credentials.userId || !credentials.pin) {
-      throw new Error('User ID and PIN are required');
+    if (!credentials.staffId || !credentials.pin) {
+      throw new Error('Staff ID and PIN are required');
     }
-    
+
     return await this.authRepository.login(credentials);
   }
 }

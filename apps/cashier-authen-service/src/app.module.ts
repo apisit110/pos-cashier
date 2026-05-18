@@ -2,35 +2,35 @@ import { Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './presentation/controllers/AuthController';
-import { UserController } from './presentation/controllers/UserController';
+import { StaffController } from './presentation/controllers/StaffController';
 import { LoginUseCase } from './application/use-cases/LoginUseCase';
-import { GetUsersUseCase } from './application/use-cases/GetUsersUseCase';
-import { CreateUserUseCase as BackendCreateUserUseCase } from './application/use-cases/CreateUserUseCase';
-import { UserRepository } from './domain/repositories/UserRepository';
-import { SqliteUserRepository } from './infrastructure/repositories/SqliteUserRepository';
+import { GetStaffsUseCase } from './application/use-cases/GetStaffsUseCase';
+import { CreateStaffUseCase } from './application/use-cases/CreateStaffUseCase';
+import { StaffRepository } from './domain/repositories/StaffRepository';
+import { SqliteStaffRepository } from './infrastructure/repositories/SqliteStaffRepository';
 import { RoleRepository } from './domain/repositories/RoleRepository';
 import { SqliteRoleRepository } from './infrastructure/repositories/SqliteRoleRepository';
 import { PermissionRepository } from './domain/repositories/PermissionRepository';
 import { SqlitePermissionRepository } from './infrastructure/repositories/SqlitePermissionRepository';
 import { DatabaseProvider } from './infrastructure/database/database.provider';
 import { LoggingInterceptor } from './presentation/interceptors/LoggingInterceptor';
-import { SyncUsersUseCase } from './application/use-cases/SyncUsersUseCase';
-import { HttpUserSyncGateway } from './infrastructure/repositories/HttpUserSyncGateway';
+import { SyncStaffsUseCase } from './application/use-cases/SyncStaffsUseCase';
+import { HttpStaffSyncGateway } from './infrastructure/repositories/HttpStaffSyncGateway';
 
 @Module({
   imports: [
     JwtModule.register({
       global: true,
-      secret: 'pos-staff-secret-key', // Use a secure key (e.g., from env) in production
+      secret: 'pos-staff-secret-key',
       signOptions: { expiresIn: '60m' },
     }),
   ],
-  controllers: [AuthController, UserController],
+  controllers: [AuthController, StaffController],
   providers: [
     DatabaseProvider,
     {
-      provide: UserRepository,
-      useClass: SqliteUserRepository,
+      provide: StaffRepository,
+      useClass: SqliteStaffRepository,
     },
     {
       provide: RoleRepository,
@@ -45,13 +45,13 @@ import { HttpUserSyncGateway } from './infrastructure/repositories/HttpUserSyncG
       useClass: LoggingInterceptor,
     },
     {
-      provide: 'UserSyncGateway',
-      useClass: HttpUserSyncGateway,
+      provide: 'StaffSyncGateway',
+      useClass: HttpStaffSyncGateway,
     },
     LoginUseCase,
-    GetUsersUseCase,
-    BackendCreateUserUseCase,
-    SyncUsersUseCase,
+    GetStaffsUseCase,
+    CreateStaffUseCase,
+    SyncStaffsUseCase,
   ],
 })
 export class AppModule {}

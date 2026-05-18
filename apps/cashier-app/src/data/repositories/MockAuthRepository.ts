@@ -1,5 +1,5 @@
 import type { AuthRepository } from '../../domain/repositories/AuthRepository';
-import type { AuthResponse } from '../../domain/entities/User';
+import type { AuthResponse } from '../../domain/entities/Staff';
 import type { LoginCredentials } from '../../domain/entities/Auth';
 
 export class MockAuthRepository implements AuthRepository {
@@ -11,9 +11,9 @@ export class MockAuthRepository implements AuthRepository {
 
     let response: AuthResponse;
 
-    if (credentials.userId === 'M001' && credentials.pin === '123456') {
+    if (credentials.staffId === 'M001' && credentials.pin === '123456') {
       response = {
-        user: {
+        staff: {
           id: 1,
           userId: 'M001',
           fullName: 'Admin Manager',
@@ -24,7 +24,7 @@ export class MockAuthRepository implements AuthRepository {
         refreshToken: 'mock-refresh-token-manager'
       };
     } else {
-      throw new Error('Invalid User ID or PIN');
+      throw new Error('Invalid Staff ID or PIN');
     }
 
     // Persist session

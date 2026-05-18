@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import { PageHeader } from '../../components/PageHeader';
 import { DataTable } from '../../components/DataTable';
-import type { GetUsersUseCase } from '../../../application/use-cases/GetUsersUseCase';
-import type { User } from '../../../domain/repositories/UserRepository';
+import type { GetStaffsUseCase } from '../../../application/use-cases/GetStaffsUseCase';
+import type { Staff } from '../../../domain/repositories/StaffRepository';
 
 const Container = styled.div`
   display: flex;
@@ -48,44 +48,44 @@ const StatusBadge = styled.span`
   text-transform: uppercase;
 `;
 
-interface UserListPageProps {
+interface StaffListPageProps {
   onBack: () => void;
-  onNavigateToCreateUser: () => void;
-  getUsersUseCase: GetUsersUseCase;
+  onNavigateToCreateStaff: () => void;
+  getStaffsUseCase: GetStaffsUseCase;
 }
 
-export const UserListPage: React.FC<UserListPageProps> = ({ onBack, onNavigateToCreateUser, getUsersUseCase }) => {
-  const [users, setUsers] = useState<User[]>([]);
+export const StaffListPage: React.FC<StaffListPageProps> = ({ onBack, onNavigateToCreateStaff, getStaffsUseCase }) => {
+  const [staffs, setStaffs] = useState<Staff[]>([]);
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchUsers = useCallback(async () => {
+  const fetchStaffs = useCallback(async () => {
     setIsLoading(true);
     try {
-      const result = await getUsersUseCase.execute(currentPage, pageSize);
-      setUsers(result.users);
+      const result = await getStaffsUseCase.execute(currentPage, pageSize);
+      setStaffs(result.staffs);
       setTotal(result.total);
     } catch (error) {
-      console.error('Failed to fetch users:', error);
+      console.error('Failed to fetch staffs:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [getUsersUseCase, currentPage, pageSize]);
+  }, [getStaffsUseCase, currentPage, pageSize]);
 
-  useEffect(() => { fetchUsers(); }, [fetchUsers]);
+  useEffect(() => { fetchStaffs(); }, [fetchStaffs]);
 
   return (
     <Container>
       <PageHeader
-        title="Manage Users"
+        title="Manage Staffs"
         onBack={onBack}
         extraContent={
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <span className="total-count">Total: {total} Users</span>
-            <button 
-              onClick={onNavigateToCreateUser}
+            <span className="total-count">Total: {total} Staffs</span>
+            <button
+              onClick={onNavigateToCreateStaff}
               style={{
                 background: '#6366f1',
                 color: 'white',
@@ -99,7 +99,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({ onBack, onNavigateTo
                 alignItems: 'center',
                 gap: '0.5rem',
                 boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
               }}
               onMouseOver={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
               onMouseOut={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
@@ -108,7 +108,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({ onBack, onNavigateTo
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
-              Create New User
+              Create New Staff
             </button>
           </div>
         }
@@ -117,28 +117,28 @@ export const UserListPage: React.FC<UserListPageProps> = ({ onBack, onNavigateTo
       <Content>
         <DataTable
           columns={[
-            { 
-              header: 'User ID', 
+            {
+              header: 'Staff ID',
               key: 'userId',
-              render: (user) => <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>{user.userId}</span>
+              render: (staff) => <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>{staff.userId}</span>,
             },
             { header: 'Full Name', key: 'fullName' },
-            { 
-              header: 'Role', 
+            {
+              header: 'Role',
               key: 'roleId',
-              render: (user) => (
-                <RoleBadge $roleId={user.roleId}>
-                  {user.roleId === 1 ? '🛡️ Manager' : '💰 Cashier'}
+              render: (staff) => (
+                <RoleBadge $roleId={staff.roleId}>
+                  {staff.roleId === 1 ? '🛡️ Manager' : '💰 Cashier'}
                 </RoleBadge>
-              )
+              ),
             },
-            { 
-              header: 'Status', 
+            {
+              header: 'Status',
               key: 'status',
-              render: () => <StatusBadge>Active</StatusBadge>
+              render: () => <StatusBadge>Active</StatusBadge>,
             },
           ]}
-          data={users}
+          data={staffs}
           isLoading={isLoading}
           totalItems={total}
           currentPage={currentPage}
@@ -148,7 +148,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({ onBack, onNavigateTo
             setPageSize(size);
             setCurrentPage(1);
           }}
-          emptyMessage="No users found."
+          emptyMessage="No staffs found."
         />
       </Content>
     </Container>

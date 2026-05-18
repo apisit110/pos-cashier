@@ -9,7 +9,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() body: any) {
-    return this.loginUseCase.execute(body.userId, body.pin);
+    return this.loginUseCase.execute(body.staffId, body.pin);
   }
 
   @UseGuards(JwtAuthGuard)

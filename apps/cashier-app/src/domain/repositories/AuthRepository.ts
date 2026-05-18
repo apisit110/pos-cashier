@@ -1,4 +1,4 @@
-import type { AuthResponse } from '../entities/User';
+import type { AuthResponse } from '../entities/Staff';
 import type { LoginCredentials } from '../entities/Auth';
 
 export interface AuthRepository {

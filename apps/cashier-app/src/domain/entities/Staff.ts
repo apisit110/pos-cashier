@@ -1,6 +1,6 @@
-export type UserRole = 'manager' | 'cashier';
+export type StaffRole = 'manager' | 'cashier';
 
-export interface User {
+export interface Staff {
   id: number;
   userId: string;
   fullName: string;
@@ -9,7 +9,7 @@ export interface User {
 }
 
 export interface AuthResponse {
-  user: User;
+  staff: Staff;
   accessToken: string;
   refreshToken: string;
 }

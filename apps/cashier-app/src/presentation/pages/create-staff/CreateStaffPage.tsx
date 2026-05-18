@@ -3,8 +3,8 @@ import styled, { keyframes, css } from 'styled-components';
 import { Button } from '../../components/Button';
 import { PageHeader } from '../../components/PageHeader';
 import { PinInputField } from '../../components/PinInputField';
-import type { CreateUserUseCase } from '../../../application/use-cases/CreateUserUseCase';
-import type { SyncUserUseCase } from '../../../application/use-cases/SyncUserUseCase';
+import type { CreateStaffUseCase } from '../../../application/use-cases/CreateStaffUseCase';
+import type { SyncStaffUseCase } from '../../../application/use-cases/SyncStaffUseCase';
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(10px); }
@@ -63,7 +63,7 @@ const FormGroup = styled.div`
   }
 `;
 
-const UserIdGroup = styled.div`
+const StaffIdGroup = styled.div`
   display: flex;
   gap: 0.5rem;
 
@@ -95,7 +95,7 @@ const RoleOptions = styled.div`
 
 const RoleOption = styled.label<{ $selected?: boolean }>`
   cursor: pointer;
-  
+
   input { display: none; }
 
   .role-card {
@@ -141,26 +141,26 @@ const StatusMessage = styled.div<{ $type: 'success' | 'error' }>`
   border: 1px solid ${({ $type }) => $type === 'success' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
 `;
 
-interface CreateUserPageProps {
+interface CreateStaffPageProps {
   onBack: () => void;
-  createUserUseCase: CreateUserUseCase;
-  syncUserUseCase: SyncUserUseCase;
+  createStaffUseCase: CreateStaffUseCase;
+  syncStaffUseCase: SyncStaffUseCase;
 }
 
-export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUserUseCase, syncUserUseCase }) => {
+export const CreateStaffPage: React.FC<CreateStaffPageProps> = ({ onBack, createStaffUseCase, syncStaffUseCase }) => {
   const [fullName, setFullName] = useState('');
-  const [userId, setUserId] = useState('');
+  const [staffId, setStaffId] = useState('');
   const [pin, setPin] = useState('');
   const [roleId, setRoleId] = useState(2);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
-  const generateUserId = () => {
+  const generateStaffId = () => {
     const id = `TEMP_${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
-    setUserId(id);
+    setStaffId(id);
   };
 
-  useEffect(() => { generateUserId(); }, []);
+  useEffect(() => { generateStaffId(); }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -176,15 +176,15 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
     setIsLoading(true);
     setMessage(null);
     try {
-      const newUser = await createUserUseCase.execute({ fullName, roleId, userId, pin });
-      await syncUserUseCase.execute();
-      setMessage({ 
-        text: `User "${newUser.fullName}" created successfully! User ID: ${newUser.userId}. Data synced to cloud.`, 
-        type: 'success' 
+      const newStaff = await createStaffUseCase.execute({ fullName, roleId, userId: staffId, pin });
+      await syncStaffUseCase.execute();
+      setMessage({
+        text: `Staff "${newStaff.fullName}" created successfully! Staff ID: ${newStaff.userId}. Data synced to cloud.`,
+        type: 'success',
       });
-      setFullName(''); setPin(''); setRoleId(2); generateUserId();
+      setFullName(''); setPin(''); setRoleId(2); generateStaffId();
     } catch (err: any) {
-      setMessage({ text: err.message || 'Failed to create user', type: 'error' });
+      setMessage({ text: err.message || 'Failed to create staff', type: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -192,29 +192,29 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
 
   return (
     <Container>
-      <PageHeader 
-        title="Create New User"
+      <PageHeader
+        title="Create New Staff"
         onBack={onBack}
       />
 
       <FormContent>
         <Form onSubmit={handleSubmit}>
           <FormGroup>
-            <label htmlFor="userId">User ID (Generated)</label>
-            <UserIdGroup>
+            <label htmlFor="staffId">Staff ID (Generated)</label>
+            <StaffIdGroup>
               <input
-                id="userId"
+                id="staffId"
                 type="text"
-                value={userId}
-                onChange={(e) => setUserId(e.target.value)}
-                placeholder="User ID"
+                value={staffId}
+                onChange={(e) => setStaffId(e.target.value)}
+                placeholder="Staff ID"
                 disabled={isLoading}
                 required
               />
-              <button 
-                type="button" 
-                className="regenerate-button" 
-                onClick={generateUserId}
+              <button
+                type="button"
+                className="regenerate-button"
+                onClick={generateStaffId}
                 disabled={isLoading}
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -222,7 +222,7 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
                   <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
                 </svg>
               </button>
-            </UserIdGroup>
+            </StaffIdGroup>
           </FormGroup>
 
           <FormGroup>
@@ -288,7 +288,7 @@ export const CreateUserPage: React.FC<CreateUserPageProps> = ({ onBack, createUs
           </FormGroup>
 
           <Button type="submit" disabled={isLoading} style={{ marginTop: '1rem' }}>
-            {isLoading ? 'Creating...' : 'Create & Sync User'}
+            {isLoading ? 'Creating...' : 'Create & Sync Staff'}
           </Button>
         </Form>
 

@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Button } from './Button';
 
-interface UserInfo {
+interface StaffInfo {
   username: string;
   role: string;
 }
@@ -10,7 +10,7 @@ interface UserInfo {
 interface PageHeaderProps {
   title: string;
   onBack?: () => void;
-  user?: UserInfo | null;
+  user?: StaffInfo | null;
   onLogout?: () => void;
   extraContent?: React.ReactNode;
   showLogo?: boolean;

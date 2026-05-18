@@ -182,7 +182,7 @@ const DemoHint = styled.div`
 `;
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
-  const [userId, setUserId] = useState('');
+  const [staffId, setStaffId] = useState('');
   const [pin, setPin] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -191,21 +191,21 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     e.preventDefault();
     setError(null);
 
-    if (!userId || !pin) {
-      setError('Please enter both User ID and PIN');
+    if (!staffId || !pin) {
+      setError('Please enter both Staff ID and PIN');
       return;
     }
 
     setIsLoading(true);
     try {
-      const response = await loginUseCase.execute({ userId, pin });
+      const response = await loginUseCase.execute({ staffId, pin });
       if (onLoginSuccess) {
-        onLoginSuccess({ 
-          uid: response.user.id.toString(), 
-          username: response.user.fullName,
-          roleId: response.user.roleId,
+        onLoginSuccess({
+          uid: response.staff.id.toString(),
+          username: response.staff.fullName,
+          roleId: response.staff.roleId,
           accessToken: response.accessToken,
-          refreshToken: response.refreshToken
+          refreshToken: response.refreshToken,
         });
       }
     } catch (err: any) {
@@ -236,10 +236,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
         <LoginForm onSubmit={handleSubmit}>
           <InputField
-            label="User ID"
+            label="Staff ID"
             type="text"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
+            value={staffId}
+            onChange={(e) => setStaffId(e.target.value)}
             placeholder="e.g. M001"
             disabled={isLoading}
           />

@@ -42,7 +42,7 @@ export function seedPermissions(db: any) {
   }
 }
 
-export function seedUsers(db: any) {
+export function seedStaffs(db: any) {
   const managerUserId = process.env.MANAGER_USER_ID;
   const managerName = process.env.MANAGER_NAME;
   const managerPin = process.env.MANAGER_PIN;
@@ -51,7 +51,7 @@ export function seedUsers(db: any) {
     throw new Error('MANAGER_USER_ID, MANAGER_NAME, and MANAGER_PIN must be defined in environment variables');
   }
 
-  db.insert(schema.users)
+  db.insert(schema.staffs)
     .values({
       userId: managerUserId,
       roleId: 1,
@@ -61,7 +61,7 @@ export function seedUsers(db: any) {
       updatedAt: new Date(),
     })
     .onConflictDoUpdate({
-      target: schema.users.userId,
+      target: schema.staffs.userId,
       set: {
         fullName: managerName,
         pinHash: managerPin,
@@ -79,7 +79,7 @@ export function seedDatabase(db: BetterSQLite3Database<typeof schema>) {
       console.log('🌱 Seeding database...');
       seedRoles(tx);
       seedPermissions(tx);
-      seedUsers(tx);
+      seedStaffs(tx);
       console.log('✅ Seeding completed successfully.');
     });
   } catch (error) {

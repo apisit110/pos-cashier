@@ -1,36 +1,35 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserRepository } from '../../domain/repositories/UserRepository';
+import { StaffRepository } from '../../domain/repositories/StaffRepository';
 
 @Injectable()
 export class LoginUseCase {
   constructor(
-    private readonly userRepository: UserRepository,
+    private readonly staffRepository: StaffRepository,
     private readonly jwtService: JwtService,
   ) {}
 
-  async execute(userId: string, pin: string) {
-    const user = await this.userRepository.findByUserId(userId);
+  async execute(staffId: string, pin: string) {
+    const staff = await this.staffRepository.findByStaffId(staffId);
 
-    // Note: In a real production app, pin/password comparison would use a hashing library like bcrypt/argon2
-    if (!user || user.pinHash !== pin) {
+    if (!staff || staff.pinHash !== pin) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { 
-      sub: user.id, 
-      userId: user.userId, 
-      fullName: user.fullName, 
-      roleId: user.roleId 
+    const payload = {
+      sub: staff.id,
+      userId: staff.userId,
+      fullName: staff.fullName,
+      roleId: staff.roleId,
     };
 
     return {
-      user: {
-        id: user.id,
-        userId: user.userId,
-        fullName: user.fullName,
-        roleId: user.roleId,
-        status: user.status,
+      staff: {
+        id: staff.id,
+        userId: staff.userId,
+        fullName: staff.fullName,
+        roleId: staff.roleId,
+        status: staff.status,
       },
       accessToken: await this.jwtService.signAsync(payload, { expiresIn: '60m' }),
       refreshToken: await this.jwtService.signAsync(payload, { expiresIn: '30d' }),

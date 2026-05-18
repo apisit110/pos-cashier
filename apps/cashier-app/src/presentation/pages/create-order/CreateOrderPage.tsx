@@ -314,10 +314,10 @@ const identifyMemberUseCase = new IdentifyMemberUseCase(memberRepository);
 interface CreateOrderPageProps {
   onBack: () => void;
   onLogout?: () => void;
-  user: { uid: string; username: string; role: string; accessToken: string } | null;
+  staff: { uid: string; username: string; role: string; accessToken: string } | null;
 }
 
-export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogout, user }) => {
+export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogout, staff }) => {
   const [items, setItems] = useState<OrderItem[]>([]);
   const [barcodeInput, setBarcodeInput] = useState('');
   const [memberInput, setMemberInput] = useState('');
@@ -569,7 +569,7 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
       <PageHeader
         title="POS Terminal"
         onBack={onBack}
-        user={user}
+        user={staff}
         onLogout={onLogout}
         extraContent={null}
       />
