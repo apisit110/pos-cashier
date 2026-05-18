@@ -13,16 +13,15 @@ export class HttpTransactionSyncRepository implements TransactionSyncRepository 
     const payload = {
       transactions: [
         {
-          posTempId: transaction.id,
-          orderId: transaction.orderId,
-          merchantId: transaction.merchantId,
-          storeId: transaction.storeId,
-          terminalId: transaction.terminalId,
+          order_id: transaction.orderId,
+          merchant_id: transaction.merchantId,
+          store_id: transaction.storeId,
+          terminal_id: transaction.terminalId,
           amount: transaction.amount,
-          paymentMethod: transaction.paymentMethod,
+          payment_method: transaction.paymentMethod,
           status: transaction.status,
-          staffName: transaction.staffName,
-          createdAt: transaction.createdAt,
+          staff_name: transaction.staffName,
+          created_at: transaction.createdAt,
         },
       ],
     };

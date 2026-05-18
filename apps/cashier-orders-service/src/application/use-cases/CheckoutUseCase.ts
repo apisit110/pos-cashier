@@ -3,8 +3,9 @@ import { ConfigService } from '@nestjs/config';
 import { Order, OrderItem, OrderStatus } from '../../domain/entities/Order';
 import type { OrderRepository } from '../interfaces/OrderRepository';
 import type { PaymentService } from '../interfaces/PaymentService';
-import { PaymentMethod } from '../interfaces/PaymentService';
+import { PaymentMethod as PSPaymentMethod } from '../interfaces/PaymentService';
 import type { TransactionService } from '../interfaces/TransactionService';
+import { PaymentMethod } from '../interfaces/TransactionService';
 import { SyncQueueService } from '../../infrastructure/queue/SyncQueueService';
 
 const ULID_ENCODING = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
@@ -26,7 +27,7 @@ function generateUlid(): string {
 export class CheckoutDto {
   items: { productId: string; quantity: number; price: number }[];
   memberId?: string;
-  paymentMethod: 'CASH' | 'CREDIT' | 'QR';
+  paymentMethod: PaymentMethod;
   receivedAmount?: number;
 }
 
@@ -85,7 +86,7 @@ export class CheckoutUseCase {
       const paymentData = await this.paymentService.processPayment({
         orderId: order.id,
         amount: totalAmount,
-        method: data.paymentMethod === 'CASH' ? PaymentMethod.CASH : (data.paymentMethod === 'CREDIT' ? PaymentMethod.CREDIT_CARD : PaymentMethod.QR_CODE),
+        method: data.paymentMethod === 'CASH' ? PSPaymentMethod.CASH : (data.paymentMethod === 'CREDIT_CARD' ? PSPaymentMethod.CREDIT_CARD : PSPaymentMethod.QR_CODE),
         receivedAmount: data.receivedAmount
       });
 
