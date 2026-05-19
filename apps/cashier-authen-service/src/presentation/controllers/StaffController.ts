@@ -22,7 +22,7 @@ export class StaffController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createStaff(@Body() body: { userId: string; fullName: string; roleId: number; pin: string }) {
+  async createStaff(@Body() body: { username: string; fullName: string; roleId: number; pin: string }) {
     return this.createStaffUseCase.execute(body);
   }
 

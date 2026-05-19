@@ -7,7 +7,7 @@ export const roles = sqliteTable('roles', {
 
 export const staffs = sqliteTable('staffs', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  userId: text('user_id').notNull().unique(),
+  username: text('username').notNull().unique(),
   roleId: integer('role_id').notNull().references(() => roles.id),
   fullName: text('full_name').notNull(),
   pinHash: text('pin_hash').notNull(),

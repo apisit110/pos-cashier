@@ -13,9 +13,9 @@ export class SqliteStaffRepository implements StaffRepository {
     private readonly db: BetterSQLite3Database<typeof schema>,
   ) {}
 
-  async findByStaffId(staffId: string): Promise<Staff | null> {
+  async findByUsername(username: string): Promise<Staff | null> {
     const result = await this.db.query.staffs.findFirst({
-      where: eq(schema.staffs.userId, staffId),
+      where: eq(schema.staffs.username, username),
     });
 
     if (!result) return null;
@@ -48,9 +48,9 @@ export class SqliteStaffRepository implements StaffRepository {
     };
   }
 
-  async create(staffData: { userId: string; fullName: string; roleId: number; pinHash: string; status: string }): Promise<Staff> {
+  async create(staffData: { username: string; fullName: string; roleId: number; pinHash: string; status: string }): Promise<Staff> {
     const [result] = await this.db.insert(schema.staffs).values({
-      userId: staffData.userId,
+      username: staffData.username,
       fullName: staffData.fullName,
       roleId: staffData.roleId,
       pinHash: staffData.pinHash,
@@ -75,10 +75,10 @@ export class SqliteStaffRepository implements StaffRepository {
       .where(eq(schema.staffs.id, id));
   }
 
-  async updateSyncStatus(id: number, userId: string, status: string): Promise<void> {
+  async updateSyncStatus(id: number, username: string, status: string): Promise<void> {
     await this.db.update(schema.staffs)
       .set({
-        userId,
+        username,
         status: status as any,
         updatedAt: new Date(),
       })
@@ -88,7 +88,7 @@ export class SqliteStaffRepository implements StaffRepository {
   private mapToEntity(result: any): Staff {
     return new Staff(
       result.id,
-      result.userId,
+      result.username,
       result.roleId,
       result.fullName,
       result.pinHash,

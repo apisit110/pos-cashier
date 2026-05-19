@@ -9,8 +9,8 @@ export class LoginUseCase {
     private readonly jwtService: JwtService,
   ) {}
 
-  async execute(staffId: string, pin: string) {
-    const staff = await this.staffRepository.findByStaffId(staffId);
+  async execute(username: string, pin: string) {
+    const staff = await this.staffRepository.findByUsername(username);
 
     if (!staff || staff.pinHash !== pin) {
       throw new UnauthorizedException('Invalid credentials');
@@ -18,7 +18,7 @@ export class LoginUseCase {
 
     const payload = {
       sub: staff.id,
-      userId: staff.userId,
+      username: staff.username,
       fullName: staff.fullName,
       roleId: staff.roleId,
     };
@@ -26,7 +26,7 @@ export class LoginUseCase {
     return {
       staff: {
         id: staff.id,
-        userId: staff.userId,
+        username: staff.username,
         fullName: staff.fullName,
         roleId: staff.roleId,
         status: staff.status,

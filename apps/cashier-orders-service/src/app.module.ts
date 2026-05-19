@@ -13,6 +13,7 @@ import { PaymentService } from './application/interfaces/PaymentService';
 import { ApiPaymentService } from './infrastructure/services/ApiPaymentService';
 import { TransactionService } from './application/interfaces/TransactionService';
 import { ApiTransactionService } from './infrastructure/services/ApiTransactionService';
+import { ApiStaffService } from './infrastructure/services/ApiStaffService';
 import { SyncQueueService } from './infrastructure/queue/SyncQueueService';
 import { GetOrderByIdUseCase } from './application/use-cases/GetOrderByIdUseCase';
 import { MarkOrderSyncedUseCase } from './application/use-cases/MarkOrderSyncedUseCase';
@@ -54,6 +55,10 @@ import { InternalOrderController } from './presentation/controllers/InternalOrde
     {
       provide: 'TransactionService',
       useClass: ApiTransactionService
+    },
+    {
+      provide: 'StaffService',
+      useClass: ApiStaffService
     },
     CreateOrderUseCase,
     UpdateOrderStatusUseCase,

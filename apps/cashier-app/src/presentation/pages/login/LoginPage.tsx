@@ -182,7 +182,7 @@ const DemoHint = styled.div`
 `;
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
-  const [staffId, setStaffId] = useState('');
+  const [username, setUsername] = useState('');
   const [pin, setPin] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -191,14 +191,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     e.preventDefault();
     setError(null);
 
-    if (!staffId || !pin) {
-      setError('Please enter both Staff ID and PIN');
+    if (!username || !pin) {
+      setError('Please enter both Username and PIN');
       return;
     }
 
     setIsLoading(true);
     try {
-      const response = await loginUseCase.execute({ staffId, pin });
+      const response = await loginUseCase.execute({ username, pin });
       if (onLoginSuccess) {
         onLoginSuccess({
           uid: response.staff.id.toString(),
@@ -236,11 +236,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
         <LoginForm onSubmit={handleSubmit}>
           <InputField
-            label="Staff ID"
+            label="Username"
             type="text"
-            value={staffId}
-            onChange={(e) => setStaffId(e.target.value)}
-            placeholder="e.g. M001"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Enter your username"
             disabled={isLoading}
           />
           
@@ -265,7 +265,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         <LoginFooter>
           <p>Don't have an account? <a href="#">Contact Support</a></p>
           <DemoHint>
-            <small>Demo Credentials: <code>M001</code> / <code>123456</code></small>
+            <small>Demo Credentials: <code>00010001</code> / <code>123456</code></small>
           </DemoHint>
         </LoginFooter>
       </LoginCard>

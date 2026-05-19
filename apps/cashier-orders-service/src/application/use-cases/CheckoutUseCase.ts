@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Order, OrderItem, OrderStatus } from '../../domain/entities/Order';
 import type { OrderRepository } from '../interfaces/OrderRepository';
@@ -6,6 +6,7 @@ import type { PaymentService } from '../interfaces/PaymentService';
 import { PaymentMethod as PSPaymentMethod } from '../interfaces/PaymentService';
 import type { TransactionService } from '../interfaces/TransactionService';
 import { PaymentMethod } from '../interfaces/TransactionService';
+import type { StaffService } from '../interfaces/StaffService';
 import { SyncQueueService } from '../../infrastructure/queue/SyncQueueService';
 
 const ULID_ENCODING = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
@@ -41,11 +42,18 @@ export class CheckoutUseCase {
     private readonly paymentService: PaymentService,
     @Inject('TransactionService')
     private readonly transactionService: TransactionService,
+    @Inject('StaffService')
+    private readonly staffService: StaffService,
     private readonly syncQueueService: SyncQueueService,
     private readonly configService: ConfigService,
   ) {}
 
-  async execute(data: CheckoutDto, staffId: string, staffName: string): Promise<Order> {
+  async execute(data: CheckoutDto, staffId: number): Promise<Order> {
+    const staff = await this.staffService.findById(staffId);
+    if (!staff) throw new NotFoundException(`Staff ${staffId} not found`);
+
+    const staffUsername = staff.username;
+    const staffName = staff.fullName;
     // 1. Calculate final values
     const subtotal = data.items.reduce(
       (sum, item) => sum + item.price * item.quantity,
@@ -69,7 +77,7 @@ export class CheckoutUseCase {
       storeId,
       items,
       totalAmount,
-      staffId,
+      staffUsername,
       new Date(),
       terminalId,
       OrderStatus.PENDING,

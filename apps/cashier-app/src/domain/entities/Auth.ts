@@ -1,4 +1,4 @@
 export interface LoginCredentials {
-  staffId: string;
+  username: string;
   pin: string;
 }

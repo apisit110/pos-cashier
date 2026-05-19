@@ -3,8 +3,10 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './presentation/controllers/AuthController';
 import { StaffController } from './presentation/controllers/StaffController';
+import { InternalStaffController } from './presentation/controllers/InternalStaffController';
 import { LoginUseCase } from './application/use-cases/LoginUseCase';
 import { GetStaffsUseCase } from './application/use-cases/GetStaffsUseCase';
+import { GetStaffByIdUseCase } from './application/use-cases/GetStaffByIdUseCase';
 import { CreateStaffUseCase } from './application/use-cases/CreateStaffUseCase';
 import { StaffRepository } from './domain/repositories/StaffRepository';
 import { SqliteStaffRepository } from './infrastructure/repositories/SqliteStaffRepository';
@@ -25,7 +27,7 @@ import { HttpStaffSyncGateway } from './infrastructure/repositories/HttpStaffSyn
       signOptions: { expiresIn: '60m' },
     }),
   ],
-  controllers: [AuthController, StaffController],
+  controllers: [AuthController, StaffController, InternalStaffController],
   providers: [
     DatabaseProvider,
     {
@@ -50,6 +52,7 @@ import { HttpStaffSyncGateway } from './infrastructure/repositories/HttpStaffSyn
     },
     LoginUseCase,
     GetStaffsUseCase,
+    GetStaffByIdUseCase,
     CreateStaffUseCase,
     SyncStaffsUseCase,
   ],

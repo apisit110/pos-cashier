@@ -27,10 +27,7 @@ export class OrderController {
   @Post('checkout')
   async checkout(@Body() checkoutDto: CheckoutDto, @Req() req: any) {
     try {
-      const staffId = req.user.sub.toString();
-      const staffName = req.user.fullName;
-      
-      return await this.checkoutUseCase.execute(checkoutDto, staffId, staffName);
+      return await this.checkoutUseCase.execute(checkoutDto, parseInt(req.user.sub));
     } catch (error) {
       throw new InternalServerErrorException((error as Error).message);
     }

@@ -34,7 +34,7 @@ export class SyncStaffsUseCase {
 
         return {
           posTempId: syncId,
-          userId: staff.userId,
+          userId: staff.username,
           fullName: staff.fullName,
           pinHash: staff.pinHash,
           roleId: staff.roleId,
@@ -54,7 +54,7 @@ export class SyncStaffsUseCase {
           if (staffToUpdate) {
             await this.staffRepository.updateSyncStatus(
               staffToUpdate.id,
-              result.userId || staffToUpdate.userId,
+              result.userId || staffToUpdate.username,
               staffToUpdate.status === StaffStatus.PENDING_SYNC ? StaffStatus.ACTIVE : staffToUpdate.status,
             );
           }

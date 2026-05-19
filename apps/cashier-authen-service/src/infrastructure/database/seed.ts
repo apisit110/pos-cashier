@@ -43,17 +43,17 @@ export function seedPermissions(db: any) {
 }
 
 export function seedStaffs(db: any) {
-  const managerUserId = process.env.MANAGER_USER_ID;
+  const managerUsername = process.env.MANAGER_USERNAME;
   const managerName = process.env.MANAGER_NAME;
   const managerPin = process.env.MANAGER_PIN;
 
-  if (!managerUserId || !managerName || !managerPin) {
-    throw new Error('MANAGER_USER_ID, MANAGER_NAME, and MANAGER_PIN must be defined in environment variables');
+  if (!managerUsername || !managerName || !managerPin) {
+    throw new Error('MANAGER_USERNAME, MANAGER_NAME, and MANAGER_PIN must be defined in environment variables');
   }
 
   db.insert(schema.staffs)
     .values({
-      userId: managerUserId,
+      username: managerUsername,
       roleId: 1,
       fullName: managerName,
       pinHash: managerPin,
@@ -61,7 +61,7 @@ export function seedStaffs(db: any) {
       updatedAt: new Date(),
     })
     .onConflictDoUpdate({
-      target: schema.staffs.userId,
+      target: schema.staffs.username,
       set: {
         fullName: managerName,
         pinHash: managerPin,

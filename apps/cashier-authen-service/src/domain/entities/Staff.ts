@@ -7,7 +7,7 @@ export enum StaffStatus {
 export class Staff {
   constructor(
     public readonly id: number,
-    public readonly userId: string,
+    public readonly username: string,
     public readonly roleId: number,
     public readonly fullName: string,
     public readonly pinHash: string,

@@ -6,11 +6,11 @@ import { v4 as uuidv4 } from 'uuid';
 export class CreateStaffUseCase {
   constructor(private readonly staffRepository: StaffRepository) {}
 
-  async execute(staffData: { userId?: string; fullName: string; roleId: number; pin: string }) {
-    const userId = staffData.userId || `TEMP_${uuidv4().substring(0, 8)}`;
+  async execute(staffData: { username?: string; fullName: string; roleId: number; pin: string }) {
+    const username = staffData.username || `TEMP_${uuidv4().substring(0, 8)}`;
 
     return this.staffRepository.create({
-      userId,
+      username,
       fullName: staffData.fullName,
       roleId: staffData.roleId,
       pinHash: staffData.pin,

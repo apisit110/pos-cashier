@@ -245,9 +245,10 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
       setChange(response.changeAmount || (received - totalAmount));
       setStep('success');
       onStepChange?.('success');
-      setCountdown(5); // Reset countdown
+      setCountdown(5);
     } catch (err: any) {
-      setError(err.message || 'Payment failed.');
+      const message = err.response?.data?.message || err.message || 'Payment failed. Please try again.';
+      setError(message);
       setStep('selection');
     }
   };
