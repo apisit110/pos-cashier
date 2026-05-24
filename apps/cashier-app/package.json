@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@apisit110/pos-ui": "^0.1.0",
+    "@apisit110/pos-ui": "^0.2.0",
     "axios": "^1.7.0",
     "dayjs": "^1.11.20",
     "react": "^19.2.4",
