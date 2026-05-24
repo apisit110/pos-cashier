@@ -7,11 +7,11 @@ dist
 .DS_Store
 
 
-apps/**/cashier-payment-service.db
-apps/**/cashier-authen-service.db
-apps/**/cashier-products-service.db
-apps/**/cashier-members-service.db
-apps/**/cashier-transactions-service.db
-apps/**/cashier-orders-service.db
-apps/**/cashier-terminal-service.db
+apps/**/pos-cashier-payment-service.db
+apps/**/pos-cashier-authen-service.db
+apps/**/pos-cashier-products-service.db
+apps/**/pos-cashier-members-service.db
+apps/**/pos-cashier-transactions-service.db
+apps/**/pos-cashier-orders-service.db
+apps/**/pos-cashier-terminal-service.db
 apps/**/drizzle

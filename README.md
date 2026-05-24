@@ -1,89 +1,46 @@
-# sync
+pos-cashier
 
-## download
+เป็นโปรเจคเกี่ยวกับเครื่องขายสินค้าหรือ point of sales ทำหน้าที่ ขายสินค้าโดยการสแกน barcode 1D จากรายการสินค้าที่กำหนดไว้พร้อมราคา
 
-- product
-- promotion
+> barcode 1D คือ บาร์โค้ด แถบยาว
+> barcode 2D คือ บาร์โค้ด สี่เหลี่ยม
 
-|                |                                                                    |
-| -------------- | ------------------------------------------------------------------ |
-| Check Version. | วันละครั้ง (หรือรอบใหญ่) เพื่อความแม่นยำ 100% (Baseline)           |
-| Notify.        | ทันทีที่มีการเปลี่ยนแปลง เพื่อความรวดเร็ว (Agility)                |
-| Effective.     | Date ตลอดเวลา (ตาม Logic) เพื่อความต่อเนื่อง 24 ชม. (Availability) |
+Functional
+
+- [x] - login
+- [x] - ขายสินค้า
+  - [x] - สร้างคำสั่งซื้อ Order
+    - [x] - ส่งข้อมูลการสร้างคำสั่งซื้อไปยัง pos-center
+  - [x] - สร้างรายการชำระเงิน Transaction
+    - [x] - ส่งข้อมูลการสร้างคำสั่งซื้อไปยัง pos-center
+- [x] - ดูรายการขาย
+- [x] - ดูรายการสินค้า
+- [x] - ดึงรายการสินค้าจาก pos-center
+- [x] - ดูพนักงานในระบบ
+- [x] - สร้างพนักงานในระบบ
+
+Set up
+
+environment
+
+- MID คือ merchant id ได้มาจาก pos-center สร้างให้
+- SID คือ store id ได้มาจาก pos-center สร้างให้
+- TID คือ terminal id ได้มาจาก pos-center สร้างให้
+
+User Access Management (UAM)
+
+| Action           | Manager | Cashier |
+| ---------------- | ------- | ------- |
+| Login            | [x]     | [x]     |
+| Sell             | [x]     | [x]     |
+| View Transaction | [x]     | []      |
+| View Products    | [x]     | []      |
+| Sync Products    | [x]     | []      |
+| View Staff       | [x]     | []      |
+| Create Staff     | [x]     | []      |
+
 
 ---
-
-## upload
-
-ต้องรับประกันว่า "ข้อมูลต้องไม่หาย (Zero Data Loss)" และ "ต้องไม่ซ้ำ (No Duplication)"
-
-- transaction
-- order
-
-- ตอน commit ลง db ใน local ให้กำหนด flag เป็น pending sync queue แล้ว add queue
-- ทำ batch upload เพื่อ add queue
-
-**การป้องกันข้อมูลซ้ำ (Idempotency) - สำคัญมาก**
-
-ในโลกของ Distributed System ปัญหาที่พบบ่อยคือ "ส่งไปแล้ว Server ได้รับแล้ว แต่เครื่อง POS ไม่ได้รับคำยืนยัน (Ack)" ทำให้เครื่อง POS พยายามส่งซ้ำ
-
-- Client-Generated ID: เครื่อง POS ต้องสร้าง UUID (เช่น order_id: "550e8400-e29b...") ประจำ Order ตั้งแต่ที่สาขา
-- Idempotency Key: เมื่อส่ง API ให้แนบ ID นี้ไปด้วย
-- Server Logic: เมื่อ Server ได้รับ ID ที่เคยบันทึกไปแล้ว จะตอบกลับว่า 200 OK (สำเร็จ) ทันทีโดยไม่บันทึกซ้ำ หรือตัดสต็อกซ้ำ
-
-> เชื่อเวลาของเครื่อง POS (Local Time) ไม่ใช่เวลาที่ Server ได้รับข้อมูล
-
-- **Normal:** ขายจบ -> บันทึก Local -> ยิง API -> Server ตอบ OK -> เปลี่ยนสถานะเป็น Synced (ใช้เวลา < 1 วินาที)
-- **Offline:** ขายจบ -> บันทึก Local -> ยิง API (Fail) -> เก็บใน Queue -> (1 ชั่วโมงผ่านไป) -> เน็ตกลับมา -> Background Task ตรวจพบ -> ยิง API ซ้ำ -> Server ตอบ OK -> เปลี่ยนสถานะเป็น Synced
-
-[ ] - sync fail
-
-[ ] - users
-[ ] - transactions
-[ ] - products
-[ ] - promotions
-
-pin_hash ยังไม่ได้ hash
-
-1. center
-
-- ระบบกลางมีหลาย merchant
-- หนึ่ง merchant มีหลาย product
-- หนึ่ง merchant มีหลาย store
-- หนึ่ง merchant มีหลาย staff
-- หนึ่ง store มีหลาย สินค้า
-- หนึ่ง store มีหลาย terminal
-- staff 1 คนแต่ 1 role ระหว่าง
-  - manager
-  - cashier
-
-- สร้าง merchant
-  - generate mid
-- สร้าง product
-- สร้าง store ผูกกับ merchant
-  - generate sid
-- ผูก product กับ store
-- สร้าง terminal ผูกกับ store
-
-set up
-
-- สร้าง merchant
-- สร้าง product ใน merchant นั้นๆ
-- สร้าง store
-- map merchant กับ product
-
-หลังจากสร้าง store ต้อง generate secret key ใช้สำหรับ encrypt หรือ verify signature ของ store นั้นๆ
-
-2. cashier
-
-set up
-
-- set env & initial
-  - merchant
-  - store
-  - default user
-- sync product (download)
-- create user role staff
 
 ```bash
 # remove drizzle folder and generate again
@@ -100,21 +57,20 @@ pnpm --filter pos-cashier-terminal-service exec drizzle-kit generate --name pos-
 pnpm run dev
 ```
 
-
 todo
 
-[ ] - report summary daily
-[ ] - report summary weekly
-[ ] - report summary monthly
-[ ] - report summary yearly
+- [ ] - report summary daily
+- [ ] - report summary weekly
+- [ ] - report summary monthly
+- [ ] - report summary yearly
 
-[ ] - theme light
-[x] - theme dark
+- [ ] - theme light
+- [x] - theme dark
 
-[ ] - sync order (upload)
-[ ] - sync transaction (upload)
-[ ] - sync user (upload)
-[ ] - sync promotion (download)
+- [x] - sync order (upload)
+- [x] - sync transaction (upload)
+- [ ] - sync user (upload)
+- [ ] - sync promotion (download)
 
-[ ] - receipt
-[ ] - void (HOLD)
+- [ ] - receipt
+- [ ] - void (HOLD)
