@@ -22,7 +22,7 @@ const Label = styled.label`
 const InputControl = styled.input<{ $hasError?: boolean }>`
   width: 100%;
   padding: 0.75rem 1rem;
-  background-color: rgba(15, 23, 42, 0.6);
+  background-color: ${({ theme }) => theme.components.input.bg};
   border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
   border-radius: ${({ theme }) => theme.borderRadius.lg};
   color: ${({ theme }) => theme.semantics.colors.text.primary};
@@ -33,7 +33,7 @@ const InputControl = styled.input<{ $hasError?: boolean }>`
   &:focus {
     border-color: ${({ theme }) => theme.semantics.colors.border.focus};
     box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-    background-color: rgba(15, 23, 42, 0.8);
+    background-color: ${({ theme }) => theme.components.input.focusBg};
   }
 
   ${({ $hasError, theme }) => $hasError && css`

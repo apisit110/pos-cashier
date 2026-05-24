@@ -123,6 +123,93 @@ export const semantics = {
   }
 };
 
+export const lightSemantics = {
+  colors: {
+    bg: {
+      main: primitives.colors.slate[100],
+      card: primitives.colors.white,
+    },
+    text: {
+      primary: primitives.colors.slate[900],
+      secondary: primitives.colors.slate[500],
+      disabled: primitives.colors.slate[400],
+      error: primitives.colors.rose[500],
+      success: primitives.colors.emerald[500],
+    },
+    accent: {
+      primary: primitives.colors.indigo[500],
+      hover: primitives.colors.indigo[600],
+      subtleBg: 'rgba(99, 102, 241, 0.12)',
+      subtleBgHover: 'rgba(99, 102, 241, 0.07)',
+    },
+    border: {
+      subtle: 'rgba(0, 0, 0, 0.1)',
+      focus: primitives.colors.indigo[500],
+    },
+    status: {
+      success: {
+        text: primitives.colors.green[500],
+        softBg: 'rgba(34, 197, 94, 0.1)',
+        softBorder: 'rgba(34, 197, 94, 0.2)',
+      },
+      error: {
+        text: primitives.colors.red[500],
+        softBg: 'rgba(239, 68, 68, 0.1)',
+        softBorder: 'rgba(239, 68, 68, 0.2)',
+      },
+      info: {
+        text: primitives.colors.indigo[400],
+        softBg: 'rgba(99, 102, 241, 0.1)',
+        softBorder: 'rgba(99, 102, 241, 0.2)',
+      },
+    },
+  },
+  effects: {
+    glass: 'backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);',
+    shadow: '0 8px 32px 0 rgba(0, 0, 0, 0.08)',
+  }
+};
+
+export const lightComponents = {
+  button: {
+    primary: {
+      bg: lightSemantics.colors.accent.primary,
+      hover: lightSemantics.colors.accent.hover,
+      text: primitives.colors.white,
+    },
+    error: {
+      text: lightSemantics.colors.text.error,
+    }
+  },
+  card: {
+    bg: lightSemantics.colors.bg.card,
+    border: lightSemantics.colors.border.subtle,
+  },
+  input: {
+    bg: primitives.colors.white,
+    focusBg: primitives.colors.slate[50],
+    border: lightSemantics.colors.border.subtle,
+    focus: lightSemantics.colors.border.focus,
+  },
+  badge: {
+    success: lightSemantics.colors.status.success,
+    error: lightSemantics.colors.status.error,
+    info: lightSemantics.colors.status.info,
+  },
+  navItem: {
+    activeBg: lightSemantics.colors.accent.subtleBg,
+    hoverBg: lightSemantics.colors.accent.subtleBgHover,
+    activeColor: lightSemantics.colors.accent.primary,
+    defaultColor: lightSemantics.colors.text.secondary,
+    hoverColor: lightSemantics.colors.accent.primary,
+  },
+  logoutButton: {
+    hoverBorder: primitives.colors.red[500],
+    hoverColor: primitives.colors.red[500],
+    hoverBg: 'rgba(239, 68, 68, 0.05)',
+  },
+};
+
 export const components = {
   button: {
     primary: {
@@ -139,6 +226,8 @@ export const components = {
     border: semantics.colors.border.subtle,
   },
   input: {
+    bg: 'rgba(15, 23, 42, 0.6)',
+    focusBg: 'rgba(15, 23, 42, 0.8)',
     border: semantics.colors.border.subtle,
     focus: semantics.colors.border.focus,
   },

@@ -27,7 +27,7 @@ const TableWrapper = styled.div`
   flex-direction: column;
 `;
 
-const Table = styled.table`
+const Table = styled.table<{ $stickyHeader?: boolean }>`
   width: 100%;
   border-collapse: collapse;
   text-align: left;
@@ -38,12 +38,18 @@ const Table = styled.table`
   }
 
   th {
-    background: rgba(255, 255, 255, 0.02);
+    background: ${({ theme }) => theme.semantics.colors.bg.card};
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: ${({ theme }) => theme.semantics.colors.text.secondary};
+    ${({ $stickyHeader }) => $stickyHeader && `
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(8px);
+    `}
   }
 
   td { font-size: 0.875rem; }
@@ -224,20 +230,15 @@ export function DataTable<T>({
 
   return (
     <TableWrapper>
-      <Table>
+      <Table $stickyHeader={stickyHeader}>
         <thead>
           <tr>
             {columns.map((col) => (
-              <th 
-                key={col.key} 
-                style={{ 
-                  width: col.width, 
+              <th
+                key={col.key}
+                style={{
+                  width: col.width,
                   textAlign: col.textAlign || 'left',
-                  position: stickyHeader ? 'sticky' : 'relative',
-                  top: stickyHeader ? 0 : 'auto',
-                  zIndex: stickyHeader ? 10 : 1,
-                  background: stickyHeader ? 'rgba(15, 23, 42, 0.95)' : 'transparent',
-                  backdropFilter: stickyHeader ? 'blur(8px)' : 'none',
                 }}
               >
                 {col.header}

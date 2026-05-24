@@ -1,9 +1,7 @@
-import { primitives, semantics, components } from '../tokens/colors';
+import { primitives, semantics, components, lightSemantics, lightComponents } from '../tokens/colors';
 
-export const theme = {
+const sharedTheme = {
   primitives,
-  semantics,
-  components,
   typography: primitives.typography,
   sizes: primitives.sizes,
   spacing: {
@@ -36,4 +34,18 @@ export const theme = {
   }
 };
 
-export type Theme = typeof theme;
+export const darkTheme = {
+  ...sharedTheme,
+  semantics,
+  components,
+};
+
+export const lightTheme = {
+  ...sharedTheme,
+  semantics: lightSemantics,
+  components: lightComponents,
+};
+
+export const theme = darkTheme;
+
+export type Theme = typeof darkTheme;

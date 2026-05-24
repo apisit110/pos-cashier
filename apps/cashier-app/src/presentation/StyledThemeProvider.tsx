@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
-import { theme } from './styles/theme';
+import { darkTheme, lightTheme } from './styles/theme';
+import { ThemeContext } from './ThemeContext';
+import type { ThemeMode } from './ThemeContext';
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -18,6 +20,7 @@ const GlobalStyle = createGlobalStyle`
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   input, button {
@@ -30,7 +33,6 @@ const GlobalStyle = createGlobalStyle`
     min-height: 100vh;
   }
 
-  /* For the initializing state in App.tsx */
   .initializing {
     display: flex;
     align-items: center;
@@ -42,10 +44,18 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 export const StyledThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [mode, setMode] = useState<ThemeMode>('dark');
+
+  const toggleTheme = () => setMode(prev => prev === 'dark' ? 'light' : 'dark');
+
+  const activeTheme = mode === 'dark' ? darkTheme : lightTheme;
+
   return (
-    <ThemeProvider theme={theme}>
-      <GlobalStyle />
-      {children}
-    </ThemeProvider>
+    <ThemeContext.Provider value={{ mode, toggleTheme }}>
+      <ThemeProvider theme={activeTheme}>
+        <GlobalStyle />
+        {children}
+      </ThemeProvider>
+    </ThemeContext.Provider>
   );
 };
