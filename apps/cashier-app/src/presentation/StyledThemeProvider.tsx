@@ -44,7 +44,7 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 export const StyledThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [mode, setMode] = useState<ThemeMode>('dark');
+  const [mode, setMode] = useState<ThemeMode>('light');
 
   const toggleTheme = () => setMode(prev => prev === 'dark' ? 'light' : 'dark');
 
