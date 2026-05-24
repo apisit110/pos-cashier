@@ -10,7 +10,7 @@ export const DATABASE_CONNECTION = 'DATABASE_CONNECTION';
 export const DatabaseProvider: Provider = {
   provide: DATABASE_CONNECTION,
   useFactory: () => {
-    const sqlite = new Database(join(process.cwd(), 'cashier-orders-service.db'));
+    const sqlite = new Database(join(process.cwd(), 'pos-cashier-orders-service.db'));
     
     const db = drizzle(sqlite, { schema });
 

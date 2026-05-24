@@ -1,10 +1,10 @@
 {
-  "name": "lightning-pos-service",
+  "name": "pos-cashier",
   "private": true,
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "dev:cashier": "turbo dev --filter=cashier-*",
+    "dev:cashier": "turbo dev --filter=pos-cashier-*",
     "watch": "nodemon",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",

@@ -90,13 +90,13 @@ set up
 rm -rf apps/*/drizzle
 rm -rf apps/*/*-service.db
 
-pnpm --filter cashier-payment-service exec drizzle-kit generate --name cashier-payment-service.db
-pnpm --filter cashier-authen-service exec drizzle-kit generate --name cashier-authen-service.db
-pnpm --filter cashier-products-service exec drizzle-kit generate --name cashier-products-service.db
-pnpm --filter cashier-members-service exec drizzle-kit generate --name cashier-members-service.db
-pnpm --filter cashier-transactions-service exec drizzle-kit generate --name cashier-transactions-service.db
-pnpm --filter cashier-orders-service exec drizzle-kit generate --name cashier-orders-service.db
-pnpm --filter cashier-terminal-service exec drizzle-kit generate --name cashier-terminal-service.db
+pnpm --filter pos-cashier-payment-service exec drizzle-kit generate --name pos-cashier-payment-service.db
+pnpm --filter pos-cashier-authen-service exec drizzle-kit generate --name pos-cashier-authen-service.db
+pnpm --filter pos-cashier-products-service exec drizzle-kit generate --name pos-cashier-products-service.db
+pnpm --filter pos-cashier-members-service exec drizzle-kit generate --name pos-cashier-members-service.db
+pnpm --filter pos-cashier-transactions-service exec drizzle-kit generate --name pos-cashier-transactions-service.db
+pnpm --filter pos-cashier-orders-service exec drizzle-kit generate --name pos-cashier-orders-service.db
+pnpm --filter pos-cashier-terminal-service exec drizzle-kit generate --name pos-cashier-terminal-service.db
 pnpm run dev
 ```
 

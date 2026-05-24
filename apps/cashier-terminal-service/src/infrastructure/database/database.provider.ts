@@ -11,7 +11,7 @@ export const DATABASE_CONNECTION = 'DATABASE_CONNECTION';
 export const DatabaseProvider: Provider = {
   provide: DATABASE_CONNECTION,
   useFactory: () => {
-    const sqlite = new Database(join(process.cwd(), 'cashier-terminal-service.db'));
+    const sqlite = new Database(join(process.cwd(), 'pos-cashier-terminal-service.db'));
     const db = drizzle(sqlite, { schema });
 
     migrate(db, { migrationsFolder: join(process.cwd(), 'drizzle') });
