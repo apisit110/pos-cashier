@@ -84,7 +84,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
     <LayoutContainer>
       {currentView !== 'create-order' && (
         <Sidebar
-          logoTitle="Lightning POS"
+          logoTitle="POS Cashier"
           logoIcon={<LogoIcon />}
           navItems={navItems}
           user={staff ? { name: staff.username, subtitle: staff.role } : undefined}
