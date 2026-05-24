@@ -13,7 +13,7 @@ const PinDigitInput = styled.input<{ $isFilled?: boolean; $size?: string }>`
   text-align: center;
   font-size: ${({ $size }) => ($size ? `calc(${$size} * 0.4)` : '1.5rem')};
   font-weight: 700;
-  background: rgba(15, 23, 42, 0.6);
+  background: ${({ theme }) => theme.components.input.bg};
   border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
   border-radius: ${({ theme }) => theme.borderRadius.lg};
   color: ${({ theme }) => theme.semantics.colors.text.primary};
@@ -22,7 +22,7 @@ const PinDigitInput = styled.input<{ $isFilled?: boolean; $size?: string }>`
 
   &:focus {
     border-color: ${({ theme }) => theme.semantics.colors.accent.primary};
-    background: rgba(15, 23, 42, 0.8);
+    background: ${({ theme }) => theme.components.input.focusBg};
     box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
   }
 
