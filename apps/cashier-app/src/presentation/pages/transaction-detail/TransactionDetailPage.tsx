@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { PageHeader } from '../../components/PageHeader';
-import { Badge } from '../../components/Badge';
+import { PageHeader, Badge } from '@apisit110/pos-ui';
 import { Container } from './Container';
 import { Content } from './Content';
 import { Card } from './Card';

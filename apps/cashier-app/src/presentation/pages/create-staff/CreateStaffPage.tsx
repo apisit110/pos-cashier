@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '../../components/Button';
-import { PageHeader } from '../../components/PageHeader';
-import { PinInputField } from '../../components/PinInputField';
+import { Button, PageHeader, PinInputField } from '@apisit110/pos-ui';
 import { Container } from './Container';
 import { FormContent } from './FormContent';
 import { Form } from './Form';

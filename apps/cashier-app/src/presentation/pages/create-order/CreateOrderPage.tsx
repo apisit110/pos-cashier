@@ -1,9 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { InputField } from '../../components/InputField';
-import { Button } from '../../components/Button';
-import { PageHeader } from '../../components/PageHeader';
-import { PaymentModal } from '../../components/PaymentModal';
-import { DataTable, type Column } from '../../components/DataTable';
+import { InputField, Button, PageHeader, PaymentModal, DataTable, type Column } from '@apisit110/pos-ui';
 import { Container } from './Container';
 import { Main } from './Main';
 import { ScannerPanel } from './ScannerPanel';

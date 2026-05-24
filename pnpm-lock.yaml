@@ -24,6 +24,9 @@ importers:
 
   apps/cashier-app:
     dependencies:
+      '@apisit110/pos-ui':
+        specifier: ^0.1.0
+        version: 0.1.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(styled-components@6.4.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
       axios:
         specifier: ^1.7.0
         version: 1.15.0
@@ -692,6 +695,13 @@ packages:
   '@angular-devkit/schematics@19.2.24':
     resolution: {integrity: sha512-lnw+ZM1Io+cJAkReC0NPDjqObL8NtKzKIkdgEEKC8CUmkhurYhedbicN8Y8NYHgG1uLd2GozW3+/QqPRZaN+Lw==}
     engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0, npm: ^6.11.0 || ^7.5.6 || >=8.0.0, yarn: '>= 1.13.0'}
+
+  '@apisit110/pos-ui@0.1.0':
+    resolution: {integrity: sha512-aNIswHItNHd5Y0hNXHMere9NtXXnpptfHt3lwsZwVz0r/yhPleWTIkfQlhKg4JgdZSx2vjedzywfFdEUztI6Hg==, tarball: https://npm.pkg.github.com/download/@apisit110/pos-ui/0.1.0/e193e3e393c387d669a8e0f3cd38db0016854cac}
+    peerDependencies:
+      react: '>=18'
+      react-dom: '>=18'
+      styled-components: '>=6'
 
   '@babel/code-frame@7.29.0':
     resolution: {integrity: sha512-9NhCeYjq9+3uxgdtp20LSiJXJvN0FeCtNGpJxuMFZ1Kv3cWUNb6DOhJwUvcVCzKGR66cw4njwM6hrJLqgOwbcw==}
@@ -4951,6 +4961,12 @@ snapshots:
       rxjs: 7.8.1
     transitivePeerDependencies:
       - chokidar
+
+  '@apisit110/pos-ui@0.1.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(styled-components@6.4.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))':
+    dependencies:
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+      styled-components: 6.4.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
 
   '@babel/code-frame@7.29.0':
     dependencies:

@@ -1,9 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { PageHeader } from '../../components/PageHeader';
-import { DataTable } from '../../components/DataTable';
-import { Badge } from '../../components/Badge';
-import { PageContainer } from '../../components/PageContainer';
-import { PageContent } from '../../components/PageContent';
+import { PageHeader, DataTable, Badge, PageContainer, PageContent } from '@apisit110/pos-ui';
 import type { GetStaffsUseCase } from '../../../application/use-cases/GetStaffsUseCase';
 import type { Staff } from '../../../domain/repositories/StaffRepository';
 

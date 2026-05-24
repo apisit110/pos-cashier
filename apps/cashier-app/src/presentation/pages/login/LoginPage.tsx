@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { InputField } from '../../components/InputField';
-import { Button } from '../../components/Button';
-import { PinInputField } from '../../components/PinInputField';
+import { InputField, Button, PinInputField } from '@apisit110/pos-ui';
 import { LoginContainer } from './LoginContainer';
 import { BgShape } from './BgShape';
 import { LoginCard } from './LoginCard';

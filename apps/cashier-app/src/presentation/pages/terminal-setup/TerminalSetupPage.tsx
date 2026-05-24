@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { InputField } from '../../components/InputField';
-import { Button } from '../../components/Button';
+import { InputField, Button } from '@apisit110/pos-ui';
 import { Container } from './Container';
 import { BgShape } from './BgShape';
 import { Card } from './Card';

@@ -1,10 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { PageHeader } from '../../components/PageHeader';
-import { DataTable, type Column } from '../../components/DataTable';
-import { PageContainer } from '../../components/PageContainer';
-import { PageContent } from '../../components/PageContent';
-import { FilterBar } from '../../components/FilterBar';
-import { TextFilter } from '../../components/TextFilter';
+import { PageHeader, DataTable, type Column, PageContainer, PageContent, FilterBar, TextFilter } from '@apisit110/pos-ui';
 import { StatusMessage } from './StatusMessage';
 import { PriceTag } from './PriceTag';
 import { ProductImage } from './ProductImage';

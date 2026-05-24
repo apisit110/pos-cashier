@@ -1,15 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import dayjs, { formatDateTime } from '../../utils/date';
-import { PageHeader } from '../../components/PageHeader';
-import { DataTable } from '../../components/DataTable';
-import { Badge } from '../../components/Badge';
-import { PageContainer } from '../../components/PageContainer';
-import { PageContent } from '../../components/PageContent';
-import { FilterBar } from '../../components/FilterBar';
-import { DateFilter } from '../../components/DateFilter';
-import { TextFilter } from '../../components/TextFilter';
-import { SelectFilter } from '../../components/SelectFilter';
-import { ClearFilterButton } from '../../components/ClearFilterButton';
+import {
+  PageHeader, DataTable, Badge, PageContainer, PageContent,
+  FilterBar, DateFilter, TextFilter, SelectFilter, ClearFilterButton,
+} from '@apisit110/pos-ui';
 import type { GetTransactionsUseCase } from '../../../application/use-cases/GetTransactionsUseCase';
 import type { Transaction, TransactionFilter } from '../../../domain/repositories/TransactionRepository';
 
