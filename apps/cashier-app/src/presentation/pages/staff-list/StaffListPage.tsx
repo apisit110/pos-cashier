@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { PageHeader } from '../../components/PageHeader';
 import { DataTable } from '../../components/DataTable';
-import { Container } from './Container';
-import { Content } from './Content';
-import { RoleBadge } from './RoleBadge';
-import { StatusBadge } from './StatusBadge';
+import { Badge } from '../../components/Badge';
+import { PageContainer } from '../../components/PageContainer';
+import { PageContent } from '../../components/PageContent';
 import type { GetStaffsUseCase } from '../../../application/use-cases/GetStaffsUseCase';
 import type { Staff } from '../../../domain/repositories/StaffRepository';
 
@@ -37,7 +36,7 @@ export const StaffListPage: React.FC<StaffListPageProps> = ({ onBack, onNavigate
   useEffect(() => { fetchStaffs(); }, [fetchStaffs]);
 
   return (
-    <Container>
+    <PageContainer>
       <PageHeader
         title="Manage Staffs"
         onBack={onBack}
@@ -74,7 +73,7 @@ export const StaffListPage: React.FC<StaffListPageProps> = ({ onBack, onNavigate
         }
       />
 
-      <Content>
+      <PageContent>
         <DataTable
           columns={[
             {
@@ -87,15 +86,15 @@ export const StaffListPage: React.FC<StaffListPageProps> = ({ onBack, onNavigate
               header: 'Role',
               key: 'roleId',
               render: (staff) => (
-                <RoleBadge $roleId={staff.roleId}>
+                <Badge $variant={staff.roleId === 1 ? 'info' : 'success'} $shape="pill">
                   {staff.roleId === 1 ? '🛡️ Manager' : '💰 Cashier'}
-                </RoleBadge>
+                </Badge>
               ),
             },
             {
               header: 'Status',
               key: 'status',
-              render: () => <StatusBadge>Active</StatusBadge>,
+              render: () => <Badge $variant="success">Active</Badge>,
             },
           ]}
           data={staffs}
@@ -110,7 +109,7 @@ export const StaffListPage: React.FC<StaffListPageProps> = ({ onBack, onNavigate
           }}
           emptyMessage="No staffs found."
         />
-      </Content>
-    </Container>
+      </PageContent>
+    </PageContainer>
   );
 };

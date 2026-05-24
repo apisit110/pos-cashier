@@ -2,13 +2,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import dayjs, { formatDateTime } from '../../utils/date';
 import { PageHeader } from '../../components/PageHeader';
 import { DataTable } from '../../components/DataTable';
-import { Container } from './Container';
-import { Content } from './Content';
-import { MethodBadge } from './MethodBadge';
-import { StatusBadge } from './StatusBadge';
-import { FilterBar } from './FilterBar';
-import { FormGroup } from './FormGroup';
-import { ClearButton } from './ClearButton';
+import { Badge } from '../../components/Badge';
+import { PageContainer } from '../../components/PageContainer';
+import { PageContent } from '../../components/PageContent';
+import { FilterBar } from '../../components/FilterBar';
+import { DateFilter } from '../../components/DateFilter';
+import { TextFilter } from '../../components/TextFilter';
+import { SelectFilter } from '../../components/SelectFilter';
+import { ClearFilterButton } from '../../components/ClearFilterButton';
 import type { GetTransactionsUseCase } from '../../../application/use-cases/GetTransactionsUseCase';
 import type { Transaction, TransactionFilter } from '../../../domain/repositories/TransactionRepository';
 
@@ -68,84 +69,72 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
   };
 
   return (
-    <Container>
+    <PageContainer>
       <PageHeader
         title="Sales History"
         onBack={onBack}
         extraContent={<span className="total-count">Total: {total} Transactions</span>}
       />
 
-      <Content>
+      <PageContent>
         <FilterBar>
-          <FormGroup>
-            <label>Start Date</label>
-            <input
-              type="date"
-              value={filters.startDate || ''}
-              onChange={(e) => handleFilterChange('startDate', e.target.value)}
-            />
-          </FormGroup>
+          <DateFilter
+            label="Start Date"
+            value={filters.startDate || ''}
+            onChange={(value) => handleFilterChange('startDate', value)}
+          />
 
-          <FormGroup>
-            <label>End Date</label>
-            <input
-              type="date"
-              value={filters.endDate || ''}
-              onChange={(e) => handleFilterChange('endDate', e.target.value)}
-            />
-          </FormGroup>
+          <DateFilter
+            label="End Date"
+            value={filters.endDate || ''}
+            onChange={(value) => handleFilterChange('endDate', value)}
+          />
 
-          <FormGroup>
-            <label>Transaction ID</label>
-            <input
-              type="text"
-              placeholder="Enter ID"
-              value={filters.id || ''}
-              onChange={(e) => handleFilterChange('id', e.target.value)}
-            />
-          </FormGroup>
+          <TextFilter
+            label="Transaction ID"
+            placeholder="Enter ID"
+            value={filters.id || ''}
+            onChange={(value) => handleFilterChange('id', value)}
+          />
 
-          <FormGroup>
-            <label>Method</label>
-            <select
-              value={filters.method || ''}
-              onChange={(e) => handleFilterChange('method', e.target.value)}
-            >
-              <option value="">All Methods</option>
-              <option value="CASH">Cash</option>
-              <option value="CREDIT">Credit Card</option>
-              <option value="QR">QR PromptPay</option>
-            </select>
-          </FormGroup>
+          <SelectFilter
+            label="Method"
+            value={filters.method || ''}
+            onChange={(value) => handleFilterChange('method', value)}
+            placeholder="All Methods"
+            options={[
+              { value: 'CASH', label: 'Cash' },
+              { value: 'CREDIT', label: 'Credit Card' },
+              { value: 'QR', label: 'QR PromptPay' },
+            ]}
+          />
 
-          <FormGroup>
-            <label>Amount Range</label>
-            <select
-              value={filters.amountRange || ''}
-              onChange={(e) => handleFilterChange('amountRange', e.target.value)}
-            >
-              <option value="">Any Amount</option>
-              <option value="0-99">0 - 99</option>
-              <option value="100-299">100 - 299</option>
-              <option value="300-499">300 - 499</option>
-              <option value="500+">500 ++</option>
-            </select>
-          </FormGroup>
+          <SelectFilter
+            label="Amount Range"
+            value={filters.amountRange || ''}
+            onChange={(value) => handleFilterChange('amountRange', value)}
+            placeholder="Any Amount"
+            options={[
+              { value: '0-99', label: '0 - 99' },
+              { value: '100-299', label: '100 - 299' },
+              { value: '300-499', label: '300 - 499' },
+              { value: '500+', label: '500 ++' },
+            ]}
+          />
 
-          <FormGroup>
-            <label>Status</label>
-            <select
-              value={filters.status || ''}
-              onChange={(e) => handleFilterChange('status', e.target.value)}
-            >
-              <option value="">All Status</option>
-              <option value="SUCCESS">Success</option>
-              <option value="FAILED">Failed</option>
-              <option value="REFUNDED">Refunded</option>
-            </select>
-          </FormGroup>
+          <SelectFilter
+            label="Status"
+            value={filters.status || ''}
+            onChange={(value) => handleFilterChange('status', value)}
+            placeholder="All Status"
+            options={[
+              { value: 'SUCCESS', label: 'Success' },
+              { value: 'FAILED', label: 'Failed' },
+              { value: 'REFUNDED', label: 'Refunded' },
+            ]}
+          />
 
-          <ClearButton onClick={clearFilters}>Clear Filters</ClearButton>
+          <ClearFilterButton onClick={clearFilters}>Clear Filters</ClearFilterButton>
         </FilterBar>
 
         <DataTable
@@ -165,9 +154,9 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
               header: 'Method',
               key: 'paymentMethod',
               render: (tx) => (
-                <MethodBadge>
+                <Badge $variant="info">
                   {tx.paymentMethod.replace('_', ' ')}
-                </MethodBadge>
+                </Badge>
               )
             },
             {
@@ -178,7 +167,11 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
             {
               header: 'Status',
               key: 'status',
-              render: (tx) => <StatusBadge $status={tx.status}>{tx.status}</StatusBadge>
+              render: (tx) => (
+                <Badge $variant={tx.status.toLowerCase() === 'success' ? 'success' : 'error'}>
+                  {tx.status}
+                </Badge>
+              )
             },
             {
               header: 'Actions',
@@ -218,7 +211,7 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
           }}
           emptyMessage="No transactions found."
         />
-      </Content>
-    </Container>
+      </PageContent>
+    </PageContainer>
   );
 };

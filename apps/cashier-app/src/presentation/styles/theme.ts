@@ -4,7 +4,8 @@ export const theme = {
   primitives,
   semantics,
   components,
-  // Add other theme properties like spacing, typography if needed
+  typography: primitives.typography,
+  sizes: primitives.sizes,
   spacing: {
     xs: '0.25rem',
     sm: '0.5rem',

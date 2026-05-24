@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const FilterBar = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
   background: ${({ theme }) => theme.semantics.colors.bg.card};

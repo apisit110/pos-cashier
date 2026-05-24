@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { PageHeader } from '../../components/PageHeader';
+import { Badge } from '../../components/Badge';
 import { Container } from './Container';
 import { Content } from './Content';
 import { Card } from './Card';
 import { DetailGrid } from './DetailGrid';
 import { DetailItem } from './DetailItem';
-import { StatusBadge } from './StatusBadge';
-import { MethodBadge } from './MethodBadge';
 import { LoadingState } from './LoadingState';
 import { Spinner } from './Spinner';
 import type { GetTransactionByIdUseCase } from '../../../application/use-cases/GetTransactionByIdUseCase';
@@ -90,13 +89,21 @@ export const TransactionDetailPage: React.FC<TransactionDetailPageProps> = ({
               <DetailItem>
                 <label>Payment Method</label>
                 <div>
-                  <MethodBadge>{transaction.paymentMethod.replace('_', ' ')}</MethodBadge>
+                  <Badge $variant="info" $size="md">
+                    {transaction.paymentMethod.replace('_', ' ')}
+                  </Badge>
                 </div>
               </DetailItem>
               <DetailItem>
                 <label>Status</label>
                 <div>
-                  <StatusBadge $status={transaction.status}>{transaction.status}</StatusBadge>
+                  <Badge
+                    $variant={transaction.status.toLowerCase() === 'success' ? 'success' : 'error'}
+                    $shape="pill"
+                    $size="md"
+                  >
+                    {transaction.status}
+                  </Badge>
                 </div>
               </DetailItem>
             </DetailGrid>

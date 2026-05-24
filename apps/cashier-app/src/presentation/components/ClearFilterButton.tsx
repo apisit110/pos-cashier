@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const ClearButton = styled.button`
+export const ClearFilterButton = styled.button`
   background: none;
   border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
   color: ${({ theme }) => theme.semantics.colors.text.secondary};

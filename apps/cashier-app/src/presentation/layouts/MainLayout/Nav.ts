@@ -4,5 +4,5 @@ export const Nav = styled.nav`
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: ${({ theme }) => theme.spacing.sm};
 `;

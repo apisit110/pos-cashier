@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { PageHeader } from '../../components/PageHeader';
 import { DataTable, type Column } from '../../components/DataTable';
-import { Container } from './Container';
-import { Content } from './Content';
+import { PageContainer } from '../../components/PageContainer';
+import { PageContent } from '../../components/PageContent';
+import { FilterBar } from '../../components/FilterBar';
+import { TextFilter } from '../../components/TextFilter';
 import { StatusMessage } from './StatusMessage';
 import { PriceTag } from './PriceTag';
 import { ProductImage } from './ProductImage';
@@ -10,8 +12,6 @@ import { ImageFallback } from './ImageFallback';
 import { SyncButton } from './SyncButton';
 import { Loader } from './Loader';
 import { LoadingOverlay } from './LoadingOverlay';
-import { FilterSection } from './FilterSection';
-import { FilterGroup } from './FilterGroup';
 import { BrandBadge } from './BrandBadge';
 import type { GetProductsUseCase } from '../../../application/use-cases/GetProductsUseCase';
 import type { SyncProductsUseCase } from '../../../application/use-cases/SyncProductsUseCase';
@@ -145,7 +145,7 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
   const paginatedProducts = products.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
-    <Container>
+    <PageContainer>
       <PageHeader
         title="Products Inventory"
         onBack={onBack}
@@ -162,55 +162,39 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
         }
       />
 
-      <Content>
+      <PageContent>
         {message && (
           <StatusMessage $type={message.type}>
             {message.text}
           </StatusMessage>
         )}
 
-        <FilterSection>
-          <FilterGroup>
-            <label htmlFor="filter-barcode">Barcode</label>
-            <input
-              id="filter-barcode"
-              type="text"
-              placeholder="Search barcode..."
-              value={filters.barcode}
-              onChange={(e) => handleFilterChange('barcode', e.target.value)}
-            />
-          </FilterGroup>
-          <FilterGroup>
-            <label htmlFor="filter-name">Product Name</label>
-            <input
-              id="filter-name"
-              type="text"
-              placeholder="Search product name..."
-              value={filters.name}
-              onChange={(e) => handleFilterChange('name', e.target.value)}
-            />
-          </FilterGroup>
-          <FilterGroup>
-            <label htmlFor="filter-brand">Brand</label>
-            <input
-              id="filter-brand"
-              type="text"
-              placeholder="Search brand..."
-              value={filters.brand}
-              onChange={(e) => handleFilterChange('brand', e.target.value)}
-            />
-          </FilterGroup>
-          <FilterGroup>
-            <label htmlFor="filter-price">Price</label>
-            <input
-              id="filter-price"
-              type="text"
-              placeholder="Search price..."
-              value={filters.price}
-              onChange={(e) => handleFilterChange('price', e.target.value)}
-            />
-          </FilterGroup>
-        </FilterSection>
+        <FilterBar>
+          <TextFilter
+            label="Barcode"
+            placeholder="Search barcode..."
+            value={filters.barcode}
+            onChange={(value) => handleFilterChange('barcode', value)}
+          />
+          <TextFilter
+            label="Product Name"
+            placeholder="Search product name..."
+            value={filters.name}
+            onChange={(value) => handleFilterChange('name', value)}
+          />
+          <TextFilter
+            label="Brand"
+            placeholder="Search brand..."
+            value={filters.brand}
+            onChange={(value) => handleFilterChange('brand', value)}
+          />
+          <TextFilter
+            label="Price"
+            placeholder="Search price..."
+            value={filters.price}
+            onChange={(value) => handleFilterChange('price', value)}
+          />
+        </FilterBar>
 
         <DataTable
           columns={columns}
@@ -228,7 +212,7 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
         />
 
         {isSyncing && <LoadingOverlay>Synchronizing data...</LoadingOverlay>}
-      </Content>
-    </Container>
+      </PageContent>
+    </PageContainer>
   );
 };
