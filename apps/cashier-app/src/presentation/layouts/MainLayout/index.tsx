@@ -1,199 +1,13 @@
 import React from 'react';
-import styled from 'styled-components';
-
-interface NavItemProps {
-  $active?: boolean;
-}
-
-const LayoutContainer = styled.div`
-  display: flex;
-  min-height: 100vh;
-  background-color: ${({ theme }) => theme.semantics.colors.bg.main};
-`;
-
-const Sidebar = styled.aside`
-  width: 280px;
-  background: ${({ theme }) => theme.semantics.colors.bg.card};
-  border-right: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-  display: flex;
-  flex-direction: column;
-  padding: 2rem 1.5rem;
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  z-index: 50;
-
-  @media (max-width: 768px) {
-    width: 80px;
-    padding: 1.5rem 1rem;
-  }
-`;
-
-const Logo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 3rem;
-  padding: 0 0.5rem;
-
-  .logo-icon {
-    width: 40px;
-    height: 40px;
-    background: ${({ theme }) => theme.semantics.colors.accent.primary};
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    box-shadow: ${({ theme }) => theme.shadows.accent};
-
-    svg {
-      width: 24px;
-      height: 24px;
-    }
-  }
-
-  .logo-text {
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: ${({ theme }) => theme.semantics.colors.text.primary};
-    letter-spacing: -0.02em;
-
-    @media (max-width: 768px) {
-      display: none;
-    }
-  }
-`;
-
-const Nav = styled.nav`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-
-const NavItem = styled.button<NavItemProps>`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.875rem 1rem;
-  border-radius: 12px;
-  border: none;
-  background: ${({ $active }) => $active ? 'rgba(99, 102, 241, 0.1)' : 'transparent'};
-  color: ${({ theme, $active }) => $active ? theme.semantics.colors.accent.primary : theme.semantics.colors.text.secondary};
-  font-size: 0.9375rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: ${({ theme }) => theme.transitions.default};
-  width: 100%;
-  text-align: left;
-
-  &:hover {
-    background: rgba(99, 102, 241, 0.05);
-    color: ${({ theme }) => theme.semantics.colors.accent.primary};
-  }
-
-  svg {
-    width: 22px;
-    height: 22px;
-  }
-
-  .nav-label {
-    @media (max-width: 768px) {
-      display: none;
-    }
-  }
-`;
-
-const UserProfile = styled.div`
-  margin-top: auto;
-  padding-top: 2rem;
-  border-top: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-`;
-
-const UserInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0 0.5rem;
-
-  .avatar {
-    width: 40px;
-    height: 40px;
-    background: ${({ theme }) => theme.semantics.colors.bg.main};
-    border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    color: ${({ theme }) => theme.semantics.colors.accent.primary};
-  }
-
-  .details {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-
-    @media (max-width: 768px) {
-      display: none;
-    }
-
-    .name {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: ${({ theme }) => theme.semantics.colors.text.primary};
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
-    }
-
-    .role {
-      font-size: 0.75rem;
-      color: ${({ theme }) => theme.semantics.colors.text.secondary};
-      text-transform: capitalize;
-    }
-  }
-`;
-
-const LogoutButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  border-radius: 12px;
-  border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-  background: transparent;
-  color: ${({ theme }) => theme.semantics.colors.text.secondary};
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: ${({ theme }) => theme.transitions.default};
-
-  &:hover {
-    border-color: #ef4444;
-    color: #ef4444;
-    background: rgba(239, 68, 68, 0.05);
-  }
-
-  @media (max-width: 768px) {
-    justify-content: center;
-    padding: 0.75rem;
-    
-    .label {
-      display: none;
-    }
-  }
-`;
-
-const MainContent = styled.main`
-  flex: 1;
-  overflow-y: auto;
-  position: relative;
-`;
+import { LayoutContainer } from './LayoutContainer';
+import { Sidebar } from './Sidebar';
+import { Logo } from './Logo';
+import { Nav } from './Nav';
+import { NavItem } from './NavItem';
+import { UserProfile } from './UserProfile';
+import { UserInfo } from './UserInfo';
+import { LogoutButton } from './LogoutButton';
+import { MainContent } from './MainContent';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -225,8 +39,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
 
           <Nav>
             {staff?.role === 'manager' && (
-              <NavItem 
-                $active={currentView === 'dashboard'} 
+              <NavItem
+                $active={currentView === 'dashboard'}
                 onClick={() => onNavigate('dashboard')}
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -239,8 +53,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
               </NavItem>
             )}
 
-            <NavItem 
-              $active={currentView === 'create-order'} 
+            <NavItem
+              $active={currentView === 'create-order'}
               onClick={() => onNavigate('create-order')}
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -252,8 +66,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
             </NavItem>
 
             {staff?.role === 'manager' && (
-              <NavItem 
-                $active={currentView === 'transaction-list'} 
+              <NavItem
+                $active={currentView === 'transaction-list'}
                 onClick={() => onNavigate('transaction-list')}
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -266,8 +80,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
 
             {staff?.role === 'manager' && (
               <>
-                <NavItem 
-                  $active={currentView === 'product-list'} 
+                <NavItem
+                  $active={currentView === 'product-list'}
                   onClick={() => onNavigate('product-list')}
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

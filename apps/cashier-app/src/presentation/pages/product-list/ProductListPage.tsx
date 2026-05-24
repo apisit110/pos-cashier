@@ -1,146 +1,31 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import styled, { keyframes } from 'styled-components';
 import { PageHeader } from '../../components/PageHeader';
 import { DataTable, type Column } from '../../components/DataTable';
+import { Container } from './Container';
+import { Content } from './Content';
+import { StatusMessage } from './StatusMessage';
+import { PriceTag } from './PriceTag';
+import { ProductImage } from './ProductImage';
+import { ImageFallback } from './ImageFallback';
+import { SyncButton } from './SyncButton';
+import { Loader } from './Loader';
+import { LoadingOverlay } from './LoadingOverlay';
+import { FilterSection } from './FilterSection';
+import { FilterGroup } from './FilterGroup';
+import { BrandBadge } from './BrandBadge';
 import type { GetProductsUseCase } from '../../../application/use-cases/GetProductsUseCase';
 import type { SyncProductsUseCase } from '../../../application/use-cases/SyncProductsUseCase';
 import type { Product } from '../../../domain/entities/Product';
-
-const spin = keyframes`
-  to { transform: rotate(360deg); }
-`;
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background-color: ${({ theme }) => theme.semantics.colors.bg.main};
-  color: ${({ theme }) => theme.semantics.colors.text.primary};
-  padding: 2rem;
-
-  .total-count {
-    font-size: 0.875rem;
-    color: ${({ theme }) => theme.semantics.colors.text.secondary};
-    background: rgba(255, 255, 255, 0.05);
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-  }
-`;
-
-const Content = styled.main`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-`;
-
-const StatusMessage = styled.div<{ $type: 'success' | 'error' }>`
-  margin-bottom: 1.5rem;
-  padding: 0.75rem 1.25rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  font-weight: 500;
-  font-size: 0.875rem;
-  background-color: ${({ $type }) => $type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'};
-  color: ${({ $type }) => $type === 'success' ? '#16a34a' : '#dc2626'};
-  border: 1px solid ${({ $type }) => $type === 'success' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
-`;
-
-const PriceTag = styled.span`
-  font-weight: 700;
-  color: ${({ theme }) => theme.semantics.colors.accent.primary};
-`;
-
-const ProductImage = styled.img`
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
-  object-fit: cover;
-  background: rgba(255, 255, 255, 0.03);
-  transition: transform 0.2s;
-
-  &:hover {
-    transform: scale(1.1);
-  }
-`;
-
-const ImageFallback = styled.div`
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${({ theme }) => theme.semantics.colors.text.secondary};
-  font-size: 1rem;
-  font-weight: 700;
-  border: 1px dashed ${({ theme }) => theme.semantics.colors.border.subtle};
-`;
-
-const SyncButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: ${({ theme }) => theme.semantics.colors.accent.primary};
-  color: white;
-  border: none;
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    filter: brightness(1.1);
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const Loader = styled.div`
-  width: 24px;
-  height: 24px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-top-color: #ffffff;
-  border-radius: 50%;
-  animation: ${spin} 1s linear infinite;
-  display: inline-block;
-  margin-right: 0.75rem;
-  vertical-align: middle;
-`;
-
-const LoadingOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(15, 23, 42, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  backdrop-filter: blur(4px);
-  font-weight: 600;
-  color: ${({ theme }) => theme.semantics.colors.accent.primary};
-`;
 
 const ProductImageCell: React.FC<{ product: Product }> = ({ product }) => {
   const [error, setError] = React.useState(false);
 
   if (product.image && !error) {
     return (
-      <ProductImage 
-        src={product.image} 
-        alt={product.name} 
-        onError={() => setError(true)} 
+      <ProductImage
+        src={product.image}
+        alt={product.name}
+        onError={() => setError(true)}
       />
     );
   }
@@ -158,63 +43,6 @@ interface ProductListPageProps {
   syncProductsUseCase: SyncProductsUseCase;
 }
 
-const FilterSection = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-  background: rgba(255, 255, 255, 0.03);
-  padding: 1.5rem;
-  border-radius: ${({ theme }) => theme.borderRadius.xl};
-  border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-`;
-
-const FilterGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-
-  label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: ${({ theme }) => theme.semantics.colors.text.secondary};
-  }
-
-  input {
-    background: rgba(15, 23, 42, 0.5);
-    border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-    border-radius: ${({ theme }) => theme.borderRadius.lg};
-    padding: 0.625rem 1rem;
-    color: ${({ theme }) => theme.semantics.colors.text.primary};
-    font-size: 0.875rem;
-    transition: all 0.2s;
-
-    &:focus {
-      outline: none;
-      border-color: ${({ theme }) => theme.semantics.colors.accent.primary};
-      box-shadow: 0 0 0 2px ${({ theme }) => theme.semantics.colors.accent.primary}20;
-      background: rgba(15, 23, 42, 0.8);
-    }
-
-    &::placeholder {
-      color: ${({ theme }) => theme.semantics.colors.text.secondary}80;
-    }
-  }
-`;
-
-const BrandBadge = styled.span`
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: ${({ theme }) => theme.semantics.colors.text.secondary};
-`;
-
 export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getProductsUseCase, syncProductsUseCase }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -223,7 +51,6 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  // Filter states
   const [filters, setFilters] = useState({
     barcode: '',
     name: '',
@@ -234,7 +61,6 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
   const fetchProducts = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Create a clean filter object (remove empty strings)
       const activeFilters = Object.entries(filters).reduce((acc, [key, value]) => {
         if (value !== '') {
           acc[key as keyof typeof filters] = value;
@@ -251,12 +77,11 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
     }
   }, [getProductsUseCase, filters]);
 
-  // Debounced effect for filtering
   useEffect(() => {
     setIsLoading(true);
     const timer = setTimeout(() => {
       fetchProducts();
-    }, 500); // 500ms debounce
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [filters, fetchProducts]);
@@ -285,31 +110,31 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
 
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
-    setCurrentPage(1); // Reset to first page when filtering
+    setCurrentPage(1);
   };
 
   const columns: Column<Product>[] = [
-    { 
-      header: 'Image', 
-      key: 'image', 
+    {
+      header: 'Image',
+      key: 'image',
       width: '80px',
       render: (product) => <ProductImageCell product={product} />
     },
-    { 
-      header: 'Barcode', 
+    {
+      header: 'Barcode',
       key: 'barcode',
       width: '180px',
       render: (product) => <span style={{ fontFamily: 'monospace', fontWeight: 600, color: '#94a3b8' }}>{product.barcode}</span>
     },
     { header: 'Product Name', key: 'name' },
-    { 
-      header: 'Brand', 
+    {
+      header: 'Brand',
       key: 'brand',
       width: '150px',
       render: (product) => product.brand ? <BrandBadge>{product.brand}</BrandBadge> : '-'
     },
-    { 
-      header: 'Price', 
+    {
+      header: 'Price',
       key: 'price',
       width: '150px',
       textAlign: 'right',
@@ -347,46 +172,46 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
         <FilterSection>
           <FilterGroup>
             <label htmlFor="filter-barcode">Barcode</label>
-            <input 
+            <input
               id="filter-barcode"
-              type="text" 
-              placeholder="Search barcode..." 
+              type="text"
+              placeholder="Search barcode..."
               value={filters.barcode}
               onChange={(e) => handleFilterChange('barcode', e.target.value)}
             />
           </FilterGroup>
           <FilterGroup>
             <label htmlFor="filter-name">Product Name</label>
-            <input 
+            <input
               id="filter-name"
-              type="text" 
-              placeholder="Search product name..." 
+              type="text"
+              placeholder="Search product name..."
               value={filters.name}
               onChange={(e) => handleFilterChange('name', e.target.value)}
             />
           </FilterGroup>
           <FilterGroup>
             <label htmlFor="filter-brand">Brand</label>
-            <input 
+            <input
               id="filter-brand"
-              type="text" 
-              placeholder="Search brand..." 
+              type="text"
+              placeholder="Search brand..."
               value={filters.brand}
               onChange={(e) => handleFilterChange('brand', e.target.value)}
             />
           </FilterGroup>
           <FilterGroup>
             <label htmlFor="filter-price">Price</label>
-            <input 
+            <input
               id="filter-price"
-              type="text" 
-              placeholder="Search price..." 
+              type="text"
+              placeholder="Search price..."
               value={filters.price}
               onChange={(e) => handleFilterChange('price', e.target.value)}
             />
           </FilterGroup>
         </FilterSection>
-        
+
         <DataTable
           columns={columns}
           data={paginatedProducts}
@@ -401,7 +226,7 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
           }}
           emptyMessage="No products found matching your filters."
         />
-        
+
         {isSyncing && <LoadingOverlay>Synchronizing data...</LoadingOverlay>}
       </Content>
     </Container>

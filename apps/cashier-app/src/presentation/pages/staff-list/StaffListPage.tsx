@@ -1,52 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import styled from 'styled-components';
 import { PageHeader } from '../../components/PageHeader';
 import { DataTable } from '../../components/DataTable';
+import { Container } from './Container';
+import { Content } from './Content';
+import { RoleBadge } from './RoleBadge';
+import { StatusBadge } from './StatusBadge';
 import type { GetStaffsUseCase } from '../../../application/use-cases/GetStaffsUseCase';
 import type { Staff } from '../../../domain/repositories/StaffRepository';
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background-color: ${({ theme }) => theme.semantics.colors.bg.main};
-  color: ${({ theme }) => theme.semantics.colors.text.primary};
-  padding: 2rem;
-
-  .total-count {
-    font-size: 0.875rem;
-    color: ${({ theme }) => theme.semantics.colors.text.secondary};
-    background: rgba(255, 255, 255, 0.05);
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-  }
-`;
-
-const Content = styled.main`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-`;
-
-const RoleBadge = styled.span<{ $roleId: number }>`
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: ${({ $roleId }) => $roleId === 1 ? 'rgba(99, 102, 241, 0.1)' : 'rgba(34, 197, 94, 0.1)'};
-  color: ${({ $roleId }) => $roleId === 1 ? '#818cf8' : '#4ade80'};
-  border: 1px solid ${({ $roleId }) => $roleId === 1 ? 'rgba(99, 102, 241, 0.2)' : 'rgba(34, 197, 94, 0.2)'};
-`;
-
-const StatusBadge = styled.span`
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  background: rgba(34, 197, 94, 0.1);
-  color: #22c55e;
-  text-transform: uppercase;
-`;
 
 interface StaffListPageProps {
   onBack: () => void;

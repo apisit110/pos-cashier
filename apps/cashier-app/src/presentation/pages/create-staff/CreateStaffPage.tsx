@@ -1,145 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import styled, { keyframes, css } from 'styled-components';
 import { Button } from '../../components/Button';
 import { PageHeader } from '../../components/PageHeader';
 import { PinInputField } from '../../components/PinInputField';
+import { Container } from './Container';
+import { FormContent } from './FormContent';
+import { Form } from './Form';
+import { FormGroup } from './FormGroup';
+import { StaffIdGroup } from './StaffIdGroup';
+import { RoleOptions } from './RoleOptions';
+import { RoleOption } from './RoleOption';
+import { StatusMessage } from './StatusMessage';
 import type { CreateStaffUseCase } from '../../../application/use-cases/CreateStaffUseCase';
 import type { SyncStaffUseCase } from '../../../application/use-cases/SyncStaffUseCase';
-
-const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-`;
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background-color: ${({ theme }) => theme.semantics.colors.bg.main};
-  color: ${({ theme }) => theme.semantics.colors.text.primary};
-  padding: 2rem;
-`;
-
-const FormContent = styled.main`
-  max-width: 600px;
-  margin: 0 auto;
-  width: 100%;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  background: ${({ theme }) => theme.semantics.colors.bg.card};
-  padding: 2rem;
-  border-radius: ${({ theme }) => theme.borderRadius.xxl};
-  border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-
-  label {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: ${({ theme }) => theme.semantics.colors.text.secondary};
-  }
-
-  input[type="text"] {
-    padding: 0.75rem 1rem;
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-    border-radius: ${({ theme }) => theme.borderRadius.lg};
-    color: ${({ theme }) => theme.semantics.colors.text.primary};
-    outline: none;
-    transition: ${({ theme }) => theme.transitions.default};
-
-    &:focus {
-      border-color: ${({ theme }) => theme.semantics.colors.accent.primary};
-      background: rgba(15, 23, 42, 0.8);
-    }
-  }
-`;
-
-const StaffIdGroup = styled.div`
-  display: flex;
-  gap: 0.5rem;
-
-  input { flex: 1; }
-
-  .regenerate-button {
-    background: ${({ theme }) => theme.semantics.colors.bg.card};
-    border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-    border-radius: ${({ theme }) => theme.borderRadius.lg};
-    color: ${({ theme }) => theme.semantics.colors.text.secondary};
-    padding: 0 0.75rem;
-    cursor: pointer;
-    transition: ${({ theme }) => theme.transitions.default};
-
-    &:hover {
-      border-color: ${({ theme }) => theme.semantics.colors.accent.primary};
-      color: ${({ theme }) => theme.semantics.colors.text.primary};
-    }
-
-    svg { width: 18px; height: 18px; }
-  }
-`;
-
-const RoleOptions = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-`;
-
-const RoleOption = styled.label<{ $selected?: boolean }>`
-  cursor: pointer;
-
-  input { display: none; }
-
-  .role-card {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem;
-    background: rgba(15, 23, 42, 0.4);
-    border: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
-    border-radius: ${({ theme }) => theme.borderRadius.lg};
-    transition: ${({ theme }) => theme.transitions.default};
-
-    .role-icon { font-size: 1.5rem; }
-
-    .role-info {
-      display: flex;
-      flex-direction: column;
-      .role-name { font-weight: 600; }
-      .role-desc { font-size: 0.75rem; color: ${({ theme }) => theme.semantics.colors.text.secondary}; }
-    }
-  }
-
-  ${({ $selected, theme }) => $selected && css`
-    .role-card {
-      background: rgba(99, 102, 241, 0.1);
-      border-color: ${theme.semantics.colors.accent.primary};
-    }
-  `}
-
-  &:hover .role-card {
-    border-color: ${({ theme }) => theme.semantics.colors.accent.primary};
-  }
-`;
-
-const StatusMessage = styled.div<{ $type: 'success' | 'error' }>`
-  margin-top: 2rem;
-  padding: 1rem 1.5rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  font-weight: 500;
-  animation: ${fadeIn} 0.3s ease;
-  background-color: ${({ $type }) => $type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'};
-  color: ${({ $type }) => $type === 'success' ? '#16a34a' : '#dc2626'};
-  border: 1px solid ${({ $type }) => $type === 'success' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
-`;
 
 interface CreateStaffPageProps {
   onBack: () => void;

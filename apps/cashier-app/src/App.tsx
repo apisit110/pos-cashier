@@ -20,7 +20,7 @@ import { ApiAuthRepository } from './data/repositories/ApiAuthRepository';
 import { ApiStaffRepository } from './data/repositories/ApiStaffRepository';
 import { ApiTransactionRepository } from './data/repositories/ApiTransactionRepository';
 import { ApiProductRepository } from './data/repositories/ApiProductRepository';
-import { MainLayout } from './presentation/components/MainLayout';
+import { MainLayout } from './presentation/layouts/MainLayout';
 import { TransactionDetailPage } from './presentation/pages/transaction-detail/TransactionDetailPage';
 
 const AppContainer = styled.div`

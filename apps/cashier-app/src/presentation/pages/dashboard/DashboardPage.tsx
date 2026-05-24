@@ -1,21 +1,9 @@
 import React from 'react';
-import styled from 'styled-components';
+import { DashboardContainer } from './DashboardContainer';
 
 interface DashboardPageProps {
   staff: { uid: string; username: string; role: string; accessToken: string } | null;
 }
-
-
-const DashboardContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background-color: ${({ theme }) => theme.semantics.colors.bg.main};
-  padding: 2rem;
-`;
-
-
-
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({
   staff,
