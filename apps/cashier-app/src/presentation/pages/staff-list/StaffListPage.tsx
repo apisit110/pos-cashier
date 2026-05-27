@@ -73,7 +73,7 @@ export const StaffListPage: React.FC<StaffListPageProps> = ({ onBack, onNavigate
         <DataTable
           columns={[
             {
-              header: 'Staff ID',
+              header: 'Username',
               key: 'userId',
               render: (staff) => <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>{staff.userId}</span>,
             },

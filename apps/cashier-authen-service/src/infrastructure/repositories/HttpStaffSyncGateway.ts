@@ -3,7 +3,7 @@ import { StaffSyncGateway, SyncStaffRequestDTO, SyncStaffResponseDTO } from '../
 
 @Injectable()
 export class HttpStaffSyncGateway implements StaffSyncGateway {
-  private readonly centerUrl = 'http://localhost:4002/v1/sync/staffs';
+  private readonly centerUrl = 'http://localhost:4002/v1/sync/users';
 
   async syncStaffs(data: SyncStaffRequestDTO): Promise<SyncStaffResponseDTO> {
     try {
@@ -12,7 +12,7 @@ export class HttpStaffSyncGateway implements StaffSyncGateway {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ users: data.staffs }),
       });
 
       if (!response.ok) {

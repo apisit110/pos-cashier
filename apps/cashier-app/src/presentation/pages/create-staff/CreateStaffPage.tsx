@@ -1,36 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { Button, PageHeader, PinInputField } from '@apisit110/pos-ui';
+import React, { useState } from 'react';
+import { Button, InputField, PageHeader, PinInputField } from '@apisit110/pos-ui';
 import { Container } from './Container';
 import { FormContent } from './FormContent';
 import { Form } from './Form';
 import { FormGroup } from './FormGroup';
-import { StaffIdGroup } from './StaffIdGroup';
 import { RoleOptions } from './RoleOptions';
 import { RoleOption } from './RoleOption';
 import { StatusMessage } from './StatusMessage';
 import type { CreateStaffUseCase } from '../../../application/use-cases/CreateStaffUseCase';
-import type { SyncStaffUseCase } from '../../../application/use-cases/SyncStaffUseCase';
 
 interface CreateStaffPageProps {
   onBack: () => void;
   createStaffUseCase: CreateStaffUseCase;
-  syncStaffUseCase: SyncStaffUseCase;
 }
 
-export const CreateStaffPage: React.FC<CreateStaffPageProps> = ({ onBack, createStaffUseCase, syncStaffUseCase }) => {
+export const CreateStaffPage: React.FC<CreateStaffPageProps> = ({ onBack, createStaffUseCase }) => {
   const [fullName, setFullName] = useState('');
-  const [staffId, setStaffId] = useState('');
   const [pin, setPin] = useState('');
   const [roleId, setRoleId] = useState(2);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
-
-  const generateStaffId = () => {
-    const id = `TEMP_${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
-    setStaffId(id);
-  };
-
-  useEffect(() => { generateStaffId(); }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,13 +35,12 @@ export const CreateStaffPage: React.FC<CreateStaffPageProps> = ({ onBack, create
     setIsLoading(true);
     setMessage(null);
     try {
-      const newStaff = await createStaffUseCase.execute({ fullName, roleId, userId: staffId, pin });
-      await syncStaffUseCase.execute();
+      const newStaff = await createStaffUseCase.execute({ fullName, roleId, pin });
       setMessage({
-        text: `Staff "${newStaff.fullName}" created successfully! Staff ID: ${newStaff.userId}. Data synced to cloud.`,
+        text: `Staff "${newStaff.fullName}" created successfully! Username: ${newStaff.userId}. Data synced to cloud.`,
         type: 'success',
       });
-      setFullName(''); setPin(''); setRoleId(2); generateStaffId();
+      setFullName(''); setPin(''); setRoleId(2);
     } catch (err: any) {
       setMessage({ text: err.message || 'Failed to create staff', type: 'error' });
     } finally {
@@ -69,44 +57,16 @@ export const CreateStaffPage: React.FC<CreateStaffPageProps> = ({ onBack, create
 
       <FormContent>
         <Form onSubmit={handleSubmit}>
-          <FormGroup>
-            <label htmlFor="staffId">Staff ID (Generated)</label>
-            <StaffIdGroup>
-              <input
-                id="staffId"
-                type="text"
-                value={staffId}
-                onChange={(e) => setStaffId(e.target.value)}
-                placeholder="Staff ID"
-                disabled={isLoading}
-                required
-              />
-              <button
-                type="button"
-                className="regenerate-button"
-                onClick={generateStaffId}
-                disabled={isLoading}
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M23 4v6h-6" />
-                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-                </svg>
-              </button>
-            </StaffIdGroup>
-          </FormGroup>
-
-          <FormGroup>
-            <label htmlFor="fullName">Full Name</label>
-            <input
-              id="fullName"
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Enter employee full name"
-              disabled={isLoading}
-              required
-            />
-          </FormGroup>
+          <InputField
+            label="Full Name"
+            id="fullName"
+            type="text"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="Enter employee full name"
+            disabled={isLoading}
+            required
+          />
 
           <PinInputField
             label="PIN Code (6 digits)"

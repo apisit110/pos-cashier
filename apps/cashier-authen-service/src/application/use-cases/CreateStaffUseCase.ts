@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { StaffRepository } from '../../domain/repositories/StaffRepository';
-import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class CreateStaffUseCase {
   constructor(private readonly staffRepository: StaffRepository) {}
 
-  async execute(staffData: { username?: string; fullName: string; roleId: number; pin: string }) {
-    const username = staffData.username || `TEMP_${uuidv4().substring(0, 8)}`;
+  async execute(staffData: { fullName: string; roleId: number; pin: string }) {
+    const mid = process.env.MID!;
+    const count = await this.staffRepository.countAll();
+    const running = String(count + 1).padStart(4, '0');
+    const username = `${mid}${running}`;
 
     return this.staffRepository.create({
       username,

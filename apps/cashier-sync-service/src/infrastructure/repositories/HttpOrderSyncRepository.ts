@@ -34,6 +34,11 @@ export class HttpOrderSyncRepository implements OrderSyncRepository {
     try {
       const response = await axios.post(this.serviceCenterUrl, payload);
       this.logger.log(`Service center response: ${JSON.stringify(response.data)}`);
+
+      const result = response.data?.results?.[0];
+      if (result?.status === 'error') {
+        throw new Error(`pos-center failed to sync order ${order.id}`);
+      }
     } catch (error: any) {
       this.logger.error(`Failed to sync order to service center: ${error.message}`);
       if (error.response) {

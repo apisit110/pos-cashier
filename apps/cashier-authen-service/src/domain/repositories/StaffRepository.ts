@@ -6,6 +6,6 @@ export abstract class StaffRepository {
   abstract findAll(page: number, limit: number): Promise<{ staffs: Staff[]; total: number }>;
   abstract create(staff: { username: string; fullName: string; roleId: number; pinHash: string; status: string }): Promise<Staff>;
   abstract findAllToSync(): Promise<Staff[]>;
-  abstract updateSyncId(id: number, syncId: string): Promise<void>;
   abstract updateSyncStatus(id: number, username: string, status: string): Promise<void>;
+  abstract countAll(): Promise<number>;
 }

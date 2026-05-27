@@ -10,7 +10,6 @@ import { TransactionListPage } from './presentation/pages/transaction-list/Trans
 import { ProductListPage } from './presentation/pages/product-list/ProductListPage';
 import { GetSessionUseCase } from './domain/use-cases/GetSessionUseCase';
 import { CreateStaffUseCase } from './application/use-cases/CreateStaffUseCase';
-import { SyncStaffUseCase } from './application/use-cases/SyncStaffUseCase';
 import { GetStaffsUseCase } from './application/use-cases/GetStaffsUseCase';
 import { GetTransactionsUseCase } from './application/use-cases/GetTransactionsUseCase';
 import { GetTransactionByIdUseCase } from './application/use-cases/GetTransactionByIdUseCase';
@@ -46,7 +45,6 @@ const productRepository = new ApiProductRepository();
 
 const getSessionUseCase = new GetSessionUseCase(authRepository);
 const createStaffUseCase = new CreateStaffUseCase(staffRepository);
-const syncStaffUseCase = new SyncStaffUseCase(staffRepository);
 const getStaffsUseCase = new GetStaffsUseCase(staffRepository);
 const getTransactionsUseCase = new GetTransactionsUseCase(transactionRepository);
 const getTransactionByIdUseCase = new GetTransactionByIdUseCase(transactionRepository);
@@ -169,7 +167,6 @@ function App() {
             <CreateStaffPage
               onBack={() => setCurrentView('staff-list')}
               createStaffUseCase={createStaffUseCase}
-              syncStaffUseCase={syncStaffUseCase}
             />
           )}
           {currentView === 'staff-list' && (

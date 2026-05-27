@@ -69,12 +69,6 @@ export class SqliteStaffRepository implements StaffRepository {
     return results.map(r => this.mapToEntity(r));
   }
 
-  async updateSyncId(id: number, syncId: string): Promise<void> {
-    await this.db.update(schema.staffs)
-      .set({ syncId })
-      .where(eq(schema.staffs.id, id));
-  }
-
   async updateSyncStatus(id: number, username: string, status: string): Promise<void> {
     await this.db.update(schema.staffs)
       .set({
@@ -83,6 +77,11 @@ export class SqliteStaffRepository implements StaffRepository {
         updatedAt: new Date(),
       })
       .where(eq(schema.staffs.id, id));
+  }
+
+  async countAll(): Promise<number> {
+    const results = this.db.select().from(schema.staffs).all();
+    return results.length;
   }
 
   private mapToEntity(result: any): Staff {

@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import { StaffRepository } from '../../domain/repositories/StaffRepository';
 import { StaffStatus } from '../../domain/entities/Staff';
 import type { StaffSyncGateway } from '../interfaces/StaffSyncGateway';
-import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class SyncStaffsUseCase {
@@ -24,24 +23,14 @@ export class SyncStaffsUseCase {
         return { success: true, results: [] };
       }
 
-      const syncStaffs = await Promise.all(staffs.map(async (staff) => {
-        let syncId = staff.syncId;
-        if (!syncId) {
-          syncId = uuidv4();
-          await this.staffRepository.updateSyncId(staff.id, syncId);
-          (staff as any).syncId = syncId;
-        }
-
-        return {
-          posTempId: syncId,
-          userId: staff.username,
-          fullName: staff.fullName,
-          pinHash: staff.pinHash,
-          roleId: staff.roleId,
-          branchIds: this.ACCESSIBLE_BRANCH_IDS,
-          status: (staff.status === StaffStatus.INACTIVE ? 'inactive' : 'active') as 'active' | 'inactive',
-          originBranchId: this.ORIGIN_BRANCH_ID,
-        };
+      const syncStaffs = staffs.map((staff) => ({
+        userId: staff.username,
+        fullName: staff.fullName,
+        pinHash: staff.pinHash,
+        roleId: staff.roleId,
+        branchIds: this.ACCESSIBLE_BRANCH_IDS,
+        status: (staff.status === StaffStatus.INACTIVE ? 'inactive' : 'active') as 'active' | 'inactive',
+        originBranchId: this.ORIGIN_BRANCH_ID,
       }));
 
       const response = await this.staffSyncGateway.syncStaffs({
@@ -50,11 +39,11 @@ export class SyncStaffsUseCase {
 
       for (const result of response.results) {
         if (result.status === 'synced' || result.status === 'already_synced') {
-          const staffToUpdate = staffs.find(s => s.syncId === result.posTempId);
+          const staffToUpdate = staffs.find(s => s.username === result.userId);
           if (staffToUpdate) {
             await this.staffRepository.updateSyncStatus(
               staffToUpdate.id,
-              result.userId || staffToUpdate.username,
+              staffToUpdate.username,
               staffToUpdate.status === StaffStatus.PENDING_SYNC ? StaffStatus.ACTIVE : staffToUpdate.status,
             );
           }

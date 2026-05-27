@@ -1,6 +1,5 @@
 export interface SyncStaffRequestDTO {
   staffs: {
-    posTempId: string;
     userId: string;
     fullName: string;
     pinHash: string;
@@ -14,8 +13,6 @@ export interface SyncStaffRequestDTO {
 export interface SyncStaffResponseDTO {
   message: string;
   results: {
-    posTempId: string;
-    globalUserId: string;
     userId: string;
     status: 'synced' | 'already_synced' | 'error';
   }[];

@@ -12,7 +12,7 @@ export class ApiStaffRepository implements StaffRepository {
     return {
       staffs: response.data.staffs.map((s: any) => ({
         id: s.id.toString(),
-        userId: s.userId,
+        userId: s.username,
         fullName: s.fullName,
         roleId: s.roleId,
       })),
@@ -22,7 +22,6 @@ export class ApiStaffRepository implements StaffRepository {
 
   async createStaff(staffData: { fullName: string; roleId: number; userId?: string; pin: string }): Promise<Staff> {
     const response = await axios.post<any>(this.baseUrl, {
-      userId: staffData.userId,
       fullName: staffData.fullName,
       roleId: staffData.roleId,
       pin: staffData.pin,
@@ -31,7 +30,7 @@ export class ApiStaffRepository implements StaffRepository {
     const s = response.data;
     return {
       id: s.id.toString(),
-      userId: s.userId,
+      userId: s.username,
       fullName: s.fullName,
       roleId: s.roleId,
     };
