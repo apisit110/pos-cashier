@@ -1,8 +1,16 @@
 import React from 'react';
-import { Sidebar } from '@apisit110/pos-ui';
+import styled from 'styled-components';
+import { Sidebar, TopBar } from '@apisit110/pos-ui';
 import { LayoutContainer } from './LayoutContainer';
 import { MainContent } from './MainContent';
 import { useThemeMode } from '../../ThemeContext';
+
+const RightColumn = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+`;
 
 const LogoIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -80,6 +88,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
     ] : []),
   ];
 
+  const viewTitles: Record<string, string> = {
+    dashboard: 'Dashboard',
+    'create-order': 'POS Terminal',
+    'transaction-list': 'Transactions',
+    'product-list': 'Products',
+    'staff-list': 'Staffs',
+    'create-staff': 'Staffs',
+  };
+
+  const pageTitle = viewTitles[currentView] ?? 'POS Cashier';
+
   return (
     <LayoutContainer>
       {currentView !== 'create-order' && (
@@ -88,14 +107,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
           logoIcon={<LogoIcon />}
           navItems={navItems}
           user={staff ? { name: staff.username, subtitle: staff.role } : undefined}
-          themeMode={mode}
-          onThemeToggle={toggleTheme}
           onLogout={onLogout}
         />
       )}
-      <MainContent style={{ width: currentView === 'create-order' ? '100%' : 'auto' }}>
-        {children}
-      </MainContent>
+      <RightColumn>
+        <TopBar title={pageTitle} themeMode={mode} onThemeToggle={toggleTheme} />
+        <MainContent>
+          {children}
+        </MainContent>
+      </RightColumn>
     </LayoutContainer>
   );
 };
