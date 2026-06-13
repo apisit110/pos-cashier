@@ -91,7 +91,10 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
         throw new Error('MID or SID not configured in environment');
       }
 
-      await syncProductsUseCase.execute(mid, sid);
+      const result = await syncProductsUseCase.execute(mid, sid);
+      if (!result.success) {
+        throw new Error('Sync failed: server returned unsuccessful response');
+      }
       await fetchProducts();
     } catch (error) {
       console.error('Failed to sync products:', error);
@@ -203,11 +206,12 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
       <AlertDialog
         open={syncError !== null}
         title="Sync Failed"
-        message={syncError ?? ''}
-        confirmLabel="OK"
-        cancelLabel="Close"
-        onConfirm={() => setSyncError(null)}
-        onCancel={() => setSyncError(null)}
+        description={syncError ?? ''}
+        buttons={[
+          { label: 'OK', variant: 'primary', onClick: () => setSyncError(null) },
+        ]}
+        closeOnOverlayClick
+        onClose={() => setSyncError(null)}
       />
     </PageContainer>
   );
