@@ -33,11 +33,12 @@ const ProductImageCell: React.FC<{ product: Product }> = ({ product }) => {
 
 interface ProductListPageProps {
   onBack: () => void;
+  onNavigateToCreateProduct: () => void;
   getProductsUseCase: GetProductsUseCase;
   syncProductsUseCase: SyncProductsUseCase;
 }
 
-export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getProductsUseCase, syncProductsUseCase }) => {
+export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavigateToCreateProduct, getProductsUseCase, syncProductsUseCase }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -150,6 +151,9 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
             <span className="total-count">
               Total: {products.length} Products
             </span>
+            <SyncButton onClick={onNavigateToCreateProduct} disabled={isSyncing || isLoading}>
+              + Create Product
+            </SyncButton>
             <SyncButton onClick={handleSync} disabled={isSyncing || isLoading}>
               {isSyncing ? 'Syncing...' : 'Sync Products'}
             </SyncButton>

@@ -8,6 +8,7 @@ import { CreateStaffPage } from './presentation/pages/create-staff/CreateStaffPa
 import { StaffListPage } from './presentation/pages/staff-list/StaffListPage';
 import { TransactionListPage } from './presentation/pages/transaction-list/TransactionListPage';
 import { ProductListPage } from './presentation/pages/product-list/ProductListPage';
+import { CreateProductPage } from './presentation/pages/create-product/CreateProductPage';
 import { GetSessionUseCase } from './domain/use-cases/GetSessionUseCase';
 import { CreateStaffUseCase } from './domain/use-cases/CreateStaffUseCase';
 import { GetStaffsUseCase } from './domain/use-cases/GetStaffsUseCase';
@@ -15,6 +16,7 @@ import { GetTransactionsUseCase } from './domain/use-cases/GetTransactionsUseCas
 import { GetTransactionByIdUseCase } from './domain/use-cases/GetTransactionByIdUseCase';
 import { GetProductsUseCase } from './domain/use-cases/GetProductsUseCase';
 import { SyncProductsUseCase as SyncProductsAppUseCase } from './domain/use-cases/SyncProductsUseCase';
+import { CreateProductUseCase } from './domain/use-cases/CreateProductUseCase';
 import { ApiAuthRepository } from './infrastructure/repositories/ApiAuthRepository';
 import { ApiStaffRepository } from './infrastructure/repositories/ApiStaffRepository';
 import { ApiTransactionRepository } from './infrastructure/repositories/ApiTransactionRepository';
@@ -50,12 +52,13 @@ const getTransactionsUseCase = new GetTransactionsUseCase(transactionRepository)
 const getTransactionByIdUseCase = new GetTransactionByIdUseCase(transactionRepository);
 const getProductsUseCase = new GetProductsUseCase(productRepository);
 const syncProductsAppUseCase = new SyncProductsAppUseCase(productRepository);
+const createProductUseCase = new CreateProductUseCase(productRepository);
 
 const TERMINAL_STORAGE_KEY = 'lightning_pos_terminal';
 
 function App() {
   const [hasTerminal, setHasTerminal] = useState(() => !!localStorage.getItem(TERMINAL_STORAGE_KEY));
-  const [currentView, setCurrentView] = useState<'login' | 'create-order' | 'dashboard' | 'create-staff' | 'staff-list' | 'transaction-list' | 'transaction-detail' | 'product-list'>('login');
+  const [currentView, setCurrentView] = useState<'login' | 'create-order' | 'dashboard' | 'create-staff' | 'staff-list' | 'transaction-list' | 'transaction-detail' | 'product-list' | 'create-product'>('login');
   const [staff, setStaff] = useState<{ uid: string; username: string; role: string; roleId: number; accessToken: string; refreshToken?: string } | null>(null);
   const [selectedTransactionId, setSelectedTransactionId] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
@@ -93,7 +96,7 @@ function App() {
 
   useEffect(() => {
     if (staff && staff.role === 'cashier') {
-      const restrictedViews = ['dashboard', 'create-staff', 'staff-list', 'product-list', 'transaction-list', 'transaction-detail'];
+      const restrictedViews = ['dashboard', 'create-staff', 'staff-list', 'product-list', 'create-product', 'transaction-list', 'transaction-detail'];
       if (restrictedViews.includes(currentView)) {
         setCurrentView('create-order');
       }
@@ -196,8 +199,15 @@ function App() {
           {currentView === 'product-list' && (
             <ProductListPage
               onBack={staff?.role === 'manager' ? () => setCurrentView('dashboard') : () => setCurrentView('create-order')}
+              onNavigateToCreateProduct={() => setCurrentView('create-product')}
               getProductsUseCase={getProductsUseCase}
               syncProductsUseCase={syncProductsAppUseCase}
+            />
+          )}
+          {currentView === 'create-product' && (
+            <CreateProductPage
+              onBack={() => setCurrentView('product-list')}
+              createProductUseCase={createProductUseCase}
             />
           )}
         </MainLayout>
