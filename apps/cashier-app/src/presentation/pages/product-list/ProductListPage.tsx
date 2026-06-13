@@ -210,6 +210,7 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
         buttons={[
           { label: 'OK', variant: 'primary', onClick: () => setSyncError(null) },
         ]}
+        autoCloseSeconds={5}
         closeOnOverlayClick
         onClose={() => setSyncError(null)}
       />
