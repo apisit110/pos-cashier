@@ -38,7 +38,7 @@ export class MockProductRepository implements ProductRepository {
     return result;
   }
 
-  async syncProducts(mid: string, sid: string): Promise<{ success: boolean; count: number }> {
+  async syncProducts(_mid: string, _sid: string): Promise<{ success: boolean; count: number }> {
     await new Promise(resolve => setTimeout(resolve, 1000));
     return { success: true, count: 0 };
   }

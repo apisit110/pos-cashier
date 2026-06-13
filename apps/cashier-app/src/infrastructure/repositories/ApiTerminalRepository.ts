@@ -1,12 +1,10 @@
-import axios from 'axios';
+import api from '../api/axiosInstance';
 import type { TerminalRepository } from '../../domain/repositories/TerminalRepository';
 import type { TerminalInfo } from '../../domain/entities/Terminal';
 
 export class ApiTerminalRepository implements TerminalRepository {
-  private readonly baseUrl = 'http://localhost:3000/api/v1/terminal';
-
   async activate(tid: string): Promise<TerminalInfo> {
-    const response = await axios.post<TerminalInfo>(`${this.baseUrl}/activate`, { tid });
+    const response = await api.post<TerminalInfo>('/terminal/activate', { tid });
     return response.data;
   }
 }

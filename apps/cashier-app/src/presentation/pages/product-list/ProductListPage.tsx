@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { PageHeader, DataTable, type Column, PageContainer, PageContent, FilterBar, TextFilter } from '@apisit110/pos-ui';
-import { StatusMessage } from './StatusMessage';
-import { PriceTag } from './PriceTag';
-import { ProductImage } from './ProductImage';
-import { ImageFallback } from './ImageFallback';
-import { SyncButton } from './SyncButton';
-import { Loader } from './Loader';
-import { LoadingOverlay } from './LoadingOverlay';
-import { BrandBadge } from './BrandBadge';
+import { PriceTag } from '../../components/PriceTag';
+import { ProductImage } from '../../components/ProductImage';
+import { ImageFallback } from '../../components/ImageFallback';
+import { SyncButton } from '../../components/SyncButton';
+import { BrandBadge } from '../../components/BrandBadge';
+import { Loading } from '../../components/Loading';
+import { AlertDialog } from '../../components/AlertDialog';
 import type { GetProductsUseCase } from '../../../domain/use-cases/GetProductsUseCase';
 import type { SyncProductsUseCase } from '../../../domain/use-cases/SyncProductsUseCase';
 import type { Product } from '../../../domain/entities/Product';
@@ -42,7 +41,7 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [syncError, setSyncError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -83,21 +82,20 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
 
   const handleSync = async () => {
     setIsSyncing(true);
-    setMessage(null);
+    setSyncError(null);
     try {
-      const mid = import.meta.env.VITE_MID;
-      const sid = import.meta.env.VITE_SID;
+      const mid = process.env.NEXT_PUBLIC_MID;
+      const sid = process.env.NEXT_PUBLIC_SID;
 
       if (!mid || !sid) {
         throw new Error('MID or SID not configured in environment');
       }
 
-      const result = await syncProductsUseCase.execute(mid, sid);
-      setMessage({ text: `Products synced! ${result.count} items updated.`, type: 'success' });
+      await syncProductsUseCase.execute(mid, sid);
       await fetchProducts();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Failed to sync products:', error);
-      setMessage({ text: error.message || 'Failed to sync products', type: 'error' });
+      setSyncError(error instanceof Error ? error.message : 'Failed to sync products');
     } finally {
       setIsSyncing(false);
     }
@@ -150,7 +148,6 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
               Total: {products.length} Products
             </span>
             <SyncButton onClick={handleSync} disabled={isSyncing || isLoading}>
-              {isSyncing ? <Loader style={{ width: 14, height: 14, margin: 0 }} /> : null}
               {isSyncing ? 'Syncing...' : 'Sync Products'}
             </SyncButton>
           </div>
@@ -158,12 +155,6 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
       />
 
       <PageContent>
-        {message && (
-          <StatusMessage $type={message.type}>
-            {message.text}
-          </StatusMessage>
-        )}
-
         <FilterBar>
           <TextFilter
             label="Barcode"
@@ -205,9 +196,19 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, getPro
           }}
           emptyMessage="No products found matching your filters."
         />
-
-        {isSyncing && <LoadingOverlay>Synchronizing data...</LoadingOverlay>}
       </PageContent>
+
+      {isSyncing && <Loading fullscreen label="Synchronizing data..." />}
+
+      <AlertDialog
+        open={syncError !== null}
+        title="Sync Failed"
+        message={syncError ?? ''}
+        confirmLabel="OK"
+        cancelLabel="Close"
+        onConfirm={() => setSyncError(null)}
+        onCancel={() => setSyncError(null)}
+      />
     </PageContainer>
   );
 };

@@ -34,7 +34,7 @@ const scanUseCase = new ScanProductUseCase(productRepository);
 const identifyMemberUseCase = new IdentifyMemberUseCase(memberRepository);
 
 interface CreateOrderPageProps {
-  onBack: () => void;
+  onBack?: () => void;
   onLogout?: () => void;
   staff: { uid: string; username: string; role: string; accessToken: string } | null;
 }

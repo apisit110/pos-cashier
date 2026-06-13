@@ -11,11 +11,11 @@ export class MockAuthRepository implements AuthRepository {
 
     let response: AuthResponse;
 
-    if (credentials.staffId === 'M001' && credentials.pin === '123456') {
+    if (credentials.username === 'M001' && credentials.pin === '123456') {
       response = {
         staff: {
           id: 1,
-          userId: 'M001',
+          username: 'M001',
           fullName: 'Admin Manager',
           roleId: 1,
           status: 'active'

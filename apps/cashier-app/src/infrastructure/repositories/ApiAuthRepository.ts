@@ -1,38 +1,33 @@
-import axios from 'axios';
+import api from '../api/axiosInstance';
 import type { AuthRepository } from '../../domain/repositories/AuthRepository';
 import type { AuthResponse } from '../../domain/entities/Staff';
 import type { LoginCredentials } from '../../domain/entities/Auth';
 
-export class ApiAuthRepository implements AuthRepository {
-  private readonly baseUrl = 'http://localhost:3000/api/v1/authen/auth';
-  private readonly STORAGE_KEY = 'lightning_pos_session';
+const STORAGE_KEY = 'lightning_pos_session';
 
+export class ApiAuthRepository implements AuthRepository {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await axios.post<AuthResponse>(`${this.baseUrl}/login`, {
+    const response = await api.post<AuthResponse>('/authen/auth/login', {
       username: credentials.username,
       pin: credentials.pin,
     });
 
-    const authData = response.data;
-
-    // Persist session
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(authData));
-    
-    return authData;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(response.data));
+    return response.data;
   }
 
   async logout(): Promise<void> {
-    localStorage.removeItem(this.STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEY);
   }
 
   async getSession(): Promise<AuthResponse | null> {
-    const session = localStorage.getItem(this.STORAGE_KEY);
+    const session = localStorage.getItem(STORAGE_KEY);
     if (!session) return null;
 
     try {
       return JSON.parse(session) as AuthResponse;
-    } catch (e) {
-      localStorage.removeItem(this.STORAGE_KEY);
+    } catch {
+      localStorage.removeItem(STORAGE_KEY);
       return null;
     }
   }
