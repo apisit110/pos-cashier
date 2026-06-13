@@ -1,10 +1,17 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import 'dotenv/config';
+import { createDatabase } from './infrastructure/database/DatabaseImpl';
+import { SqliteMemberRepositoryImpl } from './infrastructure/repositories/SqliteMemberRepositoryImpl';
+import { GetMemberByIdUseCase } from './domain/use-cases/GetMemberByIdUseCase';
+import { createApp } from './presentation/app';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.enableCors();
-  await app.listen(3004);
-  console.log('Cashier Members Service is running on: http://localhost:3004');
-}
-bootstrap();
+const PORT = process.env.PORT ?? 3004;
+
+const db = createDatabase();
+const memberRepository = new SqliteMemberRepositoryImpl(db);
+const getMemberByIdUseCase = new GetMemberByIdUseCase(memberRepository);
+
+const app = createApp(getMemberByIdUseCase);
+
+app.listen(PORT, () => {
+  console.log(`Cashier Members Service is running on: http://localhost:${PORT}`);
+});

@@ -9,7 +9,7 @@ import { ErrorMessage } from './ErrorMessage';
 import { Form } from './Form';
 import { InfoText } from './InfoText';
 import { ActivateTerminalUseCase } from '../../../domain/use-cases/ActivateTerminalUseCase';
-import { ApiTerminalRepository } from '../../../data/repositories/ApiTerminalRepository';
+import { ApiTerminalRepository } from '../../../infrastructure/repositories/ApiTerminalRepository';
 
 const terminalRepository = new ApiTerminalRepository();
 const activateTerminalUseCase = new ActivateTerminalUseCase(terminalRepository);

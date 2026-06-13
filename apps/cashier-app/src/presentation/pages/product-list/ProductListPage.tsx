@@ -8,8 +8,8 @@ import { SyncButton } from './SyncButton';
 import { Loader } from './Loader';
 import { LoadingOverlay } from './LoadingOverlay';
 import { BrandBadge } from './BrandBadge';
-import type { GetProductsUseCase } from '../../../application/use-cases/GetProductsUseCase';
-import type { SyncProductsUseCase } from '../../../application/use-cases/SyncProductsUseCase';
+import type { GetProductsUseCase } from '../../../domain/use-cases/GetProductsUseCase';
+import type { SyncProductsUseCase } from '../../../domain/use-cases/SyncProductsUseCase';
 import type { Product } from '../../../domain/entities/Product';
 
 const ProductImageCell: React.FC<{ product: Product }> = ({ product }) => {

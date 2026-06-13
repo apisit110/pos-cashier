@@ -1,10 +1,31 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import 'dotenv/config';
+import { createDatabase } from './infrastructure/database/DatabaseImpl';
+import { SqliteTransactionRepositoryImpl } from './infrastructure/repositories/SqliteTransactionRepositoryImpl';
+import { TransactionIdGeneratorImpl } from './infrastructure/utils/TransactionIdGeneratorImpl';
+import { GetTransactionsUseCase } from './domain/use-cases/GetTransactionsUseCase';
+import { GetTransactionByIdUseCase } from './domain/use-cases/GetTransactionByIdUseCase';
+import { CreateTransactionUseCase } from './domain/use-cases/CreateTransactionUseCase';
+import { MarkTransactionSyncedUseCase } from './domain/use-cases/MarkTransactionSyncedUseCase';
+import { createApp } from './presentation/app';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.enableCors(); // Enable CORS for the frontend
-  await app.listen(3006);
-  console.log(`Transactions Service is running on: ${await app.getUrl()}`);
-}
-bootstrap();
+const PORT = process.env.PORT ?? 3006;
+
+const db = createDatabase();
+const transactionRepository = new SqliteTransactionRepositoryImpl(db);
+const idGenerator = new TransactionIdGeneratorImpl();
+
+const getTransactionsUseCase = new GetTransactionsUseCase(transactionRepository);
+const getTransactionByIdUseCase = new GetTransactionByIdUseCase(transactionRepository);
+const createTransactionUseCase = new CreateTransactionUseCase(transactionRepository, idGenerator);
+const markTransactionSyncedUseCase = new MarkTransactionSyncedUseCase(transactionRepository);
+
+const app = createApp(
+  getTransactionsUseCase,
+  getTransactionByIdUseCase,
+  createTransactionUseCase,
+  markTransactionSyncedUseCase,
+);
+
+app.listen(PORT, () => {
+  console.log(`Transactions Service is running on: http://localhost:${PORT}`);
+});

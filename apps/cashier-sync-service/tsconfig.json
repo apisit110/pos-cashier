@@ -1,5 +1,5 @@
 {
-  "extends": "@lightning-pos/tsconfig/nestjs.json",
+  "extends": "@lightning-pos/tsconfig/base.json",
   "compilerOptions": {
     "baseUrl": "./",
     "outDir": "./dist"

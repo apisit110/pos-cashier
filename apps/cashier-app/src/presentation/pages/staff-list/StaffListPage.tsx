@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { PageHeader, DataTable, Badge, PageContainer, PageContent } from '@apisit110/pos-ui';
-import type { GetStaffsUseCase } from '../../../application/use-cases/GetStaffsUseCase';
+import type { GetStaffsUseCase } from '../../../domain/use-cases/GetStaffsUseCase';
 import type { Staff } from '../../../domain/repositories/StaffRepository';
 
 interface StaffListPageProps {

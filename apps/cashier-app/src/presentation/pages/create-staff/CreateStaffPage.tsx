@@ -7,7 +7,7 @@ import { FormGroup } from './FormGroup';
 import { RoleOptions } from './RoleOptions';
 import { RoleOption } from './RoleOption';
 import { StatusMessage } from './StatusMessage';
-import type { CreateStaffUseCase } from '../../../application/use-cases/CreateStaffUseCase';
+import type { CreateStaffUseCase } from '../../../domain/use-cases/CreateStaffUseCase';
 
 interface CreateStaffPageProps {
   onBack: () => void;

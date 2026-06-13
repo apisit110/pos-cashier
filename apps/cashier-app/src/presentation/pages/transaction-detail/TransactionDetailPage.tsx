@@ -7,7 +7,7 @@ import { DetailGrid } from './DetailGrid';
 import { DetailItem } from './DetailItem';
 import { LoadingState } from './LoadingState';
 import { Spinner } from './Spinner';
-import type { GetTransactionByIdUseCase } from '../../../application/use-cases/GetTransactionByIdUseCase';
+import type { GetTransactionByIdUseCase } from '../../../domain/use-cases/GetTransactionByIdUseCase';
 import type { Transaction } from '../../../domain/repositories/TransactionRepository';
 import { formatDateTime } from '../../utils/date';
 

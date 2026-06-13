@@ -12,7 +12,7 @@ import { ForgotPassword } from './ForgotPassword';
 import { LoginFooter } from './LoginFooter';
 import { DemoHint } from './DemoHint';
 import { LoginUseCase } from '../../../domain/use-cases/LoginUseCase';
-import { ApiAuthRepository } from '../../../data/repositories/ApiAuthRepository';
+import { ApiAuthRepository } from '../../../infrastructure/repositories/ApiAuthRepository';
 
 const authRepository = new ApiAuthRepository();
 const loginUseCase = new LoginUseCase(authRepository);

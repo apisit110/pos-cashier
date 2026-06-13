@@ -4,7 +4,7 @@ import {
   PageHeader, DataTable, Badge, PageContainer, PageContent,
   FilterBar, DateFilter, TextFilter, SelectFilter, ClearFilterButton,
 } from '@apisit110/pos-ui';
-import type { GetTransactionsUseCase } from '../../../application/use-cases/GetTransactionsUseCase';
+import type { GetTransactionsUseCase } from '../../../domain/use-cases/GetTransactionsUseCase';
 import type { Transaction, TransactionFilter } from '../../../domain/repositories/TransactionRepository';
 
 interface TransactionListPageProps {

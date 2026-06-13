@@ -12,14 +12,14 @@ import { ScrollArea } from './ScrollArea';
 import { QtyControls } from './QtyControls';
 import { EmptyState } from './EmptyState';
 import { OrderSummary } from './OrderSummary';
-import { ApiProductRepository } from '../../../data/repositories/ApiProductRepository';
-import { ApiMemberRepository } from '../../../data/repositories/ApiMemberRepository';
-import { ApiOrderRepository } from '../../../data/repositories/ApiOrderRepository';
-import { ScanProductUseCase } from '../../../application/use-cases/ScanProductUseCase';
+import { ApiProductRepository } from '../../../infrastructure/repositories/ApiProductRepository';
+import { ApiMemberRepository } from '../../../infrastructure/repositories/ApiMemberRepository';
+import { ApiOrderRepository } from '../../../infrastructure/repositories/ApiOrderRepository';
+import { ScanProductUseCase } from '../../../domain/use-cases/ScanProductUseCase';
 import { Product } from '../../../domain/entities/Product';
 import { Member } from '../../../domain/entities/Member';
-import { IdentifyMemberUseCase } from '../../../application/use-cases/IdentifyMemberUseCase';
-import type { PromotionResult } from '../../../application/use-cases/CalculatePromotionUseCase';
+import { IdentifyMemberUseCase } from '../../../domain/use-cases/IdentifyMemberUseCase';
+import type { PromotionResult } from '../../../domain/use-cases/CalculatePromotionUseCase';
 
 interface OrderItem {
   product: Product;
