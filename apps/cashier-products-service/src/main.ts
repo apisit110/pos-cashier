@@ -6,6 +6,7 @@ import { HttpProductSyncGatewayImpl } from './infrastructure/gateways/HttpProduc
 import { GetProductByBarcodeUseCase } from './domain/use-cases/GetProductByBarcodeUseCase';
 import { GetProductsUseCase } from './domain/use-cases/GetProductsUseCase';
 import { SyncProductsUseCase } from './domain/use-cases/SyncProductsUseCase';
+import { CreateProductUseCase } from './domain/use-cases/CreateProductUseCase';
 import { createApp } from './presentation/app';
 
 const PORT = process.env.PORT ?? 3001;
@@ -22,8 +23,9 @@ const syncProductsUseCase = new SyncProductsUseCase(
   syncMetadataRepository,
   productSyncGateway,
 );
+const createProductUseCase = new CreateProductUseCase(productRepository, productSyncGateway);
 
-const app = createApp(getProductByBarcodeUseCase, getProductsUseCase, syncProductsUseCase);
+const app = createApp(getProductByBarcodeUseCase, getProductsUseCase, syncProductsUseCase, createProductUseCase);
 
 app.listen(PORT, () => {
   console.log(`Products Service is running on http://localhost:${PORT}`);

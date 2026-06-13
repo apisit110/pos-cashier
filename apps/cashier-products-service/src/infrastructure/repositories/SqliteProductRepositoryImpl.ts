@@ -44,6 +44,19 @@ export class SqliteProductRepositoryImpl implements IProductRepository {
     );
   }
 
+  async create(product: Product): Promise<Product> {
+    await this.db.insert(schema.products).values({
+      id: product.id,
+      barcode: product.barcode,
+      name: product.name,
+      price: product.price,
+      imageUrl: product.imageUrl,
+      unitName: product.unitName,
+      brand: product.brand,
+    });
+    return product;
+  }
+
   async upsertMany(products: Product[]): Promise<void> {
     if (products.length === 0) return;
 

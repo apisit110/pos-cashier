@@ -1,6 +1,6 @@
 import { IProductRepository } from '../repositories/IProductRepository';
 import { ISyncMetadataRepository } from '../repositories/ISyncMetadataRepository';
-import { IProductSyncGateway } from '../ports/IProductSyncGateway';
+import { IProductSyncGateway } from '../repositories/IProductSyncGateway';
 
 export class SyncProductsUseCase {
   constructor(

@@ -3,7 +3,8 @@ import { Button, InputField, PageHeader } from '@apisit110/pos-ui';
 import { Container } from '../create-staff/Container';
 import { FormContent } from '../create-staff/FormContent';
 import { Form } from '../create-staff/Form';
-import { StatusMessage } from '../create-staff/StatusMessage';
+import { Loading } from '../../components/Loading';
+import { AlertDialog } from '../../components/AlertDialog';
 import type { CreateProductUseCase } from '../../../domain/use-cases/CreateProductUseCase';
 
 interface CreateProductPageProps {
@@ -17,39 +18,39 @@ export const CreateProductPage: React.FC<CreateProductPageProps> = ({ onBack, cr
   const [brand, setBrand] = useState('');
   const [price, setPrice] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!barcode.trim()) {
-      setMessage({ text: 'Please enter a barcode', type: 'error' });
+      setErrorMessage('Please enter a barcode');
       return;
     }
     if (!name.trim()) {
-      setMessage({ text: 'Please enter a product name', type: 'error' });
+      setErrorMessage('Please enter a product name');
       return;
     }
     const parsedPrice = parseFloat(price);
     if (!price || isNaN(parsedPrice) || parsedPrice < 0) {
-      setMessage({ text: 'Please enter a valid price', type: 'error' });
+      setErrorMessage('Please enter a valid price');
       return;
     }
 
     setIsLoading(true);
-    setMessage(null);
+    setErrorMessage(null);
     try {
-      const product = await createProductUseCase.execute({
+      await createProductUseCase.execute({
         barcode: barcode.trim(),
         name: name.trim(),
         brand: brand.trim() || undefined,
         price: parsedPrice,
       });
-      setMessage({ text: `Product "${product.name}" created successfully!`, type: 'success' });
       setBarcode('');
       setName('');
       setBrand('');
       setPrice('');
     } catch (err: any) {
-      setMessage({ text: err.message || 'Failed to create product', type: 'error' });
+      setErrorMessage(err.message || 'Failed to create product');
     } finally {
       setIsLoading(false);
     }
@@ -58,6 +59,16 @@ export const CreateProductPage: React.FC<CreateProductPageProps> = ({ onBack, cr
   return (
     <Container>
       <PageHeader title="Create New Product" onBack={onBack} />
+
+      {isLoading && <Loading fullscreen label="Creating product..." />}
+
+      <AlertDialog
+        open={errorMessage !== null}
+        title="Error"
+        description={errorMessage ?? undefined}
+        buttons={[{ label: 'OK', onClick: () => setErrorMessage(null), variant: 'primary' }]}
+        onClose={() => setErrorMessage(null)}
+      />
 
       <FormContent>
         <Form onSubmit={handleSubmit}>
@@ -105,16 +116,9 @@ export const CreateProductPage: React.FC<CreateProductPageProps> = ({ onBack, cr
           />
 
           <Button type="submit" disabled={isLoading} style={{ marginTop: '1rem' }}>
-            {isLoading ? 'Creating...' : 'Create Product'}
+            Create Product
           </Button>
         </Form>
-
-        {message && (
-          <StatusMessage $type={message.type}>
-            {message.type === 'success' ? '✅ ' : '❌ '}
-            {message.text}
-          </StatusMessage>
-        )}
       </FormContent>
     </Container>
   );

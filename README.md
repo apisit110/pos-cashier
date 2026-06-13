@@ -32,13 +32,14 @@ User Access Management (UAM)
 | Action           | Manager | Cashier |
 | ---------------- | ------- | ------- |
 | Login            | [x]     | [x]     |
+| View Dashboard   | [x]     | [ ]     |
 | Sell             | [x]     | [x]     |
-| View Transaction | [x]     | []      |
-| View Products    | [x]     | []      |
-| Sync Products    | [x]     | []      |
-| View Staff       | [x]     | []      |
-| Create Staff     | [x]     | []      |
-
+| View Transaction | [x]     | [ ]     |
+| View Products    | [x]     | [ ]     |
+| Sync Products    | [x]     | [ ]     |
+| Create Product   | [x]     | [ ]     |
+| View Staff       | [x]     | [ ]     |
+| Create Staff     | [x]     | [ ]     |
 
 ---
 
@@ -64,8 +65,11 @@ todo
 - [ ] - report summary monthly
 - [ ] - report summary yearly
 
-- [ ] - theme light
+- [x] - theme light
 - [x] - theme dark
+
+- [x] - create product
+- [x] - sync product (upload)
 
 - [x] - sync order (upload)
 - [x] - sync transaction (upload)

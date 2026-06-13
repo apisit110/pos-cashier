@@ -1,12 +1,22 @@
 import { Router } from 'express';
+import { z } from 'zod';
 import { GetProductByBarcodeUseCase, NotFoundError } from '../../domain/use-cases/GetProductByBarcodeUseCase';
 import { GetProductsUseCase } from '../../domain/use-cases/GetProductsUseCase';
 import { SyncProductsUseCase } from '../../domain/use-cases/SyncProductsUseCase';
+import { CreateProductUseCase } from '../../domain/use-cases/CreateProductUseCase';
+
+const createProductSchema = z.object({
+  barcode: z.string().min(1),
+  name: z.string().min(1),
+  price: z.number().nonnegative(),
+  brand: z.string().nullish(),
+});
 
 export function productRoutes(
   getProductByBarcodeUseCase: GetProductByBarcodeUseCase,
   getProductsUseCase: GetProductsUseCase,
   syncProductsUseCase: SyncProductsUseCase,
+  createProductUseCase: CreateProductUseCase,
 ): Router {
   const router = Router();
 
@@ -35,6 +45,21 @@ export function productRoutes(
         res.status(404).json({ message: error.message });
         return;
       }
+      res.status(500).json({ message: (error as Error).message });
+    }
+  });
+
+  router.post('/', async (req, res) => {
+    const parsed = createProductSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ message: 'Validation failed', errors: parsed.error.issues });
+      return;
+    }
+
+    try {
+      const product = await createProductUseCase.execute(parsed.data);
+      res.status(201).json(product);
+    } catch (error) {
       res.status(500).json({ message: (error as Error).message });
     }
   });

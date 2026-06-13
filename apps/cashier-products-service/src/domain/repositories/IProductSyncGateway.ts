@@ -6,4 +6,5 @@ export interface IProductSyncGateway {
     sid: string,
     lastSyncVersion: number,
   ): Promise<{ products: Product[]; syncVersion: number }>;
+  pushProduct(product: Product): Promise<void>;
 }
