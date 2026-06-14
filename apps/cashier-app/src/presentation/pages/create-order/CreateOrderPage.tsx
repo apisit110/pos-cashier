@@ -220,16 +220,11 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
 
   const columns: Column<OrderItem>[] = [
     {
-      header: 'Product',
-      key: 'product',
-      render: (item) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: 500 }}>
-          <div style={{ width: 40, height: 40, background: 'rgba(99, 102, 241, 0.1)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6366f1' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-          </div>
-          {item.product.name}
-        </div>
-      )
+      header: '#',
+      key: 'number',
+      width: '48px',
+      textAlign: 'center',
+      render: (item) => <span style={{ color: 'var(--color-text-secondary, #94a3b8)' }}>{items.indexOf(item) + 1}</span>
     },
     {
       header: 'Barcode',
@@ -237,15 +232,14 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
       render: (item) => <code style={{ background: 'rgba(255,255,255,0.05)', padding: '2px 4px', borderRadius: 4 }}>{item.product.barcode}</code>
     },
     {
-      header: 'Price',
-      key: 'price',
-      textAlign: 'right',
-      render: (item) => `$${item.product.price.toFixed(2)}`
+      header: 'Name',
+      key: 'name',
+      render: (item) => <span style={{ fontWeight: 500 }}>{item.product.name}</span>
     },
     {
       header: 'Qty',
       key: 'quantity',
-      textAlign: 'right',
+      textAlign: 'center',
       width: '120px',
       render: (item) => (
         <QtyControls>
@@ -256,16 +250,22 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
       )
     },
     {
+      header: 'Price',
+      key: 'price',
+      textAlign: 'right',
+      render: (item) => `$${item.product.price.toFixed(2)}`
+    },
+    {
       header: 'Total',
       key: 'total',
       textAlign: 'right',
       render: (item) => <span style={{ fontWeight: 600 }}>${(item.product.price * item.quantity).toFixed(2)}</span>
     },
     {
-      header: '',
+      header: 'Action',
       key: 'actions',
-      textAlign: 'right',
-      width: '50px',
+      textAlign: 'center',
+      width: '60px',
       render: (item) => (
         <button
           onClick={() => handleRemove(item.product.id)}
