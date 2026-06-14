@@ -20,7 +20,7 @@ export class CreateTransactionUseCase {
   ) {}
 
   async execute(data: CreateTransactionInput): Promise<string> {
-    const transactionId = this.idGenerator.generate(data.merchantId, data.storeId, data.terminalId);
+    const transactionId = this.idGenerator.generate(data.terminalId);
 
     const transaction = new Transaction(
       transactionId,

@@ -1,5 +1,5 @@
 import { ITransactionRepository } from '../repositories/ITransactionRepository';
-import { ITransactionSyncGateway } from '../ports/ITransactionSyncGateway';
+import { ITransactionSyncGateway } from '../repositories/ITransactionSyncGateway';
 
 export class SyncTransactionUseCase {
   constructor(

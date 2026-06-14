@@ -10,6 +10,7 @@ export class HttpTransactionSyncGatewayImpl implements ITransactionSyncGateway {
     const payload = {
       transactions: [
         {
+          id: transaction.id,
           order_id: transaction.orderId,
           merchant_id: transaction.merchantId,
           store_id: transaction.storeId,
