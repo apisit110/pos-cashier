@@ -1,6 +1,6 @@
 import { Product } from '../entities/Product';
 import { IProductRepository, UpdateProductInput } from '../repositories/IProductRepository';
-import { IProductSyncGateway } from '../repositories/IProductSyncGateway';
+import { ISyncOutboxRepository } from '../repositories/ISyncOutboxRepository';
 
 export class NotFoundError extends Error {
   constructor(message: string) {
@@ -12,7 +12,7 @@ export class NotFoundError extends Error {
 export class UpdateProductUseCase {
   constructor(
     private readonly productRepository: IProductRepository,
-    private readonly productSyncGateway: IProductSyncGateway,
+    private readonly syncOutboxRepository: ISyncOutboxRepository,
   ) {}
 
   async execute(id: string, input: UpdateProductInput): Promise<Product> {
@@ -22,7 +22,7 @@ export class UpdateProductUseCase {
     }
 
     const updated = await this.productRepository.update(id, input);
-    await this.productSyncGateway.pushProduct(updated);
+    await this.syncOutboxRepository.enqueue(updated);
     return updated;
   }
 }

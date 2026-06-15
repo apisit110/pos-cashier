@@ -2,7 +2,9 @@ import 'dotenv/config';
 import { createDatabase } from './infrastructure/database/DatabaseImpl';
 import { SqliteProductRepositoryImpl } from './infrastructure/repositories/SqliteProductRepositoryImpl';
 import { SqliteSyncMetadataRepositoryImpl } from './infrastructure/repositories/SqliteSyncMetadataRepositoryImpl';
+import { SqliteSyncOutboxRepositoryImpl } from './infrastructure/repositories/SqliteSyncOutboxRepositoryImpl';
 import { HttpProductSyncGatewayImpl } from './infrastructure/gateways/HttpProductSyncGatewayImpl';
+import { OutboxWorker } from './infrastructure/workers/OutboxWorker';
 import { GetProductByBarcodeUseCase } from './domain/use-cases/GetProductByBarcodeUseCase';
 import { GetProductsUseCase } from './domain/use-cases/GetProductsUseCase';
 import { SyncProductsUseCase } from './domain/use-cases/SyncProductsUseCase';
@@ -15,6 +17,7 @@ const PORT = process.env.PORT ?? 3001;
 const db = createDatabase();
 const productRepository = new SqliteProductRepositoryImpl(db);
 const syncMetadataRepository = new SqliteSyncMetadataRepositoryImpl(db);
+const syncOutboxRepository = new SqliteSyncOutboxRepositoryImpl(db);
 const productSyncGateway = new HttpProductSyncGatewayImpl();
 
 const getProductByBarcodeUseCase = new GetProductByBarcodeUseCase(productRepository);
@@ -24,8 +27,11 @@ const syncProductsUseCase = new SyncProductsUseCase(
   syncMetadataRepository,
   productSyncGateway,
 );
-const createProductUseCase = new CreateProductUseCase(productRepository, productSyncGateway);
-const updateProductUseCase = new UpdateProductUseCase(productRepository, productSyncGateway);
+const createProductUseCase = new CreateProductUseCase(productRepository, syncOutboxRepository);
+const updateProductUseCase = new UpdateProductUseCase(productRepository, syncOutboxRepository);
+
+const outboxWorker = new OutboxWorker(syncOutboxRepository, productSyncGateway);
+outboxWorker.start();
 
 const app = createApp(getProductByBarcodeUseCase, getProductsUseCase, syncProductsUseCase, createProductUseCase, updateProductUseCase);
 

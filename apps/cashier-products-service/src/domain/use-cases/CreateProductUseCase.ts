@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import { Product } from '../entities/Product';
 import { IProductRepository } from '../repositories/IProductRepository';
-import { IProductSyncGateway } from '../repositories/IProductSyncGateway';
+import { ISyncOutboxRepository } from '../repositories/ISyncOutboxRepository';
 
 export interface CreateProductInput {
   barcode: string;
@@ -13,7 +13,7 @@ export interface CreateProductInput {
 export class CreateProductUseCase {
   constructor(
     private readonly productRepository: IProductRepository,
-    private readonly productSyncGateway: IProductSyncGateway,
+    private readonly syncOutboxRepository: ISyncOutboxRepository,
   ) {}
 
   async execute(input: CreateProductInput): Promise<Product> {
@@ -33,7 +33,7 @@ export class CreateProductUseCase {
     );
 
     const created = await this.productRepository.create(product);
-    await this.productSyncGateway.pushProduct(created);
+    await this.syncOutboxRepository.enqueue(created);
     return created;
   }
 }
