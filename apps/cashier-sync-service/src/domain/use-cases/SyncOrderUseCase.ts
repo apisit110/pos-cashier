@@ -1,5 +1,5 @@
 import { IOrderRepository } from '../repositories/IOrderRepository';
-import { IOrderSyncGateway } from '../ports/IOrderSyncGateway';
+import { IOrderSyncGateway } from '../repositories/IOrderSyncGateway';
 
 export class SyncOrderUseCase {
   constructor(

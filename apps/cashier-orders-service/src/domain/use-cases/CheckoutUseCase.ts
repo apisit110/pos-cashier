@@ -4,22 +4,7 @@ import { IPaymentService, PaymentMethod as PSPaymentMethod } from '../repositori
 import { ITransactionService, PaymentMethod as TxPaymentMethod } from '../repositories/ITransactionService';
 import { IStaffService } from '../repositories/IStaffService';
 import { ISyncQueueService } from '../repositories/ISyncQueueService';
-
-const ULID_ENCODING = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
-
-function generateUlid(): string {
-  let ts = Date.now();
-  let timeStr = '';
-  for (let i = 9; i >= 0; i--) {
-    timeStr = ULID_ENCODING[ts % 32] + timeStr;
-    ts = Math.floor(ts / 32);
-  }
-  let randomStr = '';
-  for (let i = 0; i < 16; i++) {
-    randomStr += ULID_ENCODING[Math.floor(Math.random() * 32)];
-  }
-  return timeStr + randomStr;
-}
+import { generateOrderId } from '../../utils/generateOrderId';
 
 export class NotFoundError extends Error {
   constructor(message: string) {
@@ -56,7 +41,7 @@ export class CheckoutUseCase {
     const terminalId = process.env.TERMINAL_ID ?? 'DEFAULT_TERMINAL';
 
     const order = new Order(
-      `${merchantId}${storeId}${terminalId}${generateUlid()}`,
+      generateOrderId(terminalId),
       merchantId,
       storeId,
       items,

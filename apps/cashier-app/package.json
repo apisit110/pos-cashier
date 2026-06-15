@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@apisit110/pos-ui": "^0.4.0",
+    "@apisit110/pos-ui": "^0.5.0",
     "axios": "^1.7.0",
     "dayjs": "^1.11.20",
     "next": "^15.3.3",

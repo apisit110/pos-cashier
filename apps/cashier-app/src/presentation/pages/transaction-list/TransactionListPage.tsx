@@ -7,6 +7,13 @@ import {
 import type { GetTransactionsUseCase } from '../../../domain/use-cases/GetTransactionsUseCase';
 import type { Transaction, TransactionFilter } from '../../../domain/repositories/TransactionRepository';
 
+declare module '@apisit110/pos-ui' {
+  interface Column<T> {
+    subHeader?: string;
+    subRender?: (item: T) => React.ReactNode;
+  }
+}
+
 interface TransactionListPageProps {
   onBack: () => void;
   onViewDetail: (id: string) => void;
@@ -134,24 +141,21 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
         <DataTable
           columns={[
             {
-              header: 'Order No.',
+              header: 'Date',
+              subHeader: 'Time',
+              key: 'createdAt',
+              render: (tx) => formatDateTime(tx.createdAt, 'YYYY-MM-DD'),
+              subRender: (tx) => formatDateTime(tx.createdAt, 'HH:mm:ss'),
+            },
+            {
+              header: 'Transaction ID',
+              key: 'id',
+              render: (tx) => <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>{tx.id}</span>
+            },
+            {
+              header: 'Order ID',
               key: 'orderId',
               render: (tx) => <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>{tx.orderId}</span>
-            },
-            {
-              header: 'Date & Time',
-              key: 'createdAt',
-              render: (tx) => formatDateTime(tx.createdAt)
-            },
-            { header: 'Staff', key: 'staffName' },
-            {
-              header: 'Method',
-              key: 'paymentMethod',
-              render: (tx) => (
-                <Badge $variant="info">
-                  {tx.paymentMethod.replace('_', ' ')}
-                </Badge>
-              )
             },
             {
               header: 'Amount',

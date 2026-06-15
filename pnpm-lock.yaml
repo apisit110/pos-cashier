@@ -65,8 +65,8 @@ importers:
   apps/cashier-app:
     dependencies:
       '@apisit110/pos-ui':
-        specifier: ^0.4.0
-        version: 0.4.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(styled-components@6.4.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
+        specifier: ^0.5.0
+        version: 0.5.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(styled-components@6.4.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
       axios:
         specifier: ^1.7.0
         version: 1.15.0
@@ -339,6 +339,9 @@ importers:
       express:
         specifier: ^4.19.2
         version: 4.22.2
+      zod:
+        specifier: ^4.3.6
+        version: 4.4.3
     devDependencies:
       '@lightning-pos/tsconfig':
         specifier: workspace:*
@@ -504,8 +507,8 @@ importers:
 
 packages:
 
-  '@apisit110/pos-ui@0.4.0':
-    resolution: {integrity: sha512-00HKGbyQYiHf3DY8rdpRTurIUV+W4wE2JGv1RyG/1gHVxbMuCWIphofOlc0vlkI33FzB5ejqCPHB7rgwbNC2MA==, tarball: https://npm.pkg.github.com/download/@apisit110/pos-ui/0.4.0/a133ebb76bb450f19016dc18ef961795a048a29d}
+  '@apisit110/pos-ui@0.5.0':
+    resolution: {integrity: sha512-bqIswWei1lzZKOWfBb8ytKWvKmVxRR+O8lli8ShXAyq2XxTVlfNuFEZEGxZ3kOT7uHal0mdBXRWIYeJPG/kXeQ==, tarball: https://npm.pkg.github.com/download/@apisit110/pos-ui/0.5.0/7e4445248c9e0d1b0184f2ad89cb9e37054a1663}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
@@ -3684,15 +3687,12 @@ packages:
     peerDependencies:
       zod: ^3.25.0 || ^4.0.0
 
-  zod@4.3.6:
-    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
-
   zod@4.4.3:
     resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
 snapshots:
 
-  '@apisit110/pos-ui@0.4.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(styled-components@6.4.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))':
+  '@apisit110/pos-ui@0.5.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(styled-components@6.4.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))':
     dependencies:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
@@ -5355,8 +5355,8 @@ snapshots:
       '@babel/parser': 7.29.2
       eslint: 9.39.4(jiti@2.6.1)
       hermes-parser: 0.25.1
-      zod: 4.3.6
-      zod-validation-error: 4.0.2(zod@4.3.6)
+      zod: 4.4.3
+      zod-validation-error: 4.0.2(zod@4.4.3)
     transitivePeerDependencies:
       - supports-color
 
@@ -6986,10 +6986,8 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zod-validation-error@4.0.2(zod@4.3.6):
+  zod-validation-error@4.0.2(zod@4.4.3):
     dependencies:
-      zod: 4.3.6
-
-  zod@4.3.6: {}
+      zod: 4.4.3
 
   zod@4.4.3: {}
