@@ -25,7 +25,7 @@ const syncProductsUseCase = new SyncProductsUseCase(
   productSyncGateway,
 );
 const createProductUseCase = new CreateProductUseCase(productRepository, productSyncGateway);
-const updateProductUseCase = new UpdateProductUseCase(productRepository);
+const updateProductUseCase = new UpdateProductUseCase(productRepository, productSyncGateway);
 
 const app = createApp(getProductByBarcodeUseCase, getProductsUseCase, syncProductsUseCase, createProductUseCase, updateProductUseCase);
 

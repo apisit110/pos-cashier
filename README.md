@@ -70,6 +70,7 @@ todo
 
 - [x] - create product
 - [x] - sync product (upload)
+- [x] - update product + sync (upload)
 
 - [x] - sync order (upload)
 - [x] - sync transaction (upload)
@@ -78,3 +79,17 @@ todo
 
 - [ ] - receipt
 - [ ] - void (HOLD)
+
+
+
+- client -> order-service - /checkout
+- order-service -> payment-service - /payment/internal
+- order-service -> sync-service - addOrderSyncJob
+- order-service -> transactions-service - /internal/v1/transactions
+- order-service -> sync-service - addTransactionSyncJob
+  - sync-service -> center - /v1/sync/orders
+  - sync-service -> order-service - /internal/v1/orders/:id/synced
+  - sync-service -> center - /v1/sync/transactions
+  - sync-service -> transactions-service - /internal/v1/transactions/:id/synced
+
+[ ] - check id and order id generator of /checkout (doing)
