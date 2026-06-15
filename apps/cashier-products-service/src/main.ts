@@ -7,6 +7,7 @@ import { GetProductByBarcodeUseCase } from './domain/use-cases/GetProductByBarco
 import { GetProductsUseCase } from './domain/use-cases/GetProductsUseCase';
 import { SyncProductsUseCase } from './domain/use-cases/SyncProductsUseCase';
 import { CreateProductUseCase } from './domain/use-cases/CreateProductUseCase';
+import { UpdateProductUseCase } from './domain/use-cases/UpdateProductUseCase';
 import { createApp } from './presentation/app';
 
 const PORT = process.env.PORT ?? 3001;
@@ -24,8 +25,9 @@ const syncProductsUseCase = new SyncProductsUseCase(
   productSyncGateway,
 );
 const createProductUseCase = new CreateProductUseCase(productRepository, productSyncGateway);
+const updateProductUseCase = new UpdateProductUseCase(productRepository);
 
-const app = createApp(getProductByBarcodeUseCase, getProductsUseCase, syncProductsUseCase, createProductUseCase);
+const app = createApp(getProductByBarcodeUseCase, getProductsUseCase, syncProductsUseCase, createProductUseCase, updateProductUseCase);
 
 app.listen(PORT, () => {
   console.log(`Products Service is running on http://localhost:${PORT}`);

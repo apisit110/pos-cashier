@@ -1,11 +1,29 @@
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { and, like, eq, SQL } from 'drizzle-orm';
 import { Product } from '../../domain/entities/Product';
-import { IProductRepository, ProductFilters } from '../../domain/repositories/IProductRepository';
+import { IProductRepository, ProductFilters, UpdateProductInput } from '../../domain/repositories/IProductRepository';
 import * as schema from '../database/schema';
 
 export class SqliteProductRepositoryImpl implements IProductRepository {
   constructor(private readonly db: BetterSQLite3Database<typeof schema>) {}
+
+  async findById(id: string): Promise<Product | null> {
+    const result = await this.db.query.products.findFirst({
+      where: eq(schema.products.id, id),
+    });
+
+    if (!result) return null;
+
+    return new Product(
+      result.id,
+      result.barcode,
+      result.name,
+      result.price,
+      result.imageUrl,
+      result.unitName,
+      result.brand,
+    );
+  }
 
   async findByBarcode(barcode: string): Promise<Product | null> {
     const result = await this.db.query.products.findFirst({
@@ -55,6 +73,17 @@ export class SqliteProductRepositoryImpl implements IProductRepository {
       brand: product.brand,
     });
     return product;
+  }
+
+  async update(id: string, input: UpdateProductInput): Promise<Product> {
+    await this.db
+      .update(schema.products)
+      .set({ name: input.name, price: input.price, brand: input.brand ?? null })
+      .where(eq(schema.products.id, id));
+
+    const updated = await this.findById(id);
+    if (!updated) throw new Error(`Product with id "${id}" not found after update`);
+    return updated;
   }
 
   async upsertMany(products: Product[]): Promise<void> {

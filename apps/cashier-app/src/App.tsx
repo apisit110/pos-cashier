@@ -9,6 +9,7 @@ import { StaffListPage } from './presentation/pages/staff-list/StaffListPage';
 import { TransactionListPage } from './presentation/pages/transaction-list/TransactionListPage';
 import { ProductListPage } from './presentation/pages/product-list/ProductListPage';
 import { CreateProductPage } from './presentation/pages/create-product/CreateProductPage';
+import { EditProductPage } from './presentation/pages/edit-product/EditProductPage';
 import { GetSessionUseCase } from './domain/use-cases/GetSessionUseCase';
 import { CreateStaffUseCase } from './domain/use-cases/CreateStaffUseCase';
 import { GetStaffsUseCase } from './domain/use-cases/GetStaffsUseCase';
@@ -17,6 +18,7 @@ import { GetTransactionByIdUseCase } from './domain/use-cases/GetTransactionById
 import { GetProductsUseCase } from './domain/use-cases/GetProductsUseCase';
 import { SyncProductsUseCase as SyncProductsAppUseCase } from './domain/use-cases/SyncProductsUseCase';
 import { CreateProductUseCase } from './domain/use-cases/CreateProductUseCase';
+import { UpdateProductUseCase } from './domain/use-cases/UpdateProductUseCase';
 import { ApiAuthRepository } from './infrastructure/repositories/ApiAuthRepository';
 import { ApiStaffRepository } from './infrastructure/repositories/ApiStaffRepository';
 import { ApiTransactionRepository } from './infrastructure/repositories/ApiTransactionRepository';
@@ -53,14 +55,16 @@ const getTransactionByIdUseCase = new GetTransactionByIdUseCase(transactionRepos
 const getProductsUseCase = new GetProductsUseCase(productRepository);
 const syncProductsAppUseCase = new SyncProductsAppUseCase(productRepository);
 const createProductUseCase = new CreateProductUseCase(productRepository);
+const updateProductUseCase = new UpdateProductUseCase(productRepository);
 
 const TERMINAL_STORAGE_KEY = 'lightning_pos_terminal';
 
 function App() {
   const [hasTerminal, setHasTerminal] = useState(() => !!localStorage.getItem(TERMINAL_STORAGE_KEY));
-  const [currentView, setCurrentView] = useState<'login' | 'create-order' | 'dashboard' | 'create-staff' | 'staff-list' | 'transaction-list' | 'transaction-detail' | 'product-list' | 'create-product'>('login');
+  const [currentView, setCurrentView] = useState<'login' | 'create-order' | 'dashboard' | 'create-staff' | 'staff-list' | 'transaction-list' | 'transaction-detail' | 'product-list' | 'create-product' | 'edit-product'>('login');
   const [staff, setStaff] = useState<{ uid: string; username: string; role: string; roleId: number; accessToken: string; refreshToken?: string } | null>(null);
   const [selectedTransactionId, setSelectedTransactionId] = useState<string | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<import('./domain/entities/Product').Product | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
@@ -96,7 +100,7 @@ function App() {
 
   useEffect(() => {
     if (staff && staff.role === 'cashier') {
-      const restrictedViews = ['dashboard', 'create-staff', 'staff-list', 'product-list', 'create-product', 'transaction-list', 'transaction-detail'];
+      const restrictedViews = ['dashboard', 'create-staff', 'staff-list', 'product-list', 'create-product', 'edit-product', 'transaction-list', 'transaction-detail'];
       if (restrictedViews.includes(currentView)) {
         setCurrentView('create-order');
       }
@@ -200,6 +204,10 @@ function App() {
             <ProductListPage
               onBack={staff?.role === 'manager' ? () => setCurrentView('dashboard') : () => setCurrentView('create-order')}
               onNavigateToCreateProduct={() => setCurrentView('create-product')}
+              onNavigateToEditProduct={(product) => {
+                setSelectedProduct(product);
+                setCurrentView('edit-product');
+              }}
               getProductsUseCase={getProductsUseCase}
               syncProductsUseCase={syncProductsAppUseCase}
             />
@@ -208,6 +216,13 @@ function App() {
             <CreateProductPage
               onBack={() => setCurrentView('product-list')}
               createProductUseCase={createProductUseCase}
+            />
+          )}
+          {currentView === 'edit-product' && selectedProduct && (
+            <EditProductPage
+              onBack={() => setCurrentView('product-list')}
+              product={selectedProduct}
+              updateProductUseCase={updateProductUseCase}
             />
           )}
         </MainLayout>

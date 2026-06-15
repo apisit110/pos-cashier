@@ -4,9 +4,16 @@ import { GetProductByBarcodeUseCase, NotFoundError } from '../../domain/use-case
 import { GetProductsUseCase } from '../../domain/use-cases/GetProductsUseCase';
 import { SyncProductsUseCase } from '../../domain/use-cases/SyncProductsUseCase';
 import { CreateProductUseCase } from '../../domain/use-cases/CreateProductUseCase';
+import { UpdateProductUseCase, NotFoundError as UpdateNotFoundError } from '../../domain/use-cases/UpdateProductUseCase';
 
 const createProductSchema = z.object({
   barcode: z.string().min(1),
+  name: z.string().min(1),
+  price: z.number().nonnegative(),
+  brand: z.string().nullish(),
+});
+
+const updateProductSchema = z.object({
   name: z.string().min(1),
   price: z.number().nonnegative(),
   brand: z.string().nullish(),
@@ -17,6 +24,7 @@ export function productRoutes(
   getProductsUseCase: GetProductsUseCase,
   syncProductsUseCase: SyncProductsUseCase,
   createProductUseCase: CreateProductUseCase,
+  updateProductUseCase: UpdateProductUseCase,
 ): Router {
   const router = Router();
 
@@ -60,6 +68,25 @@ export function productRoutes(
       const product = await createProductUseCase.execute(parsed.data);
       res.status(201).json(product);
     } catch (error) {
+      res.status(500).json({ message: (error as Error).message });
+    }
+  });
+
+  router.put('/:id', async (req, res) => {
+    const parsed = updateProductSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ message: 'Validation failed', errors: parsed.error.issues });
+      return;
+    }
+
+    try {
+      const product = await updateProductUseCase.execute(req.params.id, parsed.data);
+      res.json(product);
+    } catch (error) {
+      if (error instanceof UpdateNotFoundError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
       res.status(500).json({ message: (error as Error).message });
     }
   });

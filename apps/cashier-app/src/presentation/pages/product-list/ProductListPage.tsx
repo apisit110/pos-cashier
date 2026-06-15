@@ -34,11 +34,12 @@ const ProductImageCell: React.FC<{ product: Product }> = ({ product }) => {
 interface ProductListPageProps {
   onBack: () => void;
   onNavigateToCreateProduct: () => void;
+  onNavigateToEditProduct: (product: Product) => void;
   getProductsUseCase: GetProductsUseCase;
   syncProductsUseCase: SyncProductsUseCase;
 }
 
-export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavigateToCreateProduct, getProductsUseCase, syncProductsUseCase }) => {
+export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavigateToCreateProduct, onNavigateToEditProduct, getProductsUseCase, syncProductsUseCase }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -136,6 +137,17 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavi
       width: '150px',
       textAlign: 'right',
       render: (product) => <PriceTag>฿{product.price.toFixed(2)}</PriceTag>
+    },
+    {
+      header: 'Actions',
+      key: 'id',
+      width: '100px',
+      textAlign: 'center',
+      render: (product) => (
+        <SyncButton onClick={() => onNavigateToEditProduct(product)} disabled={isSyncing || isLoading}>
+          Edit
+        </SyncButton>
+      ),
     },
   ];
 

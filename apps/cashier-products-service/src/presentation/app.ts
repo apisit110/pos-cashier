@@ -6,12 +6,14 @@ import { GetProductByBarcodeUseCase } from '../domain/use-cases/GetProductByBarc
 import { GetProductsUseCase } from '../domain/use-cases/GetProductsUseCase';
 import { SyncProductsUseCase } from '../domain/use-cases/SyncProductsUseCase';
 import { CreateProductUseCase } from '../domain/use-cases/CreateProductUseCase';
+import { UpdateProductUseCase } from '../domain/use-cases/UpdateProductUseCase';
 
 export function createApp(
   getProductByBarcodeUseCase: GetProductByBarcodeUseCase,
   getProductsUseCase: GetProductsUseCase,
   syncProductsUseCase: SyncProductsUseCase,
   createProductUseCase: CreateProductUseCase,
+  updateProductUseCase: UpdateProductUseCase,
 ): Application {
   const app = express();
 
@@ -21,7 +23,7 @@ export function createApp(
   app.use(
     '/api/v1/products',
     authMiddleware,
-    productRoutes(getProductByBarcodeUseCase, getProductsUseCase, syncProductsUseCase, createProductUseCase),
+    productRoutes(getProductByBarcodeUseCase, getProductsUseCase, syncProductsUseCase, createProductUseCase, updateProductUseCase),
   );
 
   return app;

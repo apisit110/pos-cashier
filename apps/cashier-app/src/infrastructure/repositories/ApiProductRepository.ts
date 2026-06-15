@@ -1,5 +1,5 @@
 import { Product } from '../../domain/entities/Product';
-import type { ProductRepository, CreateProductInput } from '../../domain/repositories/ProductRepository';
+import type { ProductRepository, CreateProductInput, UpdateProductInput } from '../../domain/repositories/ProductRepository';
 import api from '../api/axiosInstance';
 
 export class ApiProductRepository implements ProductRepository {
@@ -32,6 +32,12 @@ export class ApiProductRepository implements ProductRepository {
 
   async createProduct(input: CreateProductInput): Promise<Product> {
     const response = await api.post('/products', input);
+    const data = response.data;
+    return new Product(data.id, data.barcode, data.name, data.price, data.imageUrl, data.brand);
+  }
+
+  async updateProduct(id: string, input: UpdateProductInput): Promise<Product> {
+    const response = await api.put(`/products/${id}`, input);
     const data = response.data;
     return new Product(data.id, data.barcode, data.name, data.price, data.imageUrl, data.brand);
   }
