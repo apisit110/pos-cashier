@@ -7,8 +7,8 @@ export const transactions = sqliteTable('transactions', {
   storeId: text('store_id').notNull(),
   terminalId: text('terminal_id'),
   amount: real('amount').notNull(),
-  paymentMethod: text('payment_method').notNull(), // cash, credit_card, qr_promptpay
-  status: text('status').notNull(), // success, failed, refunded
+  paymentMethod: text('payment_method').notNull(),
+  status: text('status').notNull(),
   staffName: text('staff_name').notNull(),
   isSynced: integer('is_synced', { mode: 'boolean' }).notNull().default(false),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),

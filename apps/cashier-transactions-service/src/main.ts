@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import { createDatabase } from './infrastructure/database/DatabaseImpl';
 import { SqliteTransactionRepositoryImpl } from './infrastructure/repositories/SqliteTransactionRepositoryImpl';
+import { ApiOrderServiceImpl } from './infrastructure/services/ApiOrderServiceImpl';
+import { ApiProductServiceImpl } from './infrastructure/services/ApiProductServiceImpl';
 import { TransactionIdGeneratorImpl } from './infrastructure/utils/TransactionIdGeneratorImpl';
 import { GetTransactionsUseCase } from './domain/use-cases/GetTransactionsUseCase';
 import { GetTransactionByIdUseCase } from './domain/use-cases/GetTransactionByIdUseCase';
@@ -12,10 +14,12 @@ const PORT = process.env.PORT ?? 3006;
 
 const db = createDatabase();
 const transactionRepository = new SqliteTransactionRepositoryImpl(db);
+const orderService = new ApiOrderServiceImpl();
+const productService = new ApiProductServiceImpl();
 const idGenerator = new TransactionIdGeneratorImpl();
 
 const getTransactionsUseCase = new GetTransactionsUseCase(transactionRepository);
-const getTransactionByIdUseCase = new GetTransactionByIdUseCase(transactionRepository);
+const getTransactionByIdUseCase = new GetTransactionByIdUseCase(transactionRepository, orderService, productService);
 const createTransactionUseCase = new CreateTransactionUseCase(transactionRepository, idGenerator);
 const markTransactionSyncedUseCase = new MarkTransactionSyncedUseCase(transactionRepository);
 

@@ -6,6 +6,7 @@ import { SqliteSyncOutboxRepositoryImpl } from './infrastructure/repositories/Sq
 import { HttpProductSyncGatewayImpl } from './infrastructure/gateways/HttpProductSyncGatewayImpl';
 import { OutboxWorker } from './infrastructure/workers/OutboxWorker';
 import { GetProductByBarcodeUseCase } from './domain/use-cases/GetProductByBarcodeUseCase';
+import { GetProductByIdUseCase } from './domain/use-cases/GetProductByIdUseCase';
 import { GetProductsUseCase } from './domain/use-cases/GetProductsUseCase';
 import { SyncProductsUseCase } from './domain/use-cases/SyncProductsUseCase';
 import { CreateProductUseCase } from './domain/use-cases/CreateProductUseCase';
@@ -21,6 +22,7 @@ const syncOutboxRepository = new SqliteSyncOutboxRepositoryImpl(db);
 const productSyncGateway = new HttpProductSyncGatewayImpl();
 
 const getProductByBarcodeUseCase = new GetProductByBarcodeUseCase(productRepository);
+const getProductByIdUseCase = new GetProductByIdUseCase(productRepository);
 const getProductsUseCase = new GetProductsUseCase(productRepository);
 const syncProductsUseCase = new SyncProductsUseCase(
   productRepository,
@@ -33,7 +35,14 @@ const updateProductUseCase = new UpdateProductUseCase(productRepository, syncOut
 const outboxWorker = new OutboxWorker(syncOutboxRepository, productSyncGateway);
 outboxWorker.start();
 
-const app = createApp(getProductByBarcodeUseCase, getProductsUseCase, syncProductsUseCase, createProductUseCase, updateProductUseCase);
+const app = createApp(
+  getProductByBarcodeUseCase,
+  getProductByIdUseCase,
+  getProductsUseCase,
+  syncProductsUseCase,
+  createProductUseCase,
+  updateProductUseCase,
+);
 
 app.listen(PORT, () => {
   console.log(`Products Service is running on http://localhost:${PORT}`);

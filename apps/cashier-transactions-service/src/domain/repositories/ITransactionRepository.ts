@@ -2,6 +2,7 @@ import { Transaction } from '../entities/Transaction';
 
 export interface TransactionFilter {
   id?: string;
+  orderId?: string;
   startDate?: Date;
   endDate?: Date;
   method?: string;

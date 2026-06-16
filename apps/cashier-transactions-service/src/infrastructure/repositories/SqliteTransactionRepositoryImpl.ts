@@ -1,5 +1,5 @@
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import { eq, and, gte, lte, SQL, count } from 'drizzle-orm';
+import { eq, and, gte, lte, like, SQL, count } from 'drizzle-orm';
 import { Transaction } from '../../domain/entities/Transaction';
 import { ITransactionRepository, TransactionFilter } from '../../domain/repositories/ITransactionRepository';
 import * as schema from '../database/schema';
@@ -17,6 +17,7 @@ export class SqliteTransactionRepositoryImpl implements ITransactionRepository {
 
     if (filter) {
       if (filter.id) whereConditions.push(eq(schema.transactions.id, filter.id));
+      if (filter.orderId) whereConditions.push(like(schema.transactions.orderId, `%${filter.orderId}%`));
       if (filter.startDate) whereConditions.push(gte(schema.transactions.createdAt, filter.startDate));
       if (filter.endDate) whereConditions.push(lte(schema.transactions.createdAt, filter.endDate));
       if (filter.method) whereConditions.push(eq(schema.transactions.paymentMethod, filter.method.toUpperCase()));

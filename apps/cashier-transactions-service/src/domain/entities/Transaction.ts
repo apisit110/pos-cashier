@@ -1,3 +1,11 @@
+export interface OrderItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
+
 export class Transaction {
   constructor(
     public readonly id: string,
@@ -11,5 +19,6 @@ export class Transaction {
     public readonly createdAt: Date,
     public readonly terminalId?: string,
     public isSynced: boolean = false,
+    public readonly orderItems: OrderItem[] = [],
   ) {}
 }

@@ -98,6 +98,13 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
             onChange={(value) => handleFilterChange('id', value)}
           />
 
+          <TextFilter
+            label="Order ID"
+            placeholder="Enter Order ID"
+            value={filters.orderId || ''}
+            onChange={(value) => handleFilterChange('orderId', value)}
+          />
+
           <SelectFilter
             label="Method"
             value={filters.method || ''}

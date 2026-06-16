@@ -1,3 +1,11 @@
+export interface OrderItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
+
 export interface Transaction {
   id: string;
   orderId: string;
@@ -6,10 +14,12 @@ export interface Transaction {
   status: 'success' | 'failed' | 'refunded';
   createdAt: string;
   staffName: string;
+  orderItems?: OrderItem[];
 }
 
 export interface TransactionFilter {
   id?: string;
+  orderId?: string;
   startDate?: string;
   endDate?: string;
   method?: string;

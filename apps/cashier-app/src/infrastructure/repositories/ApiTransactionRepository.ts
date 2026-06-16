@@ -32,6 +32,13 @@ export class ApiTransactionRepository implements TransactionRepository {
       status: t.status,
       createdAt: t.createdAt,
       staffName: t.staffName,
+      orderItems: (t.orderItems ?? []).map((item: any) => ({
+        productId: item.productId,
+        productName: item.productName,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        total: item.total,
+      })),
     };
   }
 }
