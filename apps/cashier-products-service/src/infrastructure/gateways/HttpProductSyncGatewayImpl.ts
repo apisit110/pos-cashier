@@ -1,10 +1,8 @@
-import axios from 'axios';
 import { IProductSyncGateway } from '../../domain/repositories/IProductSyncGateway';
 import { Product } from '../../domain/entities/Product';
+import { httpClient } from '../http/axiosInstance';
 
 export class HttpProductSyncGatewayImpl implements IProductSyncGateway {
-  private readonly baseUrl = 'http://127.0.0.1:4002/v1/sync';
-
   async pushProduct(product: Product): Promise<void> {
     const mid = process.env.MID;
     const sid = process.env.SID;
@@ -29,7 +27,7 @@ export class HttpProductSyncGatewayImpl implements IProductSyncGateway {
     };
 
     try {
-      const response = await axios.post(`${this.baseUrl}/products/receive`, payload);
+      const response = await httpClient.post('/products/receive', payload);
       const result = response.data?.results?.[0];
       if (result?.status === 'error') {
         throw new Error(`pos-center failed to upload product ${product.id}`);
@@ -46,7 +44,7 @@ export class HttpProductSyncGatewayImpl implements IProductSyncGateway {
     lastSyncVersion: number,
   ): Promise<{ products: Product[]; syncVersion: number }> {
     try {
-      const response = await axios.post(`${this.baseUrl}/products`, { mid, sid, syncVersion: lastSyncVersion });
+      const response = await httpClient.post('/products', { mid, sid, syncVersion: lastSyncVersion });
       const data = response.data as { products: any[]; count: number; message?: string };
 
       const products = data.products.map(
