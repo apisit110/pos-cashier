@@ -25,6 +25,7 @@ import { ApiTransactionRepository } from './infrastructure/repositories/ApiTrans
 import { ApiProductRepository } from './infrastructure/repositories/ApiProductRepository';
 import { MainLayout } from './presentation/layouts/MainLayout';
 import { TransactionDetailPage } from './presentation/pages/transaction-detail/TransactionDetailPage';
+import { useTranslation } from './presentation/i18n/LanguageContext';
 
 const AppContainer = styled.div`
   width: 100%;
@@ -60,6 +61,7 @@ const updateProductUseCase = new UpdateProductUseCase(productRepository);
 const TERMINAL_STORAGE_KEY = 'lightning_pos_terminal';
 
 function App() {
+  const { t } = useTranslation();
   const [hasTerminal, setHasTerminal] = useState(() => !!localStorage.getItem(TERMINAL_STORAGE_KEY));
   const [currentView, setCurrentView] = useState<'login' | 'create-order' | 'dashboard' | 'create-staff' | 'staff-list' | 'transaction-list' | 'transaction-detail' | 'product-list' | 'create-product' | 'edit-product'>('login');
   const [staff, setStaff] = useState<{ uid: string; username: string; role: string; roleId: number; accessToken: string; refreshToken?: string } | null>(null);
@@ -144,7 +146,7 @@ function App() {
   }
 
   if (isInitializing) {
-    return <InitializingLoader>Loading Lightning POS...</InitializingLoader>;
+    return <InitializingLoader>{t.common.loadingApp}</InitializingLoader>;
   }
 
   return (

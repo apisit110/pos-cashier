@@ -13,6 +13,8 @@ import { LoginFooter } from './LoginFooter';
 import { DemoHint } from './DemoHint';
 import { LoginUseCase } from '../../../domain/use-cases/LoginUseCase';
 import { ApiAuthRepository } from '../../../infrastructure/repositories/ApiAuthRepository';
+import { useTranslation } from '../../i18n/LanguageContext';
+import { LanguageSwitcher } from '../../components/LanguageSwitcher';
 
 const authRepository = new ApiAuthRepository();
 const loginUseCase = new LoginUseCase(authRepository);
@@ -22,6 +24,7 @@ interface LoginPageProps {
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [pin, setPin] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +35,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     setError(null);
 
     if (!username || !pin) {
-      setError('Please enter both Username and PIN');
+      setError(t.login.errorRequired);
       return;
     }
 
@@ -49,7 +52,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         });
       }
     } catch (err: any) {
-      setError(err.message || 'Login failed. Please try again.');
+      setError(err.message || t.login.errorFailed);
     } finally {
       setIsLoading(false);
     }
@@ -61,6 +64,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       <BgShape $delay="-5s" $size="400px" $color="#3b82f6" $bottom="-100px" $left="-150px" />
       <BgShape $delay="-10s" $size="300px" $color="#c084fc" $top="40%" $left="20%" $opacity={0.3} />
 
+      <LanguageSwitcher style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 1 }} />
+
       <LoginCard>
         <LoginHeader>
           <BrandLogo>
@@ -68,24 +73,24 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
             </svg>
           </BrandLogo>
-          <h1>Lightning POS</h1>
-          <p>Sign in to access your dashboard</p>
+          <h1>{t.login.title}</h1>
+          <p>{t.login.subtitle}</p>
         </LoginHeader>
 
         {error && <ErrorMessage>{error}</ErrorMessage>}
 
         <LoginForm onSubmit={handleSubmit}>
           <InputField
-            label="Username"
+            label={t.login.username}
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter your username"
+            placeholder={t.login.usernamePlaceholder}
             disabled={isLoading}
           />
 
           <PinInputField
-            label="PIN Code"
+            label={t.login.pin}
             length={6}
             value={pin}
             onChange={setPin}
@@ -94,18 +99,18 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           />
 
           <FormActions>
-            <ForgotPassword href="#">Forgot PIN?</ForgotPassword>
+            <ForgotPassword href="#">{t.login.forgotPin}</ForgotPassword>
           </FormActions>
 
           <Button type="submit" isLoading={isLoading}>
-            Sign In
+            {t.login.signIn}
           </Button>
         </LoginForm>
 
         <LoginFooter>
-          <p>Don't have an account? <a href="#">Contact Support</a></p>
+          <p>{t.login.noAccount} <a href="#">{t.login.contactSupport}</a></p>
           <DemoHint>
-            <small>Demo Credentials: <code>00010001</code> / <code>123456</code></small>
+            <small>{t.login.demoCredentials} <code>00010001</code> / <code>123456</code></small>
           </DemoHint>
         </LoginFooter>
       </LoginCard>

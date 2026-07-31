@@ -4,6 +4,7 @@ import { Sidebar, TopBar } from '@apisit110/pos-ui';
 import { LayoutContainer } from './LayoutContainer';
 import { MainContent } from './MainContent';
 import { useThemeMode } from '../../ThemeContext';
+import { useTranslation } from '../../i18n/LanguageContext';
 
 const RightColumn = styled.div`
   flex: 1;
@@ -75,35 +76,36 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   onLogout,
 }) => {
   const { mode, toggleTheme } = useThemeMode();
+  const { t, language, setLanguage } = useTranslation();
 
   const isManager = staff?.role === 'manager';
 
   const navItems = [
-    ...(isManager ? [{ label: 'Dashboard', icon: <DashboardIcon />, active: currentView === 'dashboard', onClick: () => onNavigate('dashboard') }] : []),
-    { label: 'POS Terminal', icon: <PosIcon />, active: currentView === 'create-order', onClick: () => onNavigate('create-order') },
+    ...(isManager ? [{ label: t.mainLayout.dashboard, icon: <DashboardIcon />, active: currentView === 'dashboard', onClick: () => onNavigate('dashboard') }] : []),
+    { label: t.mainLayout.posTerminal, icon: <PosIcon />, active: currentView === 'create-order', onClick: () => onNavigate('create-order') },
     ...(isManager ? [
-      { label: 'Transactions', icon: <TransactionIcon />, active: currentView === 'transaction-list', onClick: () => onNavigate('transaction-list') },
-      { label: 'Products', icon: <ProductIcon />, active: currentView === 'product-list', onClick: () => onNavigate('product-list') },
-      { label: 'Staffs', icon: <StaffIcon />, active: currentView === 'staff-list' || currentView === 'create-staff', onClick: () => onNavigate('staff-list') },
+      { label: t.mainLayout.transactions, icon: <TransactionIcon />, active: currentView === 'transaction-list', onClick: () => onNavigate('transaction-list') },
+      { label: t.mainLayout.products, icon: <ProductIcon />, active: currentView === 'product-list', onClick: () => onNavigate('product-list') },
+      { label: t.mainLayout.staffs, icon: <StaffIcon />, active: currentView === 'staff-list' || currentView === 'create-staff', onClick: () => onNavigate('staff-list') },
     ] : []),
   ];
 
   const viewTitles: Record<string, string> = {
-    dashboard: 'Dashboard',
-    'create-order': 'POS Terminal',
-    'transaction-list': 'Transactions',
-    'product-list': 'Products',
-    'staff-list': 'Staffs',
-    'create-staff': 'Staffs',
+    dashboard: t.mainLayout.dashboard,
+    'create-order': t.mainLayout.posTerminal,
+    'transaction-list': t.mainLayout.transactions,
+    'product-list': t.mainLayout.products,
+    'staff-list': t.mainLayout.staffs,
+    'create-staff': t.mainLayout.createStaff,
   };
 
-  const pageTitle = viewTitles[currentView] ?? 'POS Cashier';
+  const pageTitle = viewTitles[currentView] ?? t.mainLayout.appName;
 
   return (
     <LayoutContainer>
       {currentView !== 'create-order' && (
         <Sidebar
-          logoTitle="POS Cashier"
+          logoTitle={t.mainLayout.appName}
           logoIcon={<LogoIcon />}
           navItems={navItems}
           user={staff ? { name: staff.username, subtitle: staff.role } : undefined}
@@ -111,7 +113,13 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         />
       )}
       <RightColumn>
-        <TopBar title={pageTitle} themeMode={mode} onThemeToggle={toggleTheme} />
+        <TopBar
+          title={pageTitle}
+          themeMode={mode}
+          onThemeToggle={toggleTheme}
+          language={language}
+          onLanguageToggle={() => setLanguage(language === 'en' ? 'th' : 'en')}
+        />
         <MainContent>
           {children}
         </MainContent>

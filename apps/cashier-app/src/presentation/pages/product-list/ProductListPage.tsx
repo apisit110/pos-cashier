@@ -10,6 +10,8 @@ import { AlertDialog } from '../../components/AlertDialog';
 import type { GetProductsUseCase } from '../../../domain/use-cases/GetProductsUseCase';
 import type { SyncProductsUseCase } from '../../../domain/use-cases/SyncProductsUseCase';
 import type { Product } from '../../../domain/entities/Product';
+import { useTranslation } from '../../i18n/LanguageContext';
+import { formatMessage } from '../../i18n/format';
 
 const ProductImageCell: React.FC<{ product: Product }> = ({ product }) => {
   const [error, setError] = React.useState(false);
@@ -40,6 +42,7 @@ interface ProductListPageProps {
 }
 
 export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavigateToCreateProduct, onNavigateToEditProduct, getProductsUseCase, syncProductsUseCase }) => {
+  const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -113,39 +116,39 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavi
 
   const columns: Column<Product>[] = [
     {
-      header: 'Image',
+      header: t.productList.columnImage,
       key: 'image',
       width: '80px',
       render: (product) => <ProductImageCell product={product} />
     },
     {
-      header: 'Barcode',
+      header: t.productList.columnBarcode,
       key: 'barcode',
       width: '180px',
       render: (product) => <span style={{ fontFamily: 'monospace', fontWeight: 600, color: '#94a3b8' }}>{product.barcode}</span>
     },
-    { header: 'Product Name', key: 'name' },
+    { header: t.productList.columnName, key: 'name' },
     {
-      header: 'Brand',
+      header: t.productList.columnBrand,
       key: 'brand',
       width: '150px',
       render: (product) => product.brand ? <BrandBadge>{product.brand}</BrandBadge> : '-'
     },
     {
-      header: 'Price',
+      header: t.productList.columnPrice,
       key: 'price',
       width: '150px',
       textAlign: 'right',
       render: (product) => <PriceTag>฿{product.price.toFixed(2)}</PriceTag>
     },
     {
-      header: 'Actions',
+      header: t.productList.columnActions,
       key: 'id',
       width: '100px',
       textAlign: 'center',
       render: (product) => (
         <SyncButton onClick={() => onNavigateToEditProduct(product)} disabled={isSyncing || isLoading}>
-          Edit
+          {t.common.edit}
         </SyncButton>
       ),
     },
@@ -156,18 +159,18 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavi
   return (
     <PageContainer>
       <PageHeader
-        title="Products Inventory"
+        title={t.productList.title}
         onBack={onBack}
         extraContent={
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <span className="total-count">
-              Total: {products.length} Products
+              {formatMessage(t.productList.totalProducts, { count: products.length })}
             </span>
             <SyncButton onClick={onNavigateToCreateProduct} disabled={isSyncing || isLoading}>
-              + Create Product
+              {t.productList.createProduct}
             </SyncButton>
             <SyncButton onClick={handleSync} disabled={isSyncing || isLoading}>
-              {isSyncing ? 'Syncing...' : 'Sync Products'}
+              {isSyncing ? t.productList.syncing : t.productList.syncProducts}
             </SyncButton>
           </div>
         }
@@ -176,26 +179,26 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavi
       <PageContent>
         <FilterBar>
           <TextFilter
-            label="Barcode"
-            placeholder="Search barcode..."
+            label={t.productList.filterBarcode}
+            placeholder={t.productList.filterBarcodePlaceholder}
             value={filters.barcode}
             onChange={(value) => handleFilterChange('barcode', value)}
           />
           <TextFilter
-            label="Product Name"
-            placeholder="Search product name..."
+            label={t.productList.filterName}
+            placeholder={t.productList.filterNamePlaceholder}
             value={filters.name}
             onChange={(value) => handleFilterChange('name', value)}
           />
           <TextFilter
-            label="Brand"
-            placeholder="Search brand..."
+            label={t.productList.filterBrand}
+            placeholder={t.productList.filterBrandPlaceholder}
             value={filters.brand}
             onChange={(value) => handleFilterChange('brand', value)}
           />
           <TextFilter
-            label="Price"
-            placeholder="Search price..."
+            label={t.productList.filterPrice}
+            placeholder={t.productList.filterPricePlaceholder}
             value={filters.price}
             onChange={(value) => handleFilterChange('price', value)}
           />
@@ -213,18 +216,18 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavi
             setPageSize(size);
             setCurrentPage(1);
           }}
-          emptyMessage="No products found matching your filters."
+          emptyMessage={t.productList.emptyMessage}
         />
       </PageContent>
 
-      {isSyncing && <Loading fullscreen label="Synchronizing data..." />}
+      {isSyncing && <Loading fullscreen label={t.productList.syncingLabel} />}
 
       <AlertDialog
         open={syncError !== null}
-        title="Sync Failed"
+        title={t.productList.syncFailedTitle}
         description={syncError ?? ''}
         buttons={[
-          { label: 'OK', variant: 'primary', onClick: () => setSyncError(null) },
+          { label: t.common.ok, variant: 'primary', onClick: () => setSyncError(null) },
         ]}
         autoCloseSeconds={5}
         closeOnOverlayClick

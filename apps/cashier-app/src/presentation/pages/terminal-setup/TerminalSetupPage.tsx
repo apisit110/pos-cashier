@@ -10,6 +10,8 @@ import { Form } from './Form';
 import { InfoText } from './InfoText';
 import { ActivateTerminalUseCase } from '../../../domain/use-cases/ActivateTerminalUseCase';
 import { ApiTerminalRepository } from '../../../infrastructure/repositories/ApiTerminalRepository';
+import { useTranslation } from '../../i18n/LanguageContext';
+import { LanguageSwitcher } from '../../components/LanguageSwitcher';
 
 const terminalRepository = new ApiTerminalRepository();
 const activateTerminalUseCase = new ActivateTerminalUseCase(terminalRepository);
@@ -19,6 +21,7 @@ interface TerminalSetupPageProps {
 }
 
 export const TerminalSetupPage: React.FC<TerminalSetupPageProps> = ({ onComplete }) => {
+  const { t } = useTranslation();
   const [tid, setTid] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +31,7 @@ export const TerminalSetupPage: React.FC<TerminalSetupPageProps> = ({ onComplete
     setError(null);
 
     if (!tid.trim()) {
-      setError('Please enter a Terminal ID');
+      setError(t.terminalSetup.errorRequired);
       return;
     }
 
@@ -37,7 +40,7 @@ export const TerminalSetupPage: React.FC<TerminalSetupPageProps> = ({ onComplete
       await activateTerminalUseCase.execute(tid);
       onComplete();
     } catch (err: any) {
-      const message = err.response?.data?.message || err.message || 'Terminal activation failed. Please try again.';
+      const message = err.response?.data?.message || err.message || t.terminalSetup.errorFailed;
       setError(Array.isArray(message) ? message.join(', ') : message);
     } finally {
       setIsLoading(false);
@@ -50,6 +53,8 @@ export const TerminalSetupPage: React.FC<TerminalSetupPageProps> = ({ onComplete
       <BgShape $delay="-5s" $size="400px" $color="#6366f1" $bottom="-100px" $left="-150px" />
       <BgShape $delay="-10s" $size="300px" $color="#22d3ee" $top="40%" $left="20%" $opacity={0.3} />
 
+      <LanguageSwitcher style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 1 }} />
+
       <Card>
         <Header>
           <BrandLogo>
@@ -58,30 +63,30 @@ export const TerminalSetupPage: React.FC<TerminalSetupPageProps> = ({ onComplete
               <path d="M8 21h8M12 17v4" />
             </svg>
           </BrandLogo>
-          <h1>Terminal Setup</h1>
-          <p>Enter your Terminal ID to activate this POS</p>
+          <h1>{t.terminalSetup.title}</h1>
+          <p>{t.terminalSetup.subtitle}</p>
         </Header>
 
         {error && <ErrorMessage>{error}</ErrorMessage>}
 
         <Form onSubmit={handleSubmit}>
           <InputField
-            label="Terminal ID"
+            label={t.terminalSetup.terminalId}
             type="text"
             value={tid}
             onChange={(e) => setTid(e.target.value)}
-            placeholder="e.g. T1"
+            placeholder={t.terminalSetup.terminalIdPlaceholder}
             disabled={isLoading}
             autoFocus
           />
 
           <Button type="submit" isLoading={isLoading}>
-            Activate Terminal
+            {t.terminalSetup.activate}
           </Button>
         </Form>
 
         <InfoText>
-          <small>Contact your manager if you don't know your Terminal ID</small>
+          <small>{t.terminalSetup.hint}</small>
         </InfoText>
       </Card>
     </Container>

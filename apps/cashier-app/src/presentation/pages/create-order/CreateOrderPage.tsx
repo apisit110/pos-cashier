@@ -20,6 +20,8 @@ import { Product } from '../../../domain/entities/Product';
 import { Member } from '../../../domain/entities/Member';
 import { IdentifyMemberUseCase } from '../../../domain/use-cases/IdentifyMemberUseCase';
 import type { PromotionResult } from '../../../domain/use-cases/CalculatePromotionUseCase';
+import { useTranslation } from '../../i18n/LanguageContext';
+import { formatMessage } from '../../i18n/format';
 
 interface OrderItem {
   product: Product;
@@ -40,6 +42,7 @@ interface CreateOrderPageProps {
 }
 
 export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogout, staff }) => {
+  const { t } = useTranslation();
   const [items, setItems] = useState<OrderItem[]>([]);
   const [barcodeInput, setBarcodeInput] = useState('');
   const [memberInput, setMemberInput] = useState('');
@@ -120,7 +123,7 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
       });
       setBarcodeInput('');
     } catch (err: any) {
-      setError(err.message || 'Product not found.');
+      setError(err.message || t.createOrder.errorProductNotFound);
     } finally {
       setIsScanning(false);
       if (inputRef.current) inputRef.current.focus();
@@ -185,10 +188,10 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
         setMember(foundMember);
         setMemberInput('');
       } else {
-        setError('Member not found.');
+        setError(t.createOrder.errorMemberNotFound);
       }
     } catch (err: any) {
-      setError(err.message || 'Error identifying member.');
+      setError(err.message || t.createOrder.errorIdentifyMember);
     } finally {
       setIsIdentifyingMember(false);
     }
@@ -220,24 +223,24 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
 
   const columns: Column<OrderItem>[] = [
     {
-      header: '#',
+      header: t.createOrder.columnNumber,
       key: 'number',
       width: '48px',
       textAlign: 'center',
       render: (item) => <span style={{ color: 'var(--color-text-secondary, #94a3b8)' }}>{items.indexOf(item) + 1}</span>
     },
     {
-      header: 'Barcode',
+      header: t.createOrder.columnBarcode,
       key: 'barcode',
       render: (item) => <code style={{ background: 'rgba(255,255,255,0.05)', padding: '2px 4px', borderRadius: 4 }}>{item.product.barcode}</code>
     },
     {
-      header: 'Name',
+      header: t.createOrder.columnName,
       key: 'name',
       render: (item) => <span style={{ fontWeight: 500 }}>{item.product.name}</span>
     },
     {
-      header: 'Qty',
+      header: t.createOrder.columnQty,
       key: 'quantity',
       textAlign: 'center',
       width: '120px',
@@ -250,19 +253,19 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
       )
     },
     {
-      header: 'Price',
+      header: t.createOrder.columnPrice,
       key: 'price',
       textAlign: 'right',
       render: (item) => `$${item.product.price.toFixed(2)}`
     },
     {
-      header: 'Total',
+      header: t.createOrder.columnTotal,
       key: 'total',
       textAlign: 'right',
       render: (item) => <span style={{ fontWeight: 600 }}>${(item.product.price * item.quantity).toFixed(2)}</span>
     },
     {
-      header: 'Action',
+      header: t.createOrder.columnAction,
       key: 'actions',
       textAlign: 'center',
       width: '60px',
@@ -279,10 +282,13 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
 
   const total = promotionResult?.finalTotal ?? items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
 
+  const [scanHintBefore, scanHintMid, scanHintAfter] = t.createOrder.scanHint.split(/\{barcode1\}|\{barcode2\}/);
+  const [shortcutHintBefore, shortcutHintAfter] = t.createOrder.shortcutHint.split('{key}');
+
   return (
     <Container>
       <PageHeader
-        title="POS Terminal"
+        title={t.createOrder.title}
         onBack={onBack}
         user={staff}
         onLogout={onLogout}
@@ -292,13 +298,13 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
       <Main>
         <ScannerPanel>
           <MemberSection>
-            <h3>Member</h3>
+            <h3>{t.createOrder.member}</h3>
             {member ? (
               <MemberCard>
                 <div className="member-info">
                   <span className="member-name">{member.fullName}</span>
                   <div className="member-sub-info">
-                    <span className="member-points">{member.points} points</span>
+                    <span className="member-points">{member.points} {t.createOrder.points}</span>
                   </div>
                 </div>
                 <button className="remove-btn" onClick={handleRemoveMember}>&times;</button>
@@ -306,10 +312,10 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
             ) : (
               <form onSubmit={handleIdentifyMember}>
                 <InputField
-                  label="Member ID"
+                  label={t.createOrder.memberId}
                   value={memberInput}
                   onChange={(e) => setMemberInput(e.target.value)}
-                  placeholder="Enter Member ID (M001-M003)"
+                  placeholder={t.createOrder.memberIdPlaceholder}
                   disabled={isIdentifyingMember}
                   ref={memberInputRef}
                 />
@@ -319,14 +325,14 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
                   isLoading={isIdentifyingMember}
                   style={{ marginTop: '0.5rem' }}
                 >
-                  Identify
+                  {t.createOrder.identify}
                 </Button>
               </form>
             )}
           </MemberSection>
 
           <ScannerSection>
-            <h3>Scan Product</h3>
+            <h3>{t.createOrder.scanProduct}</h3>
             <ScannerBox $isScanning={isScanning} $flash={scanFlash}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
@@ -337,33 +343,33 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
                 <path d="M12 7v10"></path>
                 <path d="M16 7v10"></path>
               </svg>
-              <p>Ready to scan barcode...</p>
+              <p>{t.createOrder.readyToScan}</p>
             </ScannerBox>
 
             <form onSubmit={handleScan}>
               <InputField
-                label="Manual Barcode Entry"
+                label={t.createOrder.manualBarcodeEntry}
                 value={barcodeInput}
                 onChange={(e) => setBarcodeInput(e.target.value)}
-                placeholder="Enter barcode (e.g. 8850123456789)"
+                placeholder={t.createOrder.manualBarcodePlaceholder}
                 disabled={isScanning}
                 ref={inputRef}
               />
               {error && <span style={{ color: 'var(--color-error, #ef4444)', fontSize: '0.875rem' }}>{error}</span>}
               <Button type="submit" isLoading={isScanning} style={{ marginTop: '0.5rem' }}>
-                Add Product
+                {t.createOrder.addProduct}
               </Button>
             </form>
             <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--color-text-secondary, #94a3b8)', fontStyle: 'italic' }}>
-              Hint: Use demo barcode <strong>8850123456789</strong> or <strong>1234567890123</strong>
+              {scanHintBefore}<strong>8850123456789</strong>{scanHintMid}<strong>1234567890123</strong>{scanHintAfter}
             </div>
           </ScannerSection>
         </ScannerPanel>
 
         <TablePanel>
           <div className="table-header">
-            <h3>Current Order</h3>
-            <span className="item-count">{items.length} items</span>
+            <h3>{t.createOrder.currentOrder}</h3>
+            <span className="item-count">{formatMessage(t.createOrder.itemsCount, { count: items.length })}</span>
           </div>
 
           <ScrollArea ref={scrollAreaRef}>
@@ -380,7 +386,7 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
                     <circle cx="20" cy="21" r="1"></circle>
                     <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                   </svg>
-                  <p>No products added yet. Scan a product to begin.</p>
+                  <p>{t.createOrder.noProducts}</p>
                 </EmptyState>
               }
             />
@@ -389,11 +395,11 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
           <OrderSummary>
             <div className="summary-content">
               <div className="summary-row">
-                <span>Promo</span>
+                <span>{t.createOrder.promo}</span>
                 <span>-</span>
               </div>
               <div className="summary-row total">
-                <span>Total</span>
+                <span>{t.createOrder.total}</span>
                 <span>${total.toFixed(2)}</span>
               </div>
               <Button
@@ -401,10 +407,10 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
                 onClick={() => setIsPaymentModalOpen(true)}
                 style={{ height: 56, fontSize: '1.125rem', fontWeight: 600 }}
               >
-                Proceed to Payment
+                {t.createOrder.proceedToPayment}
               </Button>
               <div className="shortcut-hint">
-                Press <kbd>Space</kbd> to pay
+                {shortcutHintBefore}<kbd>Space</kbd>{shortcutHintAfter}
               </div>
             </div>
           </OrderSummary>

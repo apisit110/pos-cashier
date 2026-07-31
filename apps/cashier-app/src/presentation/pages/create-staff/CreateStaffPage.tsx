@@ -8,6 +8,8 @@ import { RoleOptions } from './RoleOptions';
 import { RoleOption } from './RoleOption';
 import { StatusMessage } from './StatusMessage';
 import type { CreateStaffUseCase } from '../../../domain/use-cases/CreateStaffUseCase';
+import { useTranslation } from '../../i18n/LanguageContext';
+import { formatMessage } from '../../i18n/format';
 
 interface CreateStaffPageProps {
   onBack: () => void;
@@ -15,6 +17,7 @@ interface CreateStaffPageProps {
 }
 
 export const CreateStaffPage: React.FC<CreateStaffPageProps> = ({ onBack, createStaffUseCase }) => {
+  const { t } = useTranslation();
   const [fullName, setFullName] = useState('');
   const [pin, setPin] = useState('');
   const [roleId, setRoleId] = useState(2);
@@ -24,11 +27,11 @@ export const CreateStaffPage: React.FC<CreateStaffPageProps> = ({ onBack, create
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName.trim()) {
-      setMessage({ text: 'Please enter a full name', type: 'error' });
+      setMessage({ text: t.createStaff.errorFullNameRequired, type: 'error' });
       return;
     }
     if (!pin.trim() || pin.length < 4) {
-      setMessage({ text: 'Please enter a valid PIN (at least 4 digits)', type: 'error' });
+      setMessage({ text: t.createStaff.errorPinInvalid, type: 'error' });
       return;
     }
 
@@ -37,12 +40,12 @@ export const CreateStaffPage: React.FC<CreateStaffPageProps> = ({ onBack, create
     try {
       const newStaff = await createStaffUseCase.execute({ fullName, roleId, pin });
       setMessage({
-        text: `Staff "${newStaff.fullName}" created successfully! Username: ${newStaff.userId}. Data synced to cloud.`,
+        text: formatMessage(t.createStaff.successMessage, { fullName: newStaff.fullName, userId: newStaff.userId }),
         type: 'success',
       });
       setFullName(''); setPin(''); setRoleId(2);
     } catch (err: any) {
-      setMessage({ text: err.message || 'Failed to create staff', type: 'error' });
+      setMessage({ text: err.message || t.createStaff.errorFailed, type: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -51,25 +54,25 @@ export const CreateStaffPage: React.FC<CreateStaffPageProps> = ({ onBack, create
   return (
     <Container>
       <PageHeader
-        title="Create New Staff"
+        title={t.createStaff.title}
         onBack={onBack}
       />
 
       <FormContent>
         <Form onSubmit={handleSubmit}>
           <InputField
-            label="Full Name"
+            label={t.createStaff.fullName}
             id="fullName"
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            placeholder="Enter employee full name"
+            placeholder={t.createStaff.fullNamePlaceholder}
             disabled={isLoading}
             required
           />
 
           <PinInputField
-            label="PIN Code (6 digits)"
+            label={t.createStaff.pinCode}
             length={6}
             value={pin}
             onChange={setPin}
@@ -77,7 +80,7 @@ export const CreateStaffPage: React.FC<CreateStaffPageProps> = ({ onBack, create
           />
 
           <FormGroup>
-            <label>Role</label>
+            <label>{t.createStaff.role}</label>
             <RoleOptions>
               <RoleOption $selected={roleId === 1}>
                 <input
@@ -91,8 +94,8 @@ export const CreateStaffPage: React.FC<CreateStaffPageProps> = ({ onBack, create
                 <div className="role-card">
                   <span className="role-icon">🛡️</span>
                   <div className="role-info">
-                    <span className="role-name">Manager</span>
-                    <span className="role-desc">Full access to dashboard</span>
+                    <span className="role-name">{t.createStaff.manager}</span>
+                    <span className="role-desc">{t.createStaff.managerDesc}</span>
                   </div>
                 </div>
               </RoleOption>
@@ -109,8 +112,8 @@ export const CreateStaffPage: React.FC<CreateStaffPageProps> = ({ onBack, create
                 <div className="role-card">
                   <span className="role-icon">💰</span>
                   <div className="role-info">
-                    <span className="role-name">Cashier</span>
-                    <span className="role-desc">Access to POS</span>
+                    <span className="role-name">{t.createStaff.cashier}</span>
+                    <span className="role-desc">{t.createStaff.cashierDesc}</span>
                   </div>
                 </div>
               </RoleOption>
@@ -118,7 +121,7 @@ export const CreateStaffPage: React.FC<CreateStaffPageProps> = ({ onBack, create
           </FormGroup>
 
           <Button type="submit" disabled={isLoading} style={{ marginTop: '1rem' }}>
-            {isLoading ? 'Creating...' : 'Create & Sync Staff'}
+            {isLoading ? t.common.creating : t.createStaff.createAndSync}
           </Button>
         </Form>
 

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { PageHeader, DataTable, Badge, PageContainer, PageContent } from '@apisit110/pos-ui';
 import type { GetStaffsUseCase } from '../../../domain/use-cases/GetStaffsUseCase';
 import type { Staff } from '../../../domain/repositories/StaffRepository';
+import { useTranslation } from '../../i18n/LanguageContext';
+import { formatMessage } from '../../i18n/format';
 
 interface StaffListPageProps {
   onBack: () => void;
@@ -10,6 +12,7 @@ interface StaffListPageProps {
 }
 
 export const StaffListPage: React.FC<StaffListPageProps> = ({ onBack, onNavigateToCreateStaff, getStaffsUseCase }) => {
+  const { t } = useTranslation();
   const [staffs, setStaffs] = useState<Staff[]>([]);
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,11 +37,11 @@ export const StaffListPage: React.FC<StaffListPageProps> = ({ onBack, onNavigate
   return (
     <PageContainer>
       <PageHeader
-        title="Manage Staffs"
+        title={t.staffList.title}
         onBack={onBack}
         extraContent={
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <span className="total-count">Total: {total} Staffs</span>
+            <span className="total-count">{formatMessage(t.staffList.totalStaffs, { count: total })}</span>
             <button
               onClick={onNavigateToCreateStaff}
               style={{
@@ -63,7 +66,7 @@ export const StaffListPage: React.FC<StaffListPageProps> = ({ onBack, onNavigate
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
-              Create New Staff
+              {t.staffList.createNewStaff}
             </button>
           </div>
         }
@@ -73,24 +76,24 @@ export const StaffListPage: React.FC<StaffListPageProps> = ({ onBack, onNavigate
         <DataTable
           columns={[
             {
-              header: 'Username',
+              header: t.staffList.columnUsername,
               key: 'userId',
               render: (staff) => <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>{staff.userId}</span>,
             },
-            { header: 'Full Name', key: 'fullName' },
+            { header: t.staffList.columnFullName, key: 'fullName' },
             {
-              header: 'Role',
+              header: t.staffList.columnRole,
               key: 'roleId',
               render: (staff) => (
                 <Badge $variant={staff.roleId === 1 ? 'info' : 'success'} $shape="pill">
-                  {staff.roleId === 1 ? '🛡️ Manager' : '💰 Cashier'}
+                  {staff.roleId === 1 ? `🛡️ ${t.createStaff.manager}` : `💰 ${t.createStaff.cashier}`}
                 </Badge>
               ),
             },
             {
-              header: 'Status',
+              header: t.staffList.columnStatus,
               key: 'status',
-              render: () => <Badge $variant="success">Active</Badge>,
+              render: () => <Badge $variant="success">{t.common.active}</Badge>,
             },
           ]}
           data={staffs}
@@ -103,7 +106,7 @@ export const StaffListPage: React.FC<StaffListPageProps> = ({ onBack, onNavigate
             setPageSize(size);
             setCurrentPage(1);
           }}
-          emptyMessage="No staffs found."
+          emptyMessage={t.staffList.emptyMessage}
         />
       </PageContent>
     </PageContainer>

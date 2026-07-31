@@ -9,6 +9,9 @@ import { Spinner } from './Spinner';
 import type { GetTransactionByIdUseCase } from '../../../domain/use-cases/GetTransactionByIdUseCase';
 import type { Transaction, OrderItem } from '../../../domain/repositories/TransactionRepository';
 import { formatDateTime } from '../../utils/date';
+import { useTranslation } from '../../i18n/LanguageContext';
+import { formatMessage } from '../../i18n/format';
+import type { Translations } from '../../i18n/translations';
 
 type IndexedOrderItem = OrderItem & { _rowIndex: number };
 
@@ -21,9 +24,9 @@ const SectionTitle = styled.h3`
   margin: 0 0 1rem 0;
 `;
 
-const orderItemColumns = [
+const getOrderItemColumns = (t: Translations) => [
   {
-    header: '#',
+    header: t.transactionDetail.columnNumber,
     key: '_rowIndex',
     width: '60px',
     render: (item: IndexedOrderItem) => (
@@ -33,7 +36,7 @@ const orderItemColumns = [
     ),
   },
   {
-    header: 'Product',
+    header: t.transactionDetail.columnProduct,
     key: 'productName',
     render: (item: IndexedOrderItem) => (
       <div>
@@ -43,7 +46,7 @@ const orderItemColumns = [
     ),
   },
   {
-    header: 'Unit Price',
+    header: t.transactionDetail.columnUnitPrice,
     key: 'unitPrice',
     textAlign: 'right' as const,
     render: (item: IndexedOrderItem) => (
@@ -51,14 +54,14 @@ const orderItemColumns = [
     ),
   },
   {
-    header: 'Qty',
+    header: t.transactionDetail.columnQty,
     key: 'quantity',
     textAlign: 'center' as const,
     width: '80px',
     render: (item: IndexedOrderItem) => <span style={{ fontWeight: 600 }}>{item.quantity}</span>,
   },
   {
-    header: 'Total',
+    header: t.transactionDetail.columnTotal,
     key: 'total',
     textAlign: 'right' as const,
     render: (item: IndexedOrderItem) => (
@@ -78,6 +81,7 @@ export const TransactionDetailPage: React.FC<TransactionDetailPageProps> = ({
   onBack,
   getTransactionByIdUseCase
 }) => {
+  const { t } = useTranslation();
   const [transaction, setTransaction] = useState<Transaction | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -90,11 +94,11 @@ export const TransactionDetailPage: React.FC<TransactionDetailPageProps> = ({
       setTransaction(result);
     } catch (err) {
       console.error('Failed to fetch transaction:', err);
-      setError('Could not find transaction details. Please try again.');
+      setError(t.transactionDetail.errorNotFound);
     } finally {
       setIsLoading(false);
     }
-  }, [getTransactionByIdUseCase, transactionId]);
+  }, [getTransactionByIdUseCase, transactionId, t]);
 
   useEffect(() => {
     fetchTransaction();
@@ -106,13 +110,13 @@ export const TransactionDetailPage: React.FC<TransactionDetailPageProps> = ({
 
   return (
     <PageContainer>
-      <PageHeader title="Transaction Details" onBack={onBack} />
+      <PageHeader title={t.transactionDetail.title} onBack={onBack} />
 
       <PageContent>
         {isLoading ? (
           <LoadingState>
             <Spinner />
-            <p>Loading transaction details...</p>
+            <p>{t.transactionDetail.loading}</p>
           </LoadingState>
         ) : error ? (
           <Card>
@@ -122,29 +126,29 @@ export const TransactionDetailPage: React.FC<TransactionDetailPageProps> = ({
           <>
             <Card>
               <DetailItem>
-                <label>Amount Total</label>
+                <label>{t.transactionDetail.amountTotal}</label>
                 <span className="amount">฿{transaction.amount.toFixed(2)}</span>
               </DetailItem>
 
               <DetailGrid>
                 <DetailItem>
-                  <label>Transaction ID</label>
+                  <label>{t.transactionDetail.transactionId}</label>
                   <span style={{ fontFamily: 'monospace' }}>#{transaction.id}</span>
                 </DetailItem>
                 <DetailItem>
-                  <label>Order Reference</label>
+                  <label>{t.transactionDetail.orderReference}</label>
                   <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>{transaction.orderId}</span>
                 </DetailItem>
                 <DetailItem>
-                  <label>Date & Time</label>
+                  <label>{t.transactionDetail.dateTime}</label>
                   <span>{formatDateTime(transaction.createdAt)}</span>
                 </DetailItem>
                 <DetailItem>
-                  <label>Staff Member</label>
+                  <label>{t.transactionDetail.staffMember}</label>
                   <span>{transaction.staffName}</span>
                 </DetailItem>
                 <DetailItem>
-                  <label>Payment Method</label>
+                  <label>{t.transactionDetail.paymentMethod}</label>
                   <div>
                     <Badge $variant="info" $size="md">
                       {transaction.paymentMethod.replace('_', ' ')}
@@ -152,7 +156,7 @@ export const TransactionDetailPage: React.FC<TransactionDetailPageProps> = ({
                   </div>
                 </DetailItem>
                 <DetailItem>
-                  <label>Status</label>
+                  <label>{t.transactionDetail.status}</label>
                   <div>
                     <Badge
                       $variant={transaction.status.toLowerCase() === 'success' ? 'success' : 'error'}
@@ -167,11 +171,11 @@ export const TransactionDetailPage: React.FC<TransactionDetailPageProps> = ({
             </Card>
 
             <div style={{ marginTop: '2rem' }}>
-              <SectionTitle>Order Items ({indexedOrderItems.length})</SectionTitle>
+              <SectionTitle>{formatMessage(t.transactionDetail.orderItems, { count: indexedOrderItems.length })}</SectionTitle>
               <DataTable
-                columns={orderItemColumns}
+                columns={getOrderItemColumns(t)}
                 data={indexedOrderItems}
-                emptyMessage="No order items available."
+                emptyMessage={t.transactionDetail.emptyMessage}
               />
             </div>
           </>
