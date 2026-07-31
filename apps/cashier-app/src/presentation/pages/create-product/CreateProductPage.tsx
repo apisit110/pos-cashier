@@ -80,6 +80,7 @@ export const CreateProductPage: React.FC<CreateProductPageProps> = ({ onBack, cr
             onChange={(e) => setBarcode(e.target.value)}
             placeholder="Enter product barcode"
             disabled={isLoading}
+            autoComplete="off"
             required
           />
 
@@ -91,6 +92,7 @@ export const CreateProductPage: React.FC<CreateProductPageProps> = ({ onBack, cr
             onChange={(e) => setName(e.target.value)}
             placeholder="Enter product name"
             disabled={isLoading}
+            autoComplete="off"
             required
           />
 
@@ -102,6 +104,7 @@ export const CreateProductPage: React.FC<CreateProductPageProps> = ({ onBack, cr
             onChange={(e) => setBrand(e.target.value)}
             placeholder="Enter brand (optional)"
             disabled={isLoading}
+            autoComplete="off"
           />
 
           <InputField
@@ -112,6 +115,7 @@ export const CreateProductPage: React.FC<CreateProductPageProps> = ({ onBack, cr
             onChange={(e) => setPrice(e.target.value)}
             placeholder="0.00"
             disabled={isLoading}
+            autoComplete="off"
             required
           />
 
