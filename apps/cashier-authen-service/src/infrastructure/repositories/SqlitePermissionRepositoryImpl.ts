@@ -2,7 +2,7 @@ import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
 import { RolePermission } from '../../domain/entities/RolePermission';
 import { IPermissionRepository } from '../../domain/repositories/IPermissionRepository';
-import * as schema from '../database/schema';
+import { schema } from '@lightning-pos/model';
 
 export class SqlitePermissionRepositoryImpl implements IPermissionRepository {
   constructor(private readonly db: BetterSQLite3Database<typeof schema>) {}

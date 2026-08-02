@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { IStaffRepository } from '../repositories/IStaffRepository';
 
-const JWT_SECRET = process.env.JWT_SECRET ?? 'pos-staff-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
 export class UnauthorizedError extends Error {
   constructor(message: string) {

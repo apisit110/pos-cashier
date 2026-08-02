@@ -1,16 +1,5 @@
 import { z } from 'zod';
 
-export const CreateTransactionSchema = z.object({
-  orderId: z.string().min(1, 'Order ID is required'),
-  merchantId: z.string().min(1, 'Merchant ID is required'),
-  storeId: z.string().min(1, 'Store ID is required'),
-  terminalId: z.string().optional(),
-  amount: z.number().positive('Amount must be positive'),
-  paymentMethod: z.enum(['CASH', 'CREDIT', 'QR']),
-  status: z.enum(['SUCCESS', 'FAILED', 'REFUNDED']),
-  staffName: z.string().min(1, 'Staff name is required'),
-});
-
 export const GetTransactionsFilterSchema = z.object({
   page: z.string().optional().transform((val) => (val ? parseInt(val) : 1)),
   limit: z.string().optional().transform((val) => (val ? parseInt(val) : 10)),
@@ -23,5 +12,4 @@ export const GetTransactionsFilterSchema = z.object({
   status: z.enum(['SUCCESS', 'FAILED', 'REFUNDED']).optional(),
 });
 
-export type CreateTransactionInput = z.infer<typeof CreateTransactionSchema>;
 export type GetTransactionsFilter = z.infer<typeof GetTransactionsFilterSchema>;

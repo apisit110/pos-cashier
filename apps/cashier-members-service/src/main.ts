@@ -1,5 +1,11 @@
 import 'dotenv/config';
-import { createDatabase } from './infrastructure/database/DatabaseImpl';
+
+if (!process.env.JWT_SECRET) {
+  console.error('Missing required environment variable: JWT_SECRET');
+  process.exit(1);
+}
+
+import { createDatabase } from '@lightning-pos/database';
 import { SqliteMemberRepositoryImpl } from './infrastructure/repositories/SqliteMemberRepositoryImpl';
 import { GetMemberByIdUseCase } from './domain/use-cases/GetMemberByIdUseCase';
 import { createApp } from './presentation/app';

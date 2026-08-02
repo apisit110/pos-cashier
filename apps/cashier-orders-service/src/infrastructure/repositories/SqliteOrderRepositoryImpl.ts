@@ -2,7 +2,7 @@ import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
 import { Order, OrderItem, OrderStatus } from '../../domain/entities/Order';
 import { IOrderRepository } from '../../domain/repositories/IOrderRepository';
-import * as schema from '../database/schema';
+import { schema } from '@lightning-pos/model';
 
 export class SqliteOrderRepositoryImpl implements IOrderRepository {
   constructor(private readonly db: BetterSQLite3Database<typeof schema>) {}
@@ -21,6 +21,7 @@ export class SqliteOrderRepositoryImpl implements IOrderRepository {
           status: order.status,
           isSynced: order.isSynced,
           createdAt: order.createdAt,
+          idempotencyKey: order.idempotencyKey,
         })
         .run();
 
@@ -44,11 +45,22 @@ export class SqliteOrderRepositoryImpl implements IOrderRepository {
       where: eq(schema.orders.id, id),
       with: { items: true },
     });
-
     if (!result) return null;
+    return this.mapToEntity(result);
+  }
 
+  async findByIdempotencyKey(idempotencyKey: string): Promise<Order | null> {
+    const result = await this.db.query.orders.findFirst({
+      where: eq(schema.orders.idempotencyKey, idempotencyKey),
+      with: { items: true },
+    });
+    if (!result) return null;
+    return this.mapToEntity(result);
+  }
+
+  private mapToEntity(result: any): Order {
     const items = result.items.map(
-      (item) => new OrderItem(item.productId, item.quantity, item.price),
+      (item: any) => new OrderItem(item.productId, item.quantity, item.price),
     );
 
     return new Order(
@@ -63,6 +75,7 @@ export class SqliteOrderRepositoryImpl implements IOrderRepository {
       result.status as OrderStatus,
       result.isSynced,
       result.memberId ?? undefined,
+      result.idempotencyKey ?? undefined,
     );
   }
 

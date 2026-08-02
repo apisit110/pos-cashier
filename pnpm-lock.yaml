@@ -122,6 +122,12 @@ importers:
 
   apps/cashier-authen-service:
     dependencies:
+      '@lightning-pos/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      '@lightning-pos/model':
+        specifier: workspace:*
+        version: link:../../packages/model
       better-sqlite3:
         specifier: ^12.9.0
         version: 12.9.0
@@ -159,9 +165,6 @@ importers:
       '@types/node':
         specifier: ^24.0.0
         version: 24.12.2
-      drizzle-kit:
-        specifier: ^0.31.10
-        version: 0.31.10
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@24.12.2)(typescript@5.9.3)
@@ -174,6 +177,12 @@ importers:
 
   apps/cashier-members-service:
     dependencies:
+      '@lightning-pos/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      '@lightning-pos/model':
+        specifier: workspace:*
+        version: link:../../packages/model
       better-sqlite3:
         specifier: ^12.9.0
         version: 12.9.0
@@ -189,6 +198,9 @@ importers:
       express:
         specifier: ^4.19.2
         version: 4.22.2
+      jsonwebtoken:
+        specifier: ^9.0.2
+        version: 9.0.3
     devDependencies:
       '@lightning-pos/tsconfig':
         specifier: workspace:*
@@ -202,12 +214,12 @@ importers:
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.25
+      '@types/jsonwebtoken':
+        specifier: ^9.0.9
+        version: 9.0.10
       '@types/node':
         specifier: ^24.0.0
         version: 24.12.2
-      drizzle-kit:
-        specifier: ^0.31.10
-        version: 0.31.10
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@24.12.2)(typescript@5.9.3)
@@ -220,9 +232,12 @@ importers:
 
   apps/cashier-orders-service:
     dependencies:
-      axios:
-        specifier: ^1.15.0
-        version: 1.15.0
+      '@lightning-pos/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      '@lightning-pos/model':
+        specifier: workspace:*
+        version: link:../../packages/model
       better-sqlite3:
         specifier: ^12.9.0
         version: 12.9.0
@@ -244,6 +259,9 @@ importers:
       ioredis:
         specifier: ^5.10.1
         version: 5.10.1
+      jsonwebtoken:
+        specifier: ^9.0.2
+        version: 9.0.3
     devDependencies:
       '@lightning-pos/tsconfig':
         specifier: workspace:*
@@ -257,58 +275,12 @@ importers:
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.6
+      '@types/jsonwebtoken':
+        specifier: ^9.0.9
+        version: 9.0.10
       '@types/node':
         specifier: ^24.0.0
         version: 24.12.2
-      drizzle-kit:
-        specifier: ^0.31.10
-        version: 0.31.10
-      ts-node:
-        specifier: ^10.9.2
-        version: 10.9.2(@types/node@24.12.2)(typescript@5.9.3)
-      ts-node-dev:
-        specifier: ^2.0.0
-        version: 2.0.0(@types/node@24.12.2)(typescript@5.9.3)
-      typescript:
-        specifier: ^5.7.3
-        version: 5.9.3
-
-  apps/cashier-payment-service:
-    dependencies:
-      better-sqlite3:
-        specifier: ^12.9.0
-        version: 12.9.0
-      cors:
-        specifier: ^2.8.5
-        version: 2.8.6
-      dotenv:
-        specifier: ^16.4.7
-        version: 16.6.1
-      drizzle-orm:
-        specifier: ^0.45.2
-        version: 0.45.2(@types/better-sqlite3@7.6.13)(better-sqlite3@12.9.0)(pg@8.20.0)
-      express:
-        specifier: ^4.19.2
-        version: 4.22.2
-    devDependencies:
-      '@lightning-pos/tsconfig':
-        specifier: workspace:*
-        version: link:../../packages/tsconfig
-      '@types/better-sqlite3':
-        specifier: ^7.6.13
-        version: 7.6.13
-      '@types/cors':
-        specifier: ^2.8.17
-        version: 2.8.19
-      '@types/express':
-        specifier: ^4.17.21
-        version: 4.17.25
-      '@types/node':
-        specifier: ^24.0.0
-        version: 24.12.2
-      drizzle-kit:
-        specifier: ^0.31.10
-        version: 0.31.10
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@24.12.2)(typescript@5.9.3)
@@ -321,6 +293,12 @@ importers:
 
   apps/cashier-products-service:
     dependencies:
+      '@lightning-pos/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      '@lightning-pos/model':
+        specifier: workspace:*
+        version: link:../../packages/model
       axios:
         specifier: ^1.16.0
         version: 1.16.0
@@ -339,6 +317,9 @@ importers:
       express:
         specifier: ^4.19.2
         version: 4.22.2
+      jsonwebtoken:
+        specifier: ^9.0.2
+        version: 9.0.3
       zod:
         specifier: ^4.3.6
         version: 4.4.3
@@ -355,12 +336,12 @@ importers:
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.25
+      '@types/jsonwebtoken':
+        specifier: ^9.0.9
+        version: 9.0.10
       '@types/node':
         specifier: ^24.0.0
         version: 24.12.2
-      drizzle-kit:
-        specifier: ^0.31.10
-        version: 0.31.10
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@24.12.2)(typescript@5.9.3)
@@ -373,15 +354,27 @@ importers:
 
   apps/cashier-sync-service:
     dependencies:
+      '@lightning-pos/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      '@lightning-pos/model':
+        specifier: workspace:*
+        version: link:../../packages/model
       axios:
         specifier: ^1.15.0
         version: 1.16.0
+      better-sqlite3:
+        specifier: ^12.9.0
+        version: 12.9.0
       bullmq:
         specifier: ^5.76.6
         version: 5.76.6
       dotenv:
         specifier: ^16.0.0
         version: 16.6.1
+      drizzle-orm:
+        specifier: ^0.45.2
+        version: 0.45.2(@types/better-sqlite3@7.6.13)(better-sqlite3@12.9.0)(pg@8.20.0)
       ioredis:
         specifier: ^5.10.1
         version: 5.10.1
@@ -389,6 +382,9 @@ importers:
       '@lightning-pos/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
+      '@types/better-sqlite3':
+        specifier: ^7.6.13
+        version: 7.6.13
       '@types/node':
         specifier: ^24.0.0
         version: 24.12.2
@@ -404,6 +400,12 @@ importers:
 
   apps/cashier-terminal-service:
     dependencies:
+      '@lightning-pos/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      '@lightning-pos/model':
+        specifier: workspace:*
+        version: link:../../packages/model
       better-sqlite3:
         specifier: ^12.9.0
         version: 12.9.0
@@ -435,9 +437,6 @@ importers:
       '@types/node':
         specifier: ^24.0.0
         version: 24.12.2
-      drizzle-kit:
-        specifier: ^0.31.10
-        version: 0.31.10
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@24.12.2)(typescript@5.9.3)
@@ -450,6 +449,12 @@ importers:
 
   apps/cashier-transactions-service:
     dependencies:
+      '@lightning-pos/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      '@lightning-pos/model':
+        specifier: workspace:*
+        version: link:../../packages/model
       better-sqlite3:
         specifier: ^12.9.0
         version: 12.9.0
@@ -490,15 +495,62 @@ importers:
       '@types/node':
         specifier: ^24.0.0
         version: 24.12.2
-      drizzle-kit:
-        specifier: ^0.31.10
-        version: 0.31.10
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@24.12.2)(typescript@5.9.3)
       ts-node-dev:
         specifier: ^2.0.0
         version: 2.0.0(@types/node@24.12.2)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+
+  packages/database:
+    dependencies:
+      '@lightning-pos/model':
+        specifier: workspace:*
+        version: link:../model
+      better-sqlite3:
+        specifier: ^12.9.0
+        version: 12.9.0
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.6.1
+      drizzle-orm:
+        specifier: ^0.45.2
+        version: 0.45.2(@types/better-sqlite3@7.6.13)(better-sqlite3@12.9.0)(pg@8.20.0)
+    devDependencies:
+      '@lightning-pos/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/better-sqlite3':
+        specifier: ^7.6.13
+        version: 7.6.13
+      '@types/node':
+        specifier: ^24.0.0
+        version: 24.12.2
+      drizzle-kit:
+        specifier: ^0.31.10
+        version: 0.31.10
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@24.12.2)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+
+  packages/model:
+    dependencies:
+      drizzle-orm:
+        specifier: ^0.45.2
+        version: 0.45.2(@types/better-sqlite3@7.6.13)(better-sqlite3@12.9.0)(pg@8.20.0)
+    devDependencies:
+      '@lightning-pos/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: ^24.0.0
+        version: 24.12.2
       typescript:
         specifier: ^5.7.3
         version: 5.9.3
@@ -608,11 +660,11 @@ packages:
 
   '@esbuild-kit/core-utils@3.3.2':
     resolution: {integrity: sha512-sPRAnw9CdSsRmEtnsl2WXWdyquogVpB3yZ3dgwJfe8zrOzTsV7cJvmwrKVa+0ma5BoiGJ+BoqkMvawbayKUsqQ==}
-    deprecated: 'Merged into tsx: https://tsx.is'
+    deprecated: 'Merged into tsx: https://tsx.hirok.io'
 
   '@esbuild-kit/esm-loader@2.6.5':
     resolution: {integrity: sha512-FxEMIkJKnodyA1OaCUoEvbYRkoZlLZ4d/eXFu9Fh8CbBBgP5EmZxrfTRyN0qpXZ4vOvqnE5YdRdcrmUUXuU+dA==}
-    deprecated: 'Merged into tsx: https://tsx.is'
+    deprecated: 'Merged into tsx: https://tsx.hirok.io'
 
   '@esbuild/aix-ppc64@0.25.12':
     resolution: {integrity: sha512-Hhmwd6CInZ3dwpuGTF8fJG6yoWmsToE+vYgD4nytZVxcu1ulHpUQRAB1UJ8+N1Am3Mz4+xOByoQoSZf4D+CpkA==}

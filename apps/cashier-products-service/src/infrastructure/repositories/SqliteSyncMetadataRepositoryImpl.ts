@@ -2,7 +2,7 @@ import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
 import { SyncMetadata, SyncStatus } from '../../domain/entities/SyncMetadata';
 import { ISyncMetadataRepository } from '../../domain/repositories/ISyncMetadataRepository';
-import * as schema from '../database/schema';
+import { schema } from '@lightning-pos/model';
 
 export class SqliteSyncMetadataRepositoryImpl implements ISyncMetadataRepository {
   private readonly DEFAULT_ID = 'default';

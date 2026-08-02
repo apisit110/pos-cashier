@@ -11,6 +11,8 @@
     "start": "node dist/main.js"
   },
   "dependencies": {
+    "@lightning-pos/database": "workspace:*",
+    "@lightning-pos/model": "workspace:*",
     "better-sqlite3": "^12.9.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -25,7 +27,6 @@
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^24.0.0",
-    "drizzle-kit": "^0.31.10",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.7.3"

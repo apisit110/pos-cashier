@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { createDatabase } from './infrastructure/database/DatabaseImpl';
+import { createDatabase } from '@lightning-pos/database';
 import { SqliteTerminalRepositoryImpl } from './infrastructure/repositories/SqliteTerminalRepositoryImpl';
 import { ActivateTerminalUseCase } from './domain/use-cases/ActivateTerminalUseCase';
 import { createApp } from './presentation/app';

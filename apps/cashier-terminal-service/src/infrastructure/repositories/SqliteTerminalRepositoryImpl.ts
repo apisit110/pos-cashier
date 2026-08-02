@@ -2,7 +2,7 @@ import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
 import { Terminal } from '../../domain/entities/Terminal';
 import { ITerminalRepository } from '../../domain/repositories/ITerminalRepository';
-import * as schema from '../database/schema';
+import { schema } from '@lightning-pos/model';
 
 export class SqliteTerminalRepositoryImpl implements ITerminalRepository {
   constructor(private readonly db: BetterSQLite3Database<typeof schema>) {}

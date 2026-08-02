@@ -1,4 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization;
@@ -11,10 +14,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
   const token = authHeader.split(' ')[1];
 
   try {
-    const parts = token.split('.');
-    if (parts.length !== 3) throw new Error('Invalid token format');
-
-    const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+    const payload = jwt.verify(token, JWT_SECRET);
     (req as any).user = payload;
     next();
   } catch {

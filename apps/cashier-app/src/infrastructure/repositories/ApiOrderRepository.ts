@@ -19,8 +19,9 @@ export class ApiOrderRepository {
   async checkout(data: {
     items: OrderItemDto[];
     memberId?: string;
-    paymentMethod: 'CASH' | 'CREDIT' | 'QR';
+    paymentMethod: 'CASH';
     receivedAmount?: number;
+    idempotencyKey?: string;
   }): Promise<any> {
     try {
       const response = await api.post('/orders/checkout', data);

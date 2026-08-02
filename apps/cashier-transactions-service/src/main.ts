@@ -1,34 +1,23 @@
 import 'dotenv/config';
-import { createDatabase } from './infrastructure/database/DatabaseImpl';
+import { createDatabase } from '@lightning-pos/database';
 import { SqliteTransactionRepositoryImpl } from './infrastructure/repositories/SqliteTransactionRepositoryImpl';
-import { ApiOrderServiceImpl } from './infrastructure/services/ApiOrderServiceImpl';
-import { ApiProductServiceImpl } from './infrastructure/services/ApiProductServiceImpl';
-import { TransactionIdGeneratorImpl } from './infrastructure/utils/TransactionIdGeneratorImpl';
+import { SqliteOrderServiceImpl } from './infrastructure/services/SqliteOrderServiceImpl';
+import { SqliteProductServiceImpl } from './infrastructure/services/SqliteProductServiceImpl';
 import { GetTransactionsUseCase } from './domain/use-cases/GetTransactionsUseCase';
 import { GetTransactionByIdUseCase } from './domain/use-cases/GetTransactionByIdUseCase';
-import { CreateTransactionUseCase } from './domain/use-cases/CreateTransactionUseCase';
-import { MarkTransactionSyncedUseCase } from './domain/use-cases/MarkTransactionSyncedUseCase';
 import { createApp } from './presentation/app';
 
 const PORT = process.env.PORT ?? 3006;
 
 const db = createDatabase();
 const transactionRepository = new SqliteTransactionRepositoryImpl(db);
-const orderService = new ApiOrderServiceImpl();
-const productService = new ApiProductServiceImpl();
-const idGenerator = new TransactionIdGeneratorImpl();
+const orderService = new SqliteOrderServiceImpl(db);
+const productService = new SqliteProductServiceImpl(db);
 
 const getTransactionsUseCase = new GetTransactionsUseCase(transactionRepository);
 const getTransactionByIdUseCase = new GetTransactionByIdUseCase(transactionRepository, orderService, productService);
-const createTransactionUseCase = new CreateTransactionUseCase(transactionRepository, idGenerator);
-const markTransactionSyncedUseCase = new MarkTransactionSyncedUseCase(transactionRepository);
 
-const app = createApp(
-  getTransactionsUseCase,
-  getTransactionByIdUseCase,
-  createTransactionUseCase,
-  markTransactionSyncedUseCase,
-);
+const app = createApp(getTransactionsUseCase, getTransactionByIdUseCase);
 
 app.listen(PORT, () => {
   console.log(`Transactions Service is running on: http://localhost:${PORT}`);

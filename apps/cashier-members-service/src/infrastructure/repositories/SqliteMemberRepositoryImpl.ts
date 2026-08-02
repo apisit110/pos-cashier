@@ -2,7 +2,7 @@ import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
 import { Member } from '../../domain/entities/Member';
 import { IMemberRepository } from '../../domain/repositories/IMemberRepository';
-import * as schema from '../database/schema';
+import { schema } from '@lightning-pos/model';
 
 export class SqliteMemberRepositoryImpl implements IMemberRepository {
   constructor(private readonly db: BetterSQLite3Database<typeof schema>) {}

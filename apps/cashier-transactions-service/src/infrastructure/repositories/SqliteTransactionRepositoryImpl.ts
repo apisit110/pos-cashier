@@ -2,7 +2,7 @@ import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq, and, gte, lte, like, SQL, count } from 'drizzle-orm';
 import { Transaction } from '../../domain/entities/Transaction';
 import { ITransactionRepository, TransactionFilter } from '../../domain/repositories/ITransactionRepository';
-import * as schema from '../database/schema';
+import { schema } from '@lightning-pos/model';
 
 export class SqliteTransactionRepositoryImpl implements ITransactionRepository {
   constructor(private readonly db: BetterSQLite3Database<typeof schema>) {}

@@ -1,0 +1,22 @@
+{
+  "name": "@lightning-pos/model",
+  "version": "0.0.1",
+  "private": true,
+  "license": "UNLICENSED",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.2"
+  },
+  "devDependencies": {
+    "@lightning-pos/tsconfig": "workspace:*",
+    "@types/node": "^24.0.0",
+    "typescript": "^5.7.3"
+  }
+}

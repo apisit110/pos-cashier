@@ -4,7 +4,7 @@ import { eq, and, lt } from 'drizzle-orm';
 import { Product } from '../../domain/entities/Product';
 import { SyncOutboxEntry } from '../../domain/entities/SyncOutboxEntry';
 import { ISyncOutboxRepository } from '../../domain/repositories/ISyncOutboxRepository';
-import * as schema from '../database/schema';
+import { schema } from '@lightning-pos/model';
 
 const MAX_RETRIES = 5;
 

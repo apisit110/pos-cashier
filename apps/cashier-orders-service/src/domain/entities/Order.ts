@@ -24,7 +24,8 @@ export class Order {
     public readonly terminalId?: string,
     public status: OrderStatus = OrderStatus.PENDING,
     public isSynced: boolean = false,
-    public readonly memberId?: string
+    public readonly memberId?: string,
+    public readonly idempotencyKey?: string,
   ) {}
 
   markAsPaid() {

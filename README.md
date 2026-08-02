@@ -19,6 +19,50 @@ Functional
 - [x] - ดูพนักงานในระบบ
 - [x] - สร้างพนักงานในระบบ
 
+
+---
+
+### onboard - offline mode
+- กำหนด env ใน cashier แล้วใช้ได้เลย
+- MANAGER_USERNAME
+- MANAGER_NAME
+- MANAGER_PIN
+- MID
+- MERCHANT_ID
+- STORE_ID
+- TERMINAL_ID
+### onboard - online mode
+- สร้างที่ center แล้วได้ค่าต่างมากำหนด env ใน cashier
+
+### login - offline mode
+
+- ใช้ username pin ตอน onboard
+
+### login - online mode
+
+- ใช้ username pin ตอน onboard
+- จากนั้นเช็คกับ center
+
+### product - create - offline mode
+
+### product - create - online mode
+
+สร้างสินค้าแล้ว sync ไปยัง center ด้วย
+
+
+### product - edit - offline mode
+### product - edit - online mode
+
+### product - sync - online mode
+
+### sell - create - offline mode
+### sell - create - online mode
+
+
+
+
+---
+
 Set up
 
 environment
@@ -31,30 +75,30 @@ User Access Management (UAM)
 
 | Action           | Manager | Cashier |
 | ---------------- | ------- | ------- |
-| Login            | [x]     | [x]     |
-| View Dashboard   | [x]     | [ ]     |
-| Sell             | [x]     | [x]     |
-| View Transaction | [x]     | [ ]     |
-| View Products    | [x]     | [ ]     |
-| Sync Products    | [x]     | [ ]     |
-| Create Product   | [x]     | [ ]     |
-| View Staff       | [x]     | [ ]     |
-| Create Staff     | [x]     | [ ]     |
+| login            | [x]     | [x]     |
+| dashboard:view   | [x]     | [ ]     |
+| sell:create      | [x]     | [x]     |
+| transaction:view | [x]     | [ ]     |
+| products:view    | [x]     | [ ]     |
+| product:create   | [x]     | [ ]     |
+| products:sync    | [x]     | [ ]     |
+| staff:view       | [x]     | [ ]     |
+| staff:create     | [x]     | [ ]     |
 
 ---
 
+All services share a single SQLite database (`pos-cashier.db` at the repo root):
+
+- `packages/model` (`@lightning-pos/model`) defines the schema (drizzle tables) for every service.
+- `packages/database` (`@lightning-pos/database`) owns the drizzle migrations and connects/migrates the shared db (`createDatabase()`), plus domain-specific seed functions (`seedAuth`, `seedTerminal`) that services call at startup.
+
 ```bash
 # remove drizzle folder and generate again
-rm -rf apps/*/drizzle
-rm -rf apps/*/*-service.db
+rm -rf packages/database/drizzle
+rm -f pos-cashier.db pos-cashier.db-*
 
-pnpm --filter pos-cashier-payment-service exec drizzle-kit generate --name pos-cashier-payment-service.db
-pnpm --filter pos-cashier-authen-service exec drizzle-kit generate --name pos-cashier-authen-service.db
-pnpm --filter pos-cashier-products-service exec drizzle-kit generate --name pos-cashier-products-service.db
-pnpm --filter pos-cashier-members-service exec drizzle-kit generate --name pos-cashier-members-service.db
-pnpm --filter pos-cashier-transactions-service exec drizzle-kit generate --name pos-cashier-transactions-service.db
-pnpm --filter pos-cashier-orders-service exec drizzle-kit generate --name pos-cashier-orders-service.db
-pnpm --filter pos-cashier-terminal-service exec drizzle-kit generate --name pos-cashier-terminal-service.db
+pnpm --filter @lightning-pos/model build
+pnpm --filter @lightning-pos/database db:generate
 pnpm run dev
 ```
 
@@ -79,8 +123,6 @@ todo
 
 - [ ] - receipt
 - [ ] - void (HOLD)
-
-
 
 - client -> order-service - /checkout
 - order-service -> payment-service - /payment/internal

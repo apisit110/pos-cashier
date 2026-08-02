@@ -2,7 +2,7 @@ import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { and, like, eq, SQL } from 'drizzle-orm';
 import { Product } from '../../domain/entities/Product';
 import { IProductRepository, ProductFilters, UpdateProductInput } from '../../domain/repositories/IProductRepository';
-import * as schema from '../database/schema';
+import { schema } from '@lightning-pos/model';
 
 export class SqliteProductRepositoryImpl implements IProductRepository {
   constructor(private readonly db: BetterSQLite3Database<typeof schema>) {}

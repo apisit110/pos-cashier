@@ -7,9 +7,16 @@ export class SyncProductsUseCase {
     private readonly productRepository: IProductRepository,
     private readonly syncMetadataRepository: ISyncMetadataRepository,
     private readonly productSyncGateway: IProductSyncGateway,
+    private readonly appMode: 'online' | 'offline' = 'online',
   ) {}
 
   async execute(mid?: string, sid?: string): Promise<{ success: boolean; count: number }> {
+    if (this.appMode === 'offline') {
+      console.warn('[SyncProductsUseCase] Skipped: APP_MODE=offline');
+      await this.syncMetadataRepository.updateStatus('ERROR');
+      return { success: false, count: 0 };
+    }
+
     try {
       if (!mid || !sid) {
         throw new Error('MID and SID are required for product synchronization');

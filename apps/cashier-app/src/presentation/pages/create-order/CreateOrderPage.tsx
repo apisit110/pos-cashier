@@ -55,6 +55,10 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
   const [isIdentifyingMember, setIsIdentifyingMember] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Stays the same across retries of one checkout attempt (e.g. network timeout, double-submit)
+  // so the backend can dedupe instead of charging/creating an order twice. Cleared whenever the
+  // modal (re)opens for a fresh cart.
+  const checkoutIdempotencyKeyRef = useRef<string | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const memberInputRef = useRef<HTMLInputElement>(null);
@@ -205,9 +209,13 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
     setPromotionResult(null);
     setBarcodeInput('');
     setError(null);
+    checkoutIdempotencyKeyRef.current = null;
   };
 
   const handleProcessPayment = async (method: 'CASH', receivedAmount?: number) => {
+    if (!checkoutIdempotencyKeyRef.current) {
+      checkoutIdempotencyKeyRef.current = crypto.randomUUID();
+    }
     const itemDtos = items.map(i => ({
       productId: i.product.id,
       quantity: i.quantity,
@@ -217,7 +225,8 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
       items: itemDtos,
       memberId: member?.id,
       paymentMethod: method,
-      receivedAmount
+      receivedAmount,
+      idempotencyKey: checkoutIdempotencyKeyRef.current
     });
   };
 
@@ -419,7 +428,10 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
 
       <PaymentModal
         isOpen={isPaymentModalOpen}
-        onClose={() => setIsPaymentModalOpen(false)}
+        onClose={() => {
+          setIsPaymentModalOpen(false);
+          checkoutIdempotencyKeyRef.current = null;
+        }}
         totalAmount={total}
         onPaymentSuccess={handlePaymentSuccess}
         onProcessPayment={handleProcessPayment}
