@@ -10,7 +10,6 @@ export class Staff {
     public readonly username: string,
     public readonly roleId: number,
     public readonly fullName: string,
-    public readonly pinHash: string,
     public readonly status: StaffStatus,
     public readonly syncId: string | null,
     public readonly updatedAt: Date,

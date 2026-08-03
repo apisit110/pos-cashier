@@ -35,6 +35,9 @@ const orderRepository = new ApiOrderRepository();
 const scanUseCase = new ScanProductUseCase(productRepository);
 const identifyMemberUseCase = new IdentifyMemberUseCase(memberRepository);
 
+// Member system temporarily hidden from UI
+const SHOW_MEMBER_SECTION = false;
+
 interface CreateOrderPageProps {
   onBack?: () => void;
   onLogout?: () => void;
@@ -306,39 +309,41 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
 
       <Main>
         <ScannerPanel>
-          <MemberSection>
-            <h3>{t.createOrder.member}</h3>
-            {member ? (
-              <MemberCard>
-                <div className="member-info">
-                  <span className="member-name">{member.fullName}</span>
-                  <div className="member-sub-info">
-                    <span className="member-points">{member.points} {t.createOrder.points}</span>
+          {SHOW_MEMBER_SECTION && (
+            <MemberSection>
+              <h3>{t.createOrder.member}</h3>
+              {member ? (
+                <MemberCard>
+                  <div className="member-info">
+                    <span className="member-name">{member.fullName}</span>
+                    <div className="member-sub-info">
+                      <span className="member-points">{member.points} {t.createOrder.points}</span>
+                    </div>
                   </div>
-                </div>
-                <button className="remove-btn" onClick={handleRemoveMember}>&times;</button>
-              </MemberCard>
-            ) : (
-              <form onSubmit={handleIdentifyMember}>
-                <InputField
-                  label={t.createOrder.memberId}
-                  value={memberInput}
-                  onChange={(e) => setMemberInput(e.target.value)}
-                  placeholder={t.createOrder.memberIdPlaceholder}
-                  disabled={isIdentifyingMember}
-                  ref={memberInputRef}
-                />
-                <Button
-                  type="submit"
-                  variant="secondary"
-                  isLoading={isIdentifyingMember}
-                  style={{ marginTop: '0.5rem' }}
-                >
-                  {t.createOrder.identify}
-                </Button>
-              </form>
-            )}
-          </MemberSection>
+                  <button className="remove-btn" onClick={handleRemoveMember}>&times;</button>
+                </MemberCard>
+              ) : (
+                <form onSubmit={handleIdentifyMember}>
+                  <InputField
+                    label={t.createOrder.memberId}
+                    value={memberInput}
+                    onChange={(e) => setMemberInput(e.target.value)}
+                    placeholder={t.createOrder.memberIdPlaceholder}
+                    disabled={isIdentifyingMember}
+                    ref={memberInputRef}
+                  />
+                  <Button
+                    type="submit"
+                    variant="secondary"
+                    isLoading={isIdentifyingMember}
+                    style={{ marginTop: '0.5rem' }}
+                  >
+                    {t.createOrder.identify}
+                  </Button>
+                </form>
+              )}
+            </MemberSection>
+          )}
 
           <ScannerSection>
             <h3>{t.createOrder.scanProduct}</h3>

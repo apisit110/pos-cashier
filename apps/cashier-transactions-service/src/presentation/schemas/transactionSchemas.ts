@@ -13,3 +13,12 @@ export const GetTransactionsFilterSchema = z.object({
 });
 
 export type GetTransactionsFilter = z.infer<typeof GetTransactionsFilterSchema>;
+
+export const GetTransactionSummaryQuerySchema = z.object({
+  period: z.enum(['hourly', 'daily']),
+  startDate: z.string(),
+  endDate: z.string(),
+  storeId: z.string().optional(),
+});
+
+export type GetTransactionSummaryQuery = z.infer<typeof GetTransactionSummaryQuerySchema>;

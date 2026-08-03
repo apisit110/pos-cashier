@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET as string;
+import { JWT_SECRET, JWT_ISSUER, JWT_AUDIENCE } from '../../config/jwt';
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization;
@@ -14,10 +13,24 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
   const token = authHeader.split(' ')[1];
 
   try {
-    const payload = jwt.verify(token, JWT_SECRET);
+    const payload = jwt.verify(token, JWT_SECRET, { issuer: JWT_ISSUER, audience: JWT_AUDIENCE });
     (req as any).user = payload;
     next();
   } catch {
     res.status(401).json({ message: 'Invalid or expired token' });
   }
+}
+
+export function requireScope(requiredScope: string) {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const scope = ((req as any).user?.scope as string | undefined) ?? '';
+    const grantedScopes = scope.split(' ');
+
+    if (!grantedScopes.includes(requiredScope)) {
+      res.status(403).json({ message: 'Insufficient scope' });
+      return;
+    }
+
+    next();
+  };
 }

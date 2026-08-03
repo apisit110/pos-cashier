@@ -1,16 +1,16 @@
-'use client'
-import dynamic from 'next/dynamic'
-import { StyledThemeProvider } from '../presentation/StyledThemeProvider'
-import { LanguageProvider } from '../presentation/i18n/LanguageProvider'
+'use client';
 
-const App = dynamic(() => import('../App'), { ssr: false })
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth, homeRouteFor } from '../presentation/auth/AuthContext';
 
-export default function Page() {
-  return (
-    <StyledThemeProvider>
-      <LanguageProvider>
-        <App />
-      </LanguageProvider>
-    </StyledThemeProvider>
-  )
+export default function RootPage() {
+  const { staff } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace(staff ? homeRouteFor(staff.roleId) : '/login');
+  }, [staff, router]);
+
+  return null;
 }

@@ -1,4 +1,4 @@
-import dayjs from './date';
+import dayjs from '@lightning-pos/datetime';
 import { customAlphabet } from 'nanoid';
 
 const generateRandom = customAlphabet('0123456789', 1);

@@ -47,6 +47,15 @@ export interface Translations {
     welcomeBack: string;
     subtitle: string;
     admin: string;
+    todayRevenue: string;
+    todayOrders: string;
+    rangeRevenue: string;
+    rangeOrders: string;
+    hourlyChartTitle: string;
+    dailyChartTitle: string;
+    loading: string;
+    noSalesToday: string;
+    noSalesRecent: string;
   };
   createOrder: {
     title: string;
@@ -264,6 +273,15 @@ export const en: Translations = {
     welcomeBack: 'Welcome back, {name}',
     subtitle: "Here's what's happening with your store today.",
     admin: 'Admin',
+    todayRevenue: "Today's Revenue",
+    todayOrders: "Today's Orders",
+    rangeRevenue: 'Last {days} Days Revenue',
+    rangeOrders: 'Last {days} Days Orders',
+    hourlyChartTitle: 'Sales by Hour (Today)',
+    dailyChartTitle: 'Sales by Day (Last {days} Days)',
+    loading: 'Loading summary...',
+    noSalesToday: 'No sales yet today.',
+    noSalesRecent: 'No sales in this period.',
   },
   createOrder: {
     title: 'POS Terminal',
@@ -481,6 +499,15 @@ export const th: Translations = {
     welcomeBack: 'ยินดีต้อนรับกลับ, {name}',
     subtitle: 'นี่คือความเคลื่อนไหวของร้านคุณในวันนี้',
     admin: 'ผู้ดูแลระบบ',
+    todayRevenue: 'ยอดขายวันนี้',
+    todayOrders: 'จำนวนออเดอร์วันนี้',
+    rangeRevenue: 'ยอดขาย {days} วันล่าสุด',
+    rangeOrders: 'จำนวนออเดอร์ {days} วันล่าสุด',
+    hourlyChartTitle: 'ยอดขายรายชั่วโมง (วันนี้)',
+    dailyChartTitle: 'ยอดขายรายวัน ({days} วันล่าสุด)',
+    loading: 'กำลังโหลดข้อมูลสรุป...',
+    noSalesToday: 'ยังไม่มียอดขายวันนี้',
+    noSalesRecent: 'ไม่มียอดขายในช่วงเวลานี้',
   },
   createOrder: {
     title: 'เครื่องขาย POS',

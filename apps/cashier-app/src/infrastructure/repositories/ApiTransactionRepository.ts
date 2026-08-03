@@ -1,5 +1,11 @@
 import api from '../api/axiosInstance';
-import type { Transaction, TransactionRepository, TransactionFilter } from '../../domain/repositories/TransactionRepository';
+import type {
+  Transaction,
+  TransactionRepository,
+  TransactionFilter,
+  TransactionSummaryFilter,
+  TransactionSummaryBucket,
+} from '../../domain/repositories/TransactionRepository';
 
 export class ApiTransactionRepository implements TransactionRepository {
   async getTransactions(page: number, limit: number, filter?: TransactionFilter): Promise<{ transactions: Transaction[]; total: number }> {
@@ -40,5 +46,13 @@ export class ApiTransactionRepository implements TransactionRepository {
         total: item.total,
       })),
     };
+  }
+
+  async getSummary(filter: TransactionSummaryFilter): Promise<TransactionSummaryBucket[]> {
+    const response = await api.get<{ buckets: TransactionSummaryBucket[] }>('/transactions/summary', {
+      params: filter,
+    });
+
+    return response.data.buckets;
   }
 }

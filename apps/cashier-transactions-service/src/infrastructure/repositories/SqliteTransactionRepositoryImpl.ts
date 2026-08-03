@@ -1,7 +1,12 @@
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import { eq, and, gte, lte, like, SQL, count } from 'drizzle-orm';
+import { eq, and, gte, lte, like, SQL, count, sql } from 'drizzle-orm';
 import { Transaction } from '../../domain/entities/Transaction';
-import { ITransactionRepository, TransactionFilter } from '../../domain/repositories/ITransactionRepository';
+import {
+  ITransactionRepository,
+  TransactionFilter,
+  TransactionSummaryFilter,
+  TransactionSummaryBucket,
+} from '../../domain/repositories/ITransactionRepository';
 import { schema } from '@lightning-pos/model';
 
 export class SqliteTransactionRepositoryImpl implements ITransactionRepository {
@@ -93,6 +98,37 @@ export class SqliteTransactionRepositoryImpl implements ITransactionRepository {
       .update(schema.transactions)
       .set({ isSynced: transaction.isSynced, status: transaction.status })
       .where(eq(schema.transactions.id, transaction.id));
+  }
+
+  async getSummary(filter: TransactionSummaryFilter): Promise<TransactionSummaryBucket[]> {
+    const bucketExpr =
+      filter.period === 'hourly'
+        ? sql`strftime('%Y-%m-%d %H:00', ${schema.transactions.createdAt}, 'unixepoch', 'localtime')`
+        : sql`strftime('%Y-%m-%d', ${schema.transactions.createdAt}, 'unixepoch', 'localtime')`;
+
+    const whereConditions: SQL[] = [
+      eq(schema.transactions.status, 'SUCCESS'),
+      gte(schema.transactions.createdAt, filter.startDate),
+      lte(schema.transactions.createdAt, filter.endDate),
+    ];
+    if (filter.storeId) whereConditions.push(eq(schema.transactions.storeId, filter.storeId));
+
+    const results = await this.db
+      .select({
+        bucket: bucketExpr.as('bucket'),
+        orderCount: count().as('orderCount'),
+        totalAmount: sql<number>`sum(${schema.transactions.amount})`.as('totalAmount'),
+      })
+      .from(schema.transactions)
+      .where(and(...whereConditions))
+      .groupBy(bucketExpr)
+      .orderBy(bucketExpr);
+
+    return results.map((r) => ({
+      bucket: r.bucket as unknown as string,
+      orderCount: Number(r.orderCount),
+      totalAmount: Number(r.totalAmount) || 0,
+    }));
   }
 
   private mapToEntity(result: any): Transaction {

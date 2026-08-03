@@ -5,6 +5,7 @@ import { SqliteOrderServiceImpl } from './infrastructure/services/SqliteOrderSer
 import { SqliteProductServiceImpl } from './infrastructure/services/SqliteProductServiceImpl';
 import { GetTransactionsUseCase } from './domain/use-cases/GetTransactionsUseCase';
 import { GetTransactionByIdUseCase } from './domain/use-cases/GetTransactionByIdUseCase';
+import { GetTransactionSummaryUseCase } from './domain/use-cases/GetTransactionSummaryUseCase';
 import { createApp } from './presentation/app';
 
 const PORT = process.env.PORT ?? 3006;
@@ -16,8 +17,9 @@ const productService = new SqliteProductServiceImpl(db);
 
 const getTransactionsUseCase = new GetTransactionsUseCase(transactionRepository);
 const getTransactionByIdUseCase = new GetTransactionByIdUseCase(transactionRepository, orderService, productService);
+const getTransactionSummaryUseCase = new GetTransactionSummaryUseCase(transactionRepository);
 
-const app = createApp(getTransactionsUseCase, getTransactionByIdUseCase);
+const app = createApp(getTransactionsUseCase, getTransactionByIdUseCase, getTransactionSummaryUseCase);
 
 app.listen(PORT, () => {
   console.log(`Transactions Service is running on: http://localhost:${PORT}`);

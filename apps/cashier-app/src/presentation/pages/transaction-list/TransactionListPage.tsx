@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import dayjs, { formatDateTime } from '../../utils/date';
+import dayjs, { formatDateTime } from '@lightning-pos/datetime';
 import {
   PageHeader, DataTable, Badge, PageContainer, PageContent,
   FilterBar, DateFilter, TextFilter, SelectFilter, ClearFilterButton,

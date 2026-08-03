@@ -8,7 +8,7 @@ import { LoadingState } from './LoadingState';
 import { Spinner } from './Spinner';
 import type { GetTransactionByIdUseCase } from '../../../domain/use-cases/GetTransactionByIdUseCase';
 import type { Transaction, OrderItem } from '../../../domain/repositories/TransactionRepository';
-import { formatDateTime } from '../../utils/date';
+import { formatDateTime } from '@lightning-pos/datetime';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { formatMessage } from '../../i18n/format';
 import type { Translations } from '../../i18n/translations';

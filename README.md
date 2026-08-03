@@ -19,10 +19,10 @@ Functional
 - [x] - ดูพนักงานในระบบ
 - [x] - สร้างพนักงานในระบบ
 
-
 ---
 
 ### onboard - offline mode
+
 - กำหนด env ใน cashier แล้วใช้ได้เลย
 - MANAGER_USERNAME
 - MANAGER_NAME
@@ -31,7 +31,9 @@ Functional
 - MERCHANT_ID
 - STORE_ID
 - TERMINAL_ID
+
 ### onboard - online mode
+
 - สร้างที่ center แล้วได้ค่าต่างมากำหนด env ใน cashier
 
 ### login - offline mode
@@ -49,17 +51,15 @@ Functional
 
 สร้างสินค้าแล้ว sync ไปยัง center ด้วย
 
-
 ### product - edit - offline mode
+
 ### product - edit - online mode
 
 ### product - sync - online mode
 
 ### sell - create - offline mode
+
 ### sell - create - online mode
-
-
-
 
 ---
 
@@ -73,17 +73,17 @@ environment
 
 User Access Management (UAM)
 
-| Action           | Manager | Cashier |
-| ---------------- | ------- | ------- |
-| login            | [x]     | [x]     |
-| dashboard:view   | [x]     | [ ]     |
-| sell:create      | [x]     | [x]     |
-| transaction:view | [x]     | [ ]     |
-| products:view    | [x]     | [ ]     |
-| product:create   | [x]     | [ ]     |
-| products:sync    | [x]     | [ ]     |
-| staff:view       | [x]     | [ ]     |
-| staff:create     | [x]     | [ ]     |
+| Action           | Guest | Manager | Cashier |
+| ---------------- | ----- | ------- | ------- |
+| login            | [x]   | [ ]     | [ ]     |
+| dashboard:view   | [ ]   | [x]     | [ ]     |
+| sell:create      | [ ]   | [x]     | [x]     |
+| transaction:view | [ ]   | [x]     | [ ]     |
+| products:view    | [ ]   | [x]     | [ ]     |
+| product:create   | [ ]   | [x]     | [ ]     |
+| products:sync    | [ ]   | [x]     | [ ]     |
+| staff:view       | [ ]   | [x]     | [ ]     |
+| staff:create     | [ ]   | [x]     | [ ]     |
 
 ---
 

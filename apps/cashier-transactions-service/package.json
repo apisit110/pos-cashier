@@ -9,10 +9,10 @@
   },
   "dependencies": {
     "@lightning-pos/database": "workspace:*",
+    "@lightning-pos/datetime": "workspace:*",
     "@lightning-pos/model": "workspace:*",
     "better-sqlite3": "^12.9.0",
     "cors": "^2.8.5",
-    "dayjs": "^1.11.20",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.45.2",
     "express": "^4.19.2",
@@ -25,6 +25,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/node": "^24.0.0",
+    "dayjs": "^1.11.20",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.7.3"

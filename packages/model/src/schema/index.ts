@@ -1,5 +1,6 @@
 export * from './roles';
 export * from './staffs';
+export * from './staffPins';
 export * from './rolePermissions';
 export * from './members';
 export * from './orders';

@@ -44,7 +44,6 @@ export class SqliteStaffRepositoryImpl implements IStaffRepository {
     username: string;
     fullName: string;
     roleId: number;
-    pinHash: string;
     status: string;
   }): Promise<Staff> {
     const [result] = await this.db
@@ -53,7 +52,6 @@ export class SqliteStaffRepositoryImpl implements IStaffRepository {
         username: staffData.username,
         fullName: staffData.fullName,
         roleId: staffData.roleId,
-        pinHash: staffData.pinHash,
         status: staffData.status as any,
         updatedAt: new Date(),
       })
@@ -87,7 +85,6 @@ export class SqliteStaffRepositoryImpl implements IStaffRepository {
       result.username,
       result.roleId,
       result.fullName,
-      result.pinHash,
       result.status as StaffStatus,
       result.syncId,
       result.updatedAt,

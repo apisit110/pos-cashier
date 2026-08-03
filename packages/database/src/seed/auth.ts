@@ -20,13 +20,22 @@ export function seedRoles(db: any) {
 export function seedPermissions(db: any) {
   const permissions = [
     // Manager permissions
-    ...['manage_users', 'manage_products', 'view_transactions', 'void_orders'].map(p => ({
+    ...[
+      'dashboard:view',
+      'sell:create',
+      'transaction:view',
+      'products:view',
+      'product:create',
+      'products:sync',
+      'staff:view',
+      'staff:create',
+    ].map(p => ({
       roleId: 1,
       permissionKey: p,
       isGranted: true,
     })),
     // Cashier permissions
-    ...['create_orders', 'view_products'].map(p => ({
+    ...['sell:create'].map(p => ({
       roleId: 2,
       permissionKey: p,
       isGranted: true,
@@ -51,12 +60,11 @@ export function seedStaffs(db: any) {
     throw new Error('MANAGER_USERNAME, MANAGER_NAME, and MANAGER_PIN must be defined in environment variables');
   }
 
-  db.insert(schema.staffs)
+  const [manager] = db.insert(schema.staffs)
     .values({
       username: managerUsername,
       roleId: 1,
       fullName: managerName,
-      pinHash: managerPin,
       status: 'active',
       updatedAt: new Date(),
     })
@@ -64,6 +72,22 @@ export function seedStaffs(db: any) {
       target: schema.staffs.username,
       set: {
         fullName: managerName,
+        updatedAt: new Date(),
+      },
+    })
+    .returning()
+    .all();
+
+  db.insert(schema.staffPins)
+    .values({
+      userId: manager.id,
+      pinHash: managerPin,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: schema.staffPins.userId,
+      set: {
         pinHash: managerPin,
         updatedAt: new Date(),
       },

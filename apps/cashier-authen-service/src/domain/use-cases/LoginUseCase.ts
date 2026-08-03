@@ -1,7 +1,7 @@
-import jwt from 'jsonwebtoken';
 import { IStaffRepository } from '../repositories/IStaffRepository';
-
-const JWT_SECRET = process.env.JWT_SECRET as string;
+import { IStaffPinRepository } from '../repositories/IStaffPinRepository';
+import { IPermissionRepository } from '../repositories/IPermissionRepository';
+import { generateTokenPair } from '../../infrastructure/auth/TokenService';
 
 export class UnauthorizedError extends Error {
   constructor(message: string) {
@@ -11,24 +11,39 @@ export class UnauthorizedError extends Error {
 }
 
 export class LoginUseCase {
-  constructor(private readonly staffRepository: IStaffRepository) {}
+  constructor(
+    private readonly staffRepository: IStaffRepository,
+    private readonly staffPinRepository: IStaffPinRepository,
+    private readonly permissionRepository: IPermissionRepository,
+  ) {}
 
   async execute(username: string, pin: string) {
     const staff = await this.staffRepository.findByUsername(username);
 
-    if (!staff || staff.pinHash !== pin) {
+    if (!staff) {
       throw new UnauthorizedError('Invalid credentials');
     }
 
+    const staffPin = await this.staffPinRepository.findByUserId(staff.id);
+
+    if (!staffPin || staffPin.pinHash !== pin) {
+      throw new UnauthorizedError('Invalid credentials');
+    }
+
+    const permissions = await this.permissionRepository.findByRoleId(staff.roleId);
+    const scope = permissions
+      .filter((permission) => permission.isGranted)
+      .map((permission) => permission.permissionKey)
+      .join(' ');
+
     const payload = {
-      sub: staff.id,
       username: staff.username,
       fullName: staff.fullName,
       roleId: staff.roleId,
+      scope,
     };
 
-    const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '60m' });
-    const refreshToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '30d' });
+    const { accessToken, refreshToken } = generateTokenPair(String(staff.id), payload);
 
     return {
       staff: {

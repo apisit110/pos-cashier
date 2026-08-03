@@ -24,12 +24,12 @@ importers:
 
   apps/cashier-api-gateway:
     dependencies:
+      '@lightning-pos/datetime':
+        specifier: workspace:*
+        version: link:../../packages/datetime
       cors:
         specifier: ^2.8.5
         version: 2.8.6
-      dayjs:
-        specifier: ^1.11.20
-        version: 1.11.20
       dotenv:
         specifier: ^16.4.7
         version: 16.6.1
@@ -52,6 +52,9 @@ importers:
       '@types/node':
         specifier: ^24.0.0
         version: 24.12.2
+      dayjs:
+        specifier: ^1.11.20
+        version: 1.11.20
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@24.12.2)(typescript@5.9.3)
@@ -67,12 +70,12 @@ importers:
       '@apisit110/pos-ui':
         specifier: ^0.6.0
         version: 0.6.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(styled-components@6.4.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
+      '@lightning-pos/datetime':
+        specifier: workspace:*
+        version: link:../../packages/datetime
       axios:
         specifier: ^1.7.0
         version: 1.15.0
-      dayjs:
-        specifier: ^1.11.20
-        version: 1.11.20
       next:
         specifier: ^15.3.3
         version: 15.5.19(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -101,6 +104,9 @@ importers:
       '@types/styled-components':
         specifier: ^5.1.36
         version: 5.1.36
+      dayjs:
+        specifier: ^1.11.20
+        version: 1.11.20
       eslint:
         specifier: ^9.39.4
         version: 9.39.4(jiti@2.6.1)
@@ -452,6 +458,9 @@ importers:
       '@lightning-pos/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@lightning-pos/datetime':
+        specifier: workspace:*
+        version: link:../../packages/datetime
       '@lightning-pos/model':
         specifier: workspace:*
         version: link:../../packages/model
@@ -461,9 +470,6 @@ importers:
       cors:
         specifier: ^2.8.5
         version: 2.8.6
-      dayjs:
-        specifier: ^1.11.20
-        version: 1.11.20
       dotenv:
         specifier: ^16.4.7
         version: 16.6.1
@@ -495,6 +501,9 @@ importers:
       '@types/node':
         specifier: ^24.0.0
         version: 24.12.2
+      dayjs:
+        specifier: ^1.11.20
+        version: 1.11.20
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@24.12.2)(typescript@5.9.3)
@@ -535,6 +544,19 @@ importers:
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@24.12.2)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+
+  packages/datetime:
+    dependencies:
+      dayjs:
+        specifier: ^1.11.20
+        version: 1.11.20
+    devDependencies:
+      '@lightning-pos/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       typescript:
         specifier: ^5.7.3
         version: 5.9.3

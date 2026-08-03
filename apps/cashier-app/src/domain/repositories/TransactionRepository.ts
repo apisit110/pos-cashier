@@ -27,7 +27,22 @@ export interface TransactionFilter {
   status?: string;
 }
 
+export type TransactionSummaryPeriod = 'hourly' | 'daily';
+
+export interface TransactionSummaryFilter {
+  period: TransactionSummaryPeriod;
+  startDate: string;
+  endDate: string;
+}
+
+export interface TransactionSummaryBucket {
+  bucket: string;
+  orderCount: number;
+  totalAmount: number;
+}
+
 export interface TransactionRepository {
   getTransactions(page: number, limit: number, filter?: TransactionFilter): Promise<{ transactions: Transaction[]; total: number }>;
   getTransactionById(id: string): Promise<Transaction>;
+  getSummary(filter: TransactionSummaryFilter): Promise<TransactionSummaryBucket[]>;
 }

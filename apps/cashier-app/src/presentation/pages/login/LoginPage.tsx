@@ -87,6 +87,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             onChange={(e) => setUsername(e.target.value)}
             placeholder={t.login.usernamePlaceholder}
             disabled={isLoading}
+            autoFocus
           />
 
           <PinInputField

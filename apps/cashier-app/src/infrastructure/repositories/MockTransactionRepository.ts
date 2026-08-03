@@ -1,4 +1,10 @@
-import type { Transaction, TransactionRepository, TransactionFilter } from '../../domain/repositories/TransactionRepository';
+import type {
+  Transaction,
+  TransactionRepository,
+  TransactionFilter,
+  TransactionSummaryFilter,
+  TransactionSummaryBucket,
+} from '../../domain/repositories/TransactionRepository';
 
 export class MockTransactionRepository implements TransactionRepository {
   private transactions: Transaction[] = [
@@ -120,5 +126,29 @@ export class MockTransactionRepository implements TransactionRepository {
       throw new Error(`Transaction with ID ${id} not found`);
     }
     return transaction;
+  }
+
+  async getSummary(filter: TransactionSummaryFilter): Promise<TransactionSummaryBucket[]> {
+    const start = new Date(filter.startDate);
+    const end = new Date(filter.endDate);
+    const buckets = new Map<string, TransactionSummaryBucket>();
+
+    for (const t of this.transactions) {
+      if (t.status !== 'success') continue;
+      const createdAt = new Date(t.createdAt);
+      if (createdAt < start || createdAt > end) continue;
+
+      const bucketKey =
+        filter.period === 'hourly'
+          ? createdAt.toISOString().slice(0, 13) + ':00'
+          : createdAt.toISOString().slice(0, 10);
+
+      const existing = buckets.get(bucketKey) ?? { bucket: bucketKey, orderCount: 0, totalAmount: 0 };
+      existing.orderCount += 1;
+      existing.totalAmount += t.amount;
+      buckets.set(bucketKey, existing);
+    }
+
+    return Array.from(buckets.values()).sort((a, b) => a.bucket.localeCompare(b.bucket));
   }
 }

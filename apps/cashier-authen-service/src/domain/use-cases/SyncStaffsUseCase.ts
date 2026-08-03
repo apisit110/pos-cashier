@@ -1,4 +1,5 @@
 import { IStaffRepository } from '../repositories/IStaffRepository';
+import { IStaffPinRepository } from '../repositories/IStaffPinRepository';
 import { IStaffSyncGateway } from '../ports/IStaffSyncGateway';
 import { StaffStatus } from '../entities/Staff';
 
@@ -8,6 +9,7 @@ export class SyncStaffsUseCase {
 
   constructor(
     private readonly staffRepository: IStaffRepository,
+    private readonly staffPinRepository: IStaffPinRepository,
     private readonly staffSyncGateway: IStaffSyncGateway,
   ) {}
 
@@ -19,15 +21,20 @@ export class SyncStaffsUseCase {
         return { success: true, results: [] };
       }
 
-      const syncStaffs = staffs.map((staff) => ({
-        userId: staff.username,
-        fullName: staff.fullName,
-        pinHash: staff.pinHash,
-        roleId: staff.roleId,
-        branchIds: this.ACCESSIBLE_BRANCH_IDS,
-        status: (staff.status === StaffStatus.INACTIVE ? 'inactive' : 'active') as 'active' | 'inactive',
-        originBranchId: this.ORIGIN_BRANCH_ID,
-      }));
+      const syncStaffs = await Promise.all(
+        staffs.map(async (staff) => {
+          const staffPin = await this.staffPinRepository.findByUserId(staff.id);
+          return {
+            userId: staff.username,
+            fullName: staff.fullName,
+            pinHash: staffPin?.pinHash ?? '',
+            roleId: staff.roleId,
+            branchIds: this.ACCESSIBLE_BRANCH_IDS,
+            status: (staff.status === StaffStatus.INACTIVE ? 'inactive' : 'active') as 'active' | 'inactive',
+            originBranchId: this.ORIGIN_BRANCH_ID,
+          };
+        }),
+      );
 
       const response = await this.staffSyncGateway.syncStaffs({ staffs: syncStaffs });
 

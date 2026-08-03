@@ -1,10 +1,14 @@
+'use client';
+
 import React from 'react';
 import styled from 'styled-components';
+import { usePathname, useRouter } from 'next/navigation';
 import { Sidebar, TopBar } from '@apisit110/pos-ui';
-import { LayoutContainer } from './LayoutContainer';
-import { MainContent } from './MainContent';
+import { LayoutContainer } from '../LayoutContainer';
+import { MainContent } from '../MainContent';
 import { useThemeMode } from '../../ThemeContext';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { useAuth } from '../../auth/AuthContext';
 
 const RightColumn = styled.div`
   flex: 1;
@@ -62,56 +66,46 @@ const StaffIcon = () => (
 
 interface MainLayoutProps {
   children: React.ReactNode;
-  currentView: string;
-  staff: { username: string; role: string } | null;
-  onNavigate: (view: any) => void;
-  onLogout: () => void;
 }
 
-export const MainLayout: React.FC<MainLayoutProps> = ({
-  children,
-  currentView,
-  staff,
-  onNavigate,
-  onLogout,
-}) => {
+export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const { mode, toggleTheme } = useThemeMode();
   const { t, language, setLanguage } = useTranslation();
+  const { staff, logout } = useAuth();
+  const pathname = usePathname();
+  const router = useRouter();
 
   const isManager = staff?.role === 'manager';
 
   const navItems = [
-    ...(isManager ? [{ label: t.mainLayout.dashboard, icon: <DashboardIcon />, active: currentView === 'dashboard', onClick: () => onNavigate('dashboard') }] : []),
-    { label: t.mainLayout.posTerminal, icon: <PosIcon />, active: currentView === 'create-order', onClick: () => onNavigate('create-order') },
+    ...(isManager ? [{ label: t.mainLayout.dashboard, icon: <DashboardIcon />, active: pathname === '/dashboard', onClick: () => router.push('/dashboard') }] : []),
+    { label: t.mainLayout.posTerminal, icon: <PosIcon />, active: pathname === '/pos', onClick: () => router.push('/pos') },
     ...(isManager ? [
-      { label: t.mainLayout.transactions, icon: <TransactionIcon />, active: currentView === 'transaction-list', onClick: () => onNavigate('transaction-list') },
-      { label: t.mainLayout.products, icon: <ProductIcon />, active: currentView === 'product-list', onClick: () => onNavigate('product-list') },
-      { label: t.mainLayout.staffs, icon: <StaffIcon />, active: currentView === 'staff-list' || currentView === 'create-staff', onClick: () => onNavigate('staff-list') },
+      { label: t.mainLayout.transactions, icon: <TransactionIcon />, active: pathname.startsWith('/transactions'), onClick: () => router.push('/transactions') },
+      { label: t.mainLayout.products, icon: <ProductIcon />, active: pathname.startsWith('/products'), onClick: () => router.push('/products') },
+      { label: t.mainLayout.staffs, icon: <StaffIcon />, active: pathname.startsWith('/staff'), onClick: () => router.push('/staff') },
     ] : []),
   ];
 
-  const viewTitles: Record<string, string> = {
-    dashboard: t.mainLayout.dashboard,
-    'create-order': t.mainLayout.posTerminal,
-    'transaction-list': t.mainLayout.transactions,
-    'product-list': t.mainLayout.products,
-    'staff-list': t.mainLayout.staffs,
-    'create-staff': t.mainLayout.createStaff,
-  };
-
-  const pageTitle = viewTitles[currentView] ?? t.mainLayout.appName;
+  const pageTitle = (() => {
+    if (pathname === '/dashboard') return t.mainLayout.dashboard;
+    if (pathname === '/pos') return t.mainLayout.posTerminal;
+    if (pathname.startsWith('/transactions')) return t.mainLayout.transactions;
+    if (pathname.startsWith('/products')) return t.mainLayout.products;
+    if (pathname === '/staff/create') return t.mainLayout.createStaff;
+    if (pathname.startsWith('/staff')) return t.mainLayout.staffs;
+    return t.mainLayout.appName;
+  })();
 
   return (
     <LayoutContainer>
-      {currentView !== 'create-order' && (
-        <Sidebar
-          logoTitle={t.mainLayout.appName}
-          logoIcon={<LogoIcon />}
-          navItems={navItems}
-          user={staff ? { name: staff.username, subtitle: staff.role } : undefined}
-          onLogout={onLogout}
-        />
-      )}
+      <Sidebar
+        logoTitle={t.mainLayout.appName}
+        logoIcon={<LogoIcon />}
+        navItems={navItems}
+        user={staff ? { name: staff.username, subtitle: staff.role } : undefined}
+        onLogout={logout}
+      />
       <RightColumn>
         <TopBar
           title={pageTitle}

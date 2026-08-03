@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import StyledComponentsRegistry from '../lib/registry'
+import { Providers } from './providers'
 
 export const metadata: Metadata = {
   title: 'POS Cashier',
@@ -10,7 +11,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <StyledComponentsRegistry>
-          {children}
+          <Providers>{children}</Providers>
         </StyledComponentsRegistry>
       </body>
     </html>

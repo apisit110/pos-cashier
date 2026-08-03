@@ -1,9 +1,6 @@
 import crypto from 'crypto';
 import { Request, Response, NextFunction } from 'express';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-
-dayjs.extend(utc);
+import dayjs, { type Dayjs } from '@lightning-pos/datetime';
 
 function tryParseJson(raw: string): unknown {
   try {
@@ -21,14 +18,14 @@ function logRequest(uuid: string, req: Request) {
   );
 }
 
-function logResponse(uuid: string, reqTime: dayjs.Dayjs, res: Response, body: unknown) {
+function logResponse(uuid: string, reqTime: Dayjs, res: Response, body: unknown) {
   const duration = dayjs.utc().diff(reqTime);
   console.log(
     `[res] [${uuid}] ${dayjs.utc().format()} ${res.statusCode} ${duration}ms body=${JSON.stringify(body)}`,
   );
 }
 
-function logError(uuid: string, reqTime: dayjs.Dayjs, err: unknown) {
+function logError(uuid: string, reqTime: Dayjs, err: unknown) {
   const duration = dayjs.utc().diff(reqTime);
   const message = err instanceof Error ? err.message : String(err);
   console.error(

@@ -21,6 +21,7 @@ Participants ที่ใช้ร่วมกัน:
 3. [Product — edit — offline / online](./03-product-edit.md)
 4. [Product — sync — online](./04-product-sync.md)
 5. [Sell (ขายสินค้า) — create/checkout — offline / online](./05-sell-checkout.md)
+6. [Transaction Summary (สรุปยอดขาย) — hourly / daily — read-only](./06-transaction-summary.md)
 
 ## สรุปแนวคิด offline vs online
 
