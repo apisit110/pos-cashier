@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@lightning-pos/database": "workspace:*",
+    "@lightning-pos/datetime": "workspace:*",
     "@lightning-pos/model": "workspace:*",
     "better-sqlite3": "^12.9.0",
     "bullmq": "^5.76.6",
