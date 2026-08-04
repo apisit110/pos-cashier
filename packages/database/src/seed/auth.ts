@@ -66,6 +66,7 @@ export function seedStaffs(db: any) {
       roleId: 1,
       fullName: managerName,
       status: 'active',
+      syncStatus: 'pending',
       updatedAt: new Date(),
     })
     .onConflictDoUpdate({

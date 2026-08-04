@@ -108,6 +108,10 @@ export interface Translations {
     title: string;
     totalStaffs: string;
     createNewStaff: string;
+    syncStaffs: string;
+    syncing: string;
+    syncFailedTitle: string;
+    syncingLabel: string;
     columnUsername: string;
     columnFullName: string;
     columnRole: string;
@@ -334,6 +338,10 @@ export const en: Translations = {
     title: 'Manage Staffs',
     totalStaffs: 'Total: {count} Staffs',
     createNewStaff: 'Create New Staff',
+    syncStaffs: 'Sync to Manager',
+    syncing: 'Syncing...',
+    syncFailedTitle: 'Sync Failed',
+    syncingLabel: 'Synchronizing staff data...',
     columnUsername: 'Username',
     columnFullName: 'Full Name',
     columnRole: 'Role',
@@ -560,6 +568,10 @@ export const th: Translations = {
     title: 'จัดการพนักงาน',
     totalStaffs: 'ทั้งหมด: {count} คน',
     createNewStaff: 'สร้างพนักงานใหม่',
+    syncStaffs: 'ซิงค์พนักงาน',
+    syncing: 'กำลังซิงค์...',
+    syncFailedTitle: 'ซิงค์ไม่สำเร็จ',
+    syncingLabel: 'กำลังซิงค์ข้อมูลพนักงาน...',
     columnUsername: 'ชื่อผู้ใช้',
     columnFullName: 'ชื่อ-นามสกุล',
     columnRole: 'ตำแหน่ง',

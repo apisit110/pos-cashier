@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { PageHeader, DataTable, type Column, PageContainer, PageContent, FilterBar, TextFilter } from '@apisit110/pos-ui';
+import { PageHeader, DataTable, type Column, Button, PageContainer, PageContent, FilterBar, TextFilter } from '@apisit110/pos-ui';
 import { PriceTag } from '../../components/PriceTag';
 import { ProductImage } from '../../components/ProductImage';
 import { ImageFallback } from '../../components/ImageFallback';
@@ -166,12 +166,12 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavi
             <span className="total-count">
               {formatMessage(t.productList.totalProducts, { count: products.length })}
             </span>
-            <SyncButton onClick={onNavigateToCreateProduct} disabled={isSyncing || isLoading}>
+            <Button variant="primary" style={{ width: 'auto' }} disabled={isSyncing || isLoading} onClick={onNavigateToCreateProduct}>
               {t.productList.createProduct}
-            </SyncButton>
-            <SyncButton onClick={handleSync} disabled={isSyncing || isLoading}>
+            </Button>
+            <Button variant="primary" style={{ width: 'auto' }} isLoading={isSyncing} disabled={isLoading} onClick={handleSync}>
               {isSyncing ? t.productList.syncing : t.productList.syncProducts}
-            </SyncButton>
+            </Button>
           </div>
         }
       />

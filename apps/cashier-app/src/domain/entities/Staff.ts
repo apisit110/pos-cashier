@@ -5,7 +5,7 @@ export interface Staff {
   username: string;
   fullName: string;
   roleId: number;
-  status: 'active' | 'pending_sync' | 'inactive';
+  status: 'active' | 'inactive';
 }
 
 export interface AuthResponse {

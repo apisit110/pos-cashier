@@ -2,6 +2,7 @@ import { IStaffRepository } from '../repositories/IStaffRepository';
 import { IStaffPinRepository } from '../repositories/IStaffPinRepository';
 import { IPermissionRepository } from '../repositories/IPermissionRepository';
 import { generateTokenPair } from '../../infrastructure/auth/TokenService';
+import { StaffStatus } from '../entities/Staff';
 
 export class UnauthorizedError extends Error {
   constructor(message: string) {
@@ -22,6 +23,10 @@ export class LoginUseCase {
 
     if (!staff) {
       throw new UnauthorizedError('Invalid credentials');
+    }
+
+    if (staff.status === StaffStatus.INACTIVE) {
+      throw new UnauthorizedError('Staff account is inactive');
     }
 
     const staffPin = await this.staffPinRepository.findByUserId(staff.id);

@@ -17,7 +17,8 @@ export class CreateStaffUseCase {
       username,
       fullName: staffData.fullName,
       roleId: staffData.roleId,
-      status: 'pending_sync',
+      status: 'active',
+      syncStatus: 'pending',
     });
 
     await this.staffPinRepository.create({

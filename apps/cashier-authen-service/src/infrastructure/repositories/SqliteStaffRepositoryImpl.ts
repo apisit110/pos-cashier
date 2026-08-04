@@ -1,6 +1,6 @@
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
-import { Staff, StaffStatus } from '../../domain/entities/Staff';
+import { Staff, StaffStatus, StaffSyncStatus } from '../../domain/entities/Staff';
 import { IStaffRepository } from '../../domain/repositories/IStaffRepository';
 import { schema } from '@lightning-pos/model';
 
@@ -45,6 +45,7 @@ export class SqliteStaffRepositoryImpl implements IStaffRepository {
     fullName: string;
     roleId: number;
     status: string;
+    syncStatus: string;
   }): Promise<Staff> {
     const [result] = await this.db
       .insert(schema.staffs)
@@ -53,6 +54,7 @@ export class SqliteStaffRepositoryImpl implements IStaffRepository {
         fullName: staffData.fullName,
         roleId: staffData.roleId,
         status: staffData.status as any,
+        syncStatus: staffData.syncStatus as any,
         updatedAt: new Date(),
       })
       .returning();
@@ -62,15 +64,15 @@ export class SqliteStaffRepositoryImpl implements IStaffRepository {
 
   async findAllToSync(): Promise<Staff[]> {
     const results = await this.db.query.staffs.findMany({
-      where: eq(schema.staffs.status, StaffStatus.PENDING_SYNC as any),
+      where: eq(schema.staffs.syncStatus, StaffSyncStatus.PENDING as any),
     });
     return results.map((r) => this.mapToEntity(r));
   }
 
-  async updateSyncStatus(id: number, username: string, status: string): Promise<void> {
+  async updateSyncStatus(id: number, username: string, syncStatus: string): Promise<void> {
     await this.db
       .update(schema.staffs)
-      .set({ username, status: status as any, updatedAt: new Date() })
+      .set({ username, syncStatus: syncStatus as any, updatedAt: new Date() })
       .where(eq(schema.staffs.id, id));
   }
 
@@ -86,6 +88,7 @@ export class SqliteStaffRepositoryImpl implements IStaffRepository {
       result.roleId,
       result.fullName,
       result.status as StaffStatus,
+      result.syncStatus as StaffSyncStatus,
       result.syncId,
       result.updatedAt,
     );

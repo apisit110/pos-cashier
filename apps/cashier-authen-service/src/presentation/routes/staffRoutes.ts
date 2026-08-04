@@ -25,7 +25,11 @@ export function staffRoutes(
     try {
       const body = req.body as { fullName: string; roleId: number; pin: string };
       const staff = await createStaffUseCase.execute(body);
-      await syncStaffsUseCase.execute();
+      try {
+        await syncStaffsUseCase.execute();
+      } catch (syncError) {
+        console.error('[staffRoutes] Failed to sync staffs after create:', syncError);
+      }
       res.status(201).json(staff);
     } catch (error) {
       res.status(500).json({ message: (error as Error).message });

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { StaffListPage } from '../../../presentation/pages/staff-list/StaffListPage';
-import { getStaffsUseCase } from '../../../presentation/di/container';
+import { getStaffsUseCase, syncStaffUseCase } from '../../../presentation/di/container';
 
 export default function StaffList() {
   const router = useRouter();
@@ -12,6 +12,7 @@ export default function StaffList() {
       onBack={() => router.push('/dashboard')}
       onNavigateToCreateStaff={() => router.push('/staff/create')}
       getStaffsUseCase={getStaffsUseCase}
+      syncStaffUseCase={syncStaffUseCase}
     />
   );
 }

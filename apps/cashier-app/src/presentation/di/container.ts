@@ -1,6 +1,7 @@
 import { GetSessionUseCase } from '../../domain/use-cases/GetSessionUseCase';
 import { CreateStaffUseCase } from '../../domain/use-cases/CreateStaffUseCase';
 import { GetStaffsUseCase } from '../../domain/use-cases/GetStaffsUseCase';
+import { SyncStaffUseCase } from '../../domain/use-cases/SyncStaffUseCase';
 import { GetTransactionsUseCase } from '../../domain/use-cases/GetTransactionsUseCase';
 import { GetTransactionByIdUseCase } from '../../domain/use-cases/GetTransactionByIdUseCase';
 import { GetTransactionSummaryUseCase } from '../../domain/use-cases/GetTransactionSummaryUseCase';
@@ -22,6 +23,7 @@ export const productRepository = new ApiProductRepository();
 export const getSessionUseCase = new GetSessionUseCase(authRepository);
 export const createStaffUseCase = new CreateStaffUseCase(staffRepository);
 export const getStaffsUseCase = new GetStaffsUseCase(staffRepository);
+export const syncStaffUseCase = new SyncStaffUseCase(staffRepository);
 export const getTransactionsUseCase = new GetTransactionsUseCase(transactionRepository);
 export const getTransactionByIdUseCase = new GetTransactionByIdUseCase(transactionRepository);
 export const getTransactionSummaryUseCase = new GetTransactionSummaryUseCase(transactionRepository);
