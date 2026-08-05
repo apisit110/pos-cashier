@@ -1,6 +1,7 @@
 import express, { Application } from 'express';
 import cors from 'cors';
 import { loggingMiddleware } from './middleware/loggingMiddleware';
+import { authMiddleware } from './middleware/authMiddleware';
 import { authRoutes } from './routes/authRoutes';
 import { staffRoutes } from './routes/staffRoutes';
 import { LoginUseCase } from '../domain/use-cases/LoginUseCase';
@@ -21,7 +22,11 @@ export function createApp(
   app.use(loggingMiddleware);
 
   app.use('/api/v1/authen/auth', authRoutes(loginUseCase));
-  app.use('/api/v1/authen/staffs', staffRoutes(getStaffsUseCase, createStaffUseCase, syncStaffsUseCase));
+  app.use(
+    '/api/v1/authen/staffs',
+    authMiddleware,
+    staffRoutes(getStaffsUseCase, createStaffUseCase, syncStaffsUseCase),
+  );
 
   return app;
 }

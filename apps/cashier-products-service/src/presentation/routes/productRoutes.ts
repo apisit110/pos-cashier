@@ -5,6 +5,7 @@ import { GetProductsUseCase } from '../../domain/use-cases/GetProductsUseCase';
 import { SyncProductsUseCase } from '../../domain/use-cases/SyncProductsUseCase';
 import { CreateProductUseCase } from '../../domain/use-cases/CreateProductUseCase';
 import { UpdateProductUseCase, NotFoundError as UpdateNotFoundError } from '../../domain/use-cases/UpdateProductUseCase';
+import { requireScope } from '../middleware/authMiddleware';
 
 const createProductSchema = z.object({
   barcode: z.string().min(1),
@@ -17,6 +18,11 @@ const updateProductSchema = z.object({
   name: z.string().min(1),
   price: z.number().nonnegative(),
   brand: z.string().nullish(),
+});
+
+const syncProductsSchema = z.object({
+  mid: z.string().min(1).optional(),
+  sid: z.string().min(1).optional(),
 });
 
 export function productRoutes(
@@ -57,7 +63,7 @@ export function productRoutes(
     }
   });
 
-  router.post('/', async (req, res) => {
+  router.post('/', requireScope('product:create'), async (req, res) => {
     const parsed = createProductSchema.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({ message: 'Validation failed', errors: parsed.error.issues });
@@ -72,7 +78,7 @@ export function productRoutes(
     }
   });
 
-  router.put('/:id', async (req, res) => {
+  router.put('/:id', requireScope('product:create'), async (req, res) => {
     const parsed = updateProductSchema.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({ message: 'Validation failed', errors: parsed.error.issues });
@@ -91,9 +97,15 @@ export function productRoutes(
     }
   });
 
-  router.post('/sync', async (req, res) => {
+  router.post('/sync', requireScope('products:sync'), async (req, res) => {
+    const parsed = syncProductsSchema.safeParse(req.body ?? {});
+    if (!parsed.success) {
+      res.status(400).json({ message: 'Validation failed', errors: parsed.error.issues });
+      return;
+    }
+
     try {
-      const { mid, sid } = req.body as { mid?: string; sid?: string };
+      const { mid, sid } = parsed.data;
       const result = await syncProductsUseCase.execute(mid, sid);
       res.json(result);
     } catch (error) {

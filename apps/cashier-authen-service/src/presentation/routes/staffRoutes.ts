@@ -1,7 +1,15 @@
 import { Router } from 'express';
+import { z } from 'zod';
 import { GetStaffsUseCase } from '../../domain/use-cases/GetStaffsUseCase';
 import { CreateStaffUseCase } from '../../domain/use-cases/CreateStaffUseCase';
 import { SyncStaffsUseCase } from '../../domain/use-cases/SyncStaffsUseCase';
+import { requireScope } from '../middleware/authMiddleware';
+
+const createStaffSchema = z.object({
+  fullName: z.string().min(1),
+  roleId: z.number().int().positive(),
+  pin: z.string().min(4),
+});
 
 export function staffRoutes(
   getStaffsUseCase: GetStaffsUseCase,
@@ -10,7 +18,7 @@ export function staffRoutes(
 ): Router {
   const router = Router();
 
-  router.get('/', async (req, res) => {
+  router.get('/', requireScope('staff:view'), async (req, res) => {
     try {
       const page = parseInt((req.query.page as string) ?? '1');
       const limit = parseInt((req.query.limit as string) ?? '10');
@@ -21,10 +29,15 @@ export function staffRoutes(
     }
   });
 
-  router.post('/', async (req, res) => {
+  router.post('/', requireScope('staff:create'), async (req, res) => {
+    const parsed = createStaffSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ message: 'Validation failed', errors: parsed.error.issues });
+      return;
+    }
+
     try {
-      const body = req.body as { fullName: string; roleId: number; pin: string };
-      const staff = await createStaffUseCase.execute(body);
+      const staff = await createStaffUseCase.execute(parsed.data);
       try {
         await syncStaffsUseCase.execute();
       } catch (syncError) {
@@ -36,7 +49,7 @@ export function staffRoutes(
     }
   });
 
-  router.post('/sync', async (req, res) => {
+  router.post('/sync', requireScope('staff:create'), async (req, res) => {
     try {
       const result = await syncStaffsUseCase.execute();
       res.json(result);

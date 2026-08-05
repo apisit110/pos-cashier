@@ -18,7 +18,8 @@
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.45.2",
     "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@lightning-pos/tsconfig": "workspace:*",

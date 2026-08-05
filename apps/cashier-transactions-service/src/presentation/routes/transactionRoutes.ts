@@ -3,6 +3,7 @@ import { GetTransactionsUseCase } from '../../domain/use-cases/GetTransactionsUs
 import { GetTransactionByIdUseCase, NotFoundError } from '../../domain/use-cases/GetTransactionByIdUseCase';
 import { GetTransactionSummaryUseCase } from '../../domain/use-cases/GetTransactionSummaryUseCase';
 import { GetTransactionsFilterSchema, GetTransactionSummaryQuerySchema } from '../schemas/transactionSchemas';
+import { requireScope } from '../middleware/authMiddleware';
 
 export function transactionRoutes(
   getTransactionsUseCase: GetTransactionsUseCase,
@@ -10,6 +11,8 @@ export function transactionRoutes(
   getTransactionSummaryUseCase: GetTransactionSummaryUseCase,
 ): Router {
   const router = Router();
+
+  router.use(requireScope('transaction:view'));
 
   router.get('/', async (req, res) => {
     try {

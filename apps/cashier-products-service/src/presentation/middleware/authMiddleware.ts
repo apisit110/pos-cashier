@@ -21,3 +21,17 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
     res.status(401).json({ message: 'Invalid or expired token' });
   }
 }
+
+export function requireScope(requiredScope: string) {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const scope = ((req as any).user?.scope as string | undefined) ?? '';
+    const grantedScopes = scope.split(' ');
+
+    if (!grantedScopes.includes(requiredScope)) {
+      res.status(403).json({ message: 'Insufficient scope' });
+      return;
+    }
+
+    next();
+  };
+}

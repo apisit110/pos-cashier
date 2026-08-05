@@ -1,6 +1,7 @@
 import express, { Application } from 'express';
 import cors from 'cors';
 import { loggingMiddleware } from './middleware/loggingMiddleware';
+import { authMiddleware } from './middleware/authMiddleware';
 import { transactionRoutes } from './routes/transactionRoutes';
 import { GetTransactionsUseCase } from '../domain/use-cases/GetTransactionsUseCase';
 import { GetTransactionByIdUseCase } from '../domain/use-cases/GetTransactionByIdUseCase';
@@ -19,6 +20,7 @@ export function createApp(
 
   app.use(
     '/api/v1/transactions',
+    authMiddleware,
     transactionRoutes(getTransactionsUseCase, getTransactionByIdUseCase, getTransactionSummaryUseCase),
   );
 
