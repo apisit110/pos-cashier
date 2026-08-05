@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { InputField, Button, PageHeader, PaymentModal, DataTable, type Column } from '@apisit110/pos-ui';
 import { Container } from './Container';
 import { Main } from './Main';
-import { ScannerPanel } from './ScannerPanel';
+import { SidePanel } from './SidePanel';
 import { MemberSection } from './MemberSection';
 import { MemberCard } from './MemberCard';
 import { ScannerSection } from './ScannerSection';
@@ -308,7 +308,34 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
       />
 
       <Main>
-        <ScannerPanel>
+        <TablePanel>
+          <div className="table-header">
+            <h3>{t.createOrder.currentOrder}</h3>
+            <span className="item-count">{formatMessage(t.createOrder.itemsCount, { count: items.length })}</span>
+          </div>
+
+          <ScrollArea ref={scrollAreaRef}>
+            <DataTable
+              columns={columns}
+              data={items}
+              rowKey={(item) => item.product.id}
+              getRowClassName={(item) => lastScannedId === item.product.id ? 'new-item' : ''}
+              stickyHeader
+              emptyState={
+                <EmptyState>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                  </svg>
+                  <p>{t.createOrder.noProducts}</p>
+                </EmptyState>
+              }
+            />
+          </ScrollArea>
+        </TablePanel>
+
+        <SidePanel>
           {SHOW_MEMBER_SECTION && (
             <MemberSection>
               <h3>{t.createOrder.member}</h3>
@@ -378,33 +405,6 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
               {scanHintBefore}<strong>8850123456789</strong>{scanHintMid}<strong>1234567890123</strong>{scanHintAfter}
             </div>
           </ScannerSection>
-        </ScannerPanel>
-
-        <TablePanel>
-          <div className="table-header">
-            <h3>{t.createOrder.currentOrder}</h3>
-            <span className="item-count">{formatMessage(t.createOrder.itemsCount, { count: items.length })}</span>
-          </div>
-
-          <ScrollArea ref={scrollAreaRef}>
-            <DataTable
-              columns={columns}
-              data={items}
-              rowKey={(item) => item.product.id}
-              getRowClassName={(item) => lastScannedId === item.product.id ? 'new-item' : ''}
-              stickyHeader
-              emptyState={
-                <EmptyState>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="9" cy="21" r="1"></circle>
-                    <circle cx="20" cy="21" r="1"></circle>
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                  </svg>
-                  <p>{t.createOrder.noProducts}</p>
-                </EmptyState>
-              }
-            />
-          </ScrollArea>
 
           <OrderSummary>
             <div className="summary-content">
@@ -428,7 +428,7 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
               </div>
             </div>
           </OrderSummary>
-        </TablePanel>
+        </SidePanel>
       </Main>
 
       <PaymentModal

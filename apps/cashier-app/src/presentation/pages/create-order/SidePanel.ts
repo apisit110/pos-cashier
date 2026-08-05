@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
-export const ScannerPanel = styled.aside`
+export const SidePanel = styled.aside`
   width: 320px;
-  border-right: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+  border-left: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
   padding: 1rem;
   display: flex;
   flex-direction: column;

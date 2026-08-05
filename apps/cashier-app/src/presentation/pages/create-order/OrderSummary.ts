@@ -1,21 +1,17 @@
 import styled from 'styled-components';
 
 export const OrderSummary = styled.div`
-  padding: 1rem 1.5rem;
-  background: ${({ theme }) => theme.semantics.colors.bg.card};
+  padding-top: 1rem;
   border-top: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.15);
-  z-index: 10;
 
   .summary-content {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    width: 300px;
-    align-self: flex-end;
+    width: 100%;
   }
 
   .summary-row {
