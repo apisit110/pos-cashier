@@ -176,6 +176,7 @@ export const TransactionDetailPage: React.FC<TransactionDetailPageProps> = ({
                 columns={getOrderItemColumns(t)}
                 data={indexedOrderItems}
                 emptyMessage={t.transactionDetail.emptyMessage}
+                rowKey="_rowIndex"
               />
             </div>
           </>

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const OrderSummary = styled.div`
   margin-top: auto;
   padding-top: 1rem;
-  border-top: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
+  // border-top: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
