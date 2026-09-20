@@ -64,12 +64,6 @@ export interface Translations {
     memberIdPlaceholder: string;
     identify: string;
     points: string;
-    scanProduct: string;
-    readyToScan: string;
-    manualBarcodeEntry: string;
-    manualBarcodePlaceholder: string;
-    addProduct: string;
-    scanHint: string;
     currentOrder: string;
     itemsCount: string;
     columnNumber: string;
@@ -83,7 +77,6 @@ export interface Translations {
     promo: string;
     total: string;
     proceedToPayment: string;
-    shortcutHint: string;
     errorProductNotFound: string;
     errorMemberNotFound: string;
     errorIdentifyMember: string;
@@ -294,12 +287,6 @@ export const en: Translations = {
     memberIdPlaceholder: 'Enter Member ID (M001-M003)',
     identify: 'Identify',
     points: 'points',
-    scanProduct: 'Scan Product',
-    readyToScan: 'Ready to scan barcode...',
-    manualBarcodeEntry: 'Manual Barcode Entry',
-    manualBarcodePlaceholder: 'Enter barcode (e.g. 8850123456789)',
-    addProduct: 'Add Product',
-    scanHint: 'Hint: Use demo barcode {barcode1} or {barcode2}',
     currentOrder: 'Current Order',
     itemsCount: '{count} items',
     columnNumber: '#',
@@ -313,7 +300,6 @@ export const en: Translations = {
     promo: 'Promo',
     total: 'Total',
     proceedToPayment: 'Proceed to Payment',
-    shortcutHint: 'Press {key} to pay',
     errorProductNotFound: 'Product not found.',
     errorMemberNotFound: 'Member not found.',
     errorIdentifyMember: 'Error identifying member.',
@@ -524,12 +510,6 @@ export const th: Translations = {
     memberIdPlaceholder: 'กรอกรหัสสมาชิก (M001-M003)',
     identify: 'ตรวจสอบ',
     points: 'คะแนน',
-    scanProduct: 'สแกนสินค้า',
-    readyToScan: 'พร้อมสแกนบาร์โค้ด...',
-    manualBarcodeEntry: 'กรอกบาร์โค้ดด้วยตนเอง',
-    manualBarcodePlaceholder: 'กรอกบาร์โค้ด (เช่น 8850123456789)',
-    addProduct: 'เพิ่มสินค้า',
-    scanHint: 'คำแนะนำ: ใช้บาร์โค้ดตัวอย่าง {barcode1} หรือ {barcode2}',
     currentOrder: 'รายการสั่งซื้อปัจจุบัน',
     itemsCount: '{count} รายการ',
     columnNumber: '#',
@@ -542,8 +522,7 @@ export const th: Translations = {
     noProducts: 'ยังไม่มีสินค้าที่เพิ่ม สแกนสินค้าเพื่อเริ่มต้น',
     promo: 'โปรโมชั่น',
     total: 'ยอดรวม',
-    proceedToPayment: 'ดำเนินการชำระเงิน',
-    shortcutHint: 'กด {key} เพื่อชำระเงิน',
+    proceedToPayment: 'คิดเงิน',
     errorProductNotFound: 'ไม่พบสินค้า',
     errorMemberNotFound: 'ไม่พบสมาชิก',
     errorIdentifyMember: 'เกิดข้อผิดพลาดในการตรวจสอบสมาชิก',

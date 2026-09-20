@@ -5,8 +5,6 @@ import { Main } from './Main';
 import { SidePanel } from './SidePanel';
 import { MemberSection } from './MemberSection';
 import { MemberCard } from './MemberCard';
-import { ScannerSection } from './ScannerSection';
-import { ScannerBox } from './ScannerBox';
 import { TablePanel } from './TablePanel';
 import { ScrollArea } from './ScrollArea';
 import { QtyControls } from './QtyControls';
@@ -47,12 +45,9 @@ interface CreateOrderPageProps {
 export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogout, staff }) => {
   const { t } = useTranslation();
   const [items, setItems] = useState<OrderItem[]>([]);
-  const [barcodeInput, setBarcodeInput] = useState('');
   const [memberInput, setMemberInput] = useState('');
   const [member, setMember] = useState<Member | null>(null);
   const [promotionResult, setPromotionResult] = useState<PromotionResult | null>(null);
-  const [isScanning, setIsScanning] = useState(false);
-  const [scanFlash, setScanFlash] = useState(false);
   const [lastScannedId, setLastScannedId] = useState<string | null>(null);
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
   const [isIdentifyingMember, setIsIdentifyingMember] = useState(false);
@@ -63,7 +58,6 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
   // modal (re)opens for a fresh cart.
   const checkoutIdempotencyKeyRef = useRef<string | null>(null);
 
-  const inputRef = useRef<HTMLInputElement>(null);
   const memberInputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -102,10 +96,6 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
     calculate();
   }, [items, member]);
 
-  useEffect(() => {
-    if (inputRef.current) inputRef.current.focus();
-  }, []);
-
   const performScan = async (barcode: string) => {
     if (!barcode.trim()) return;
 
@@ -113,13 +103,10 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
       handlePaymentSuccess();
     }
 
-    setIsScanning(true);
     setError(null);
     try {
       const product = await scanUseCase.execute(barcode.trim());
       setLastScannedId(product.id);
-      setScanFlash(true);
-      setTimeout(() => setScanFlash(false), 500);
 
       setItems((prev) => {
         const existingItem = prev.find(i => i.product.id === product.id);
@@ -128,18 +115,9 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
         }
         return [...prev, { product, quantity: 1 }];
       });
-      setBarcodeInput('');
     } catch (err: any) {
       setError(err.message || t.createOrder.errorProductNotFound);
-    } finally {
-      setIsScanning(false);
-      if (inputRef.current) inputRef.current.focus();
     }
-  };
-
-  const handleScan = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await performScan(barcodeInput);
   };
 
   useEffect(() => {
@@ -147,12 +125,6 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
     let lastKeyTime = Date.now();
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
-
-      if (e.code === 'Space' && target.tagName !== 'INPUT' && items.length > 0 && !isPaymentModalOpen) {
-        e.preventDefault();
-        setIsPaymentModalOpen(true);
-        return;
-      }
 
       if (target.tagName === 'INPUT') return;
 
@@ -167,6 +139,9 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
           e.preventDefault();
           performScan(buffer);
           buffer = '';
+        } else if (items.length > 0 && !isPaymentModalOpen) {
+          e.preventDefault();
+          setIsPaymentModalOpen(true);
         }
       } else if (e.key.length === 1) buffer += e.key;
     };
@@ -210,7 +185,6 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
     setItems([]);
     setMember(null);
     setPromotionResult(null);
-    setBarcodeInput('');
     setError(null);
     checkoutIdempotencyKeyRef.current = null;
   };
@@ -294,9 +268,6 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
 
   const total = promotionResult?.finalTotal ?? items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
 
-  const [scanHintBefore, scanHintMid, scanHintAfter] = t.createOrder.scanHint.split(/\{barcode1\}|\{barcode2\}/);
-  const [shortcutHintBefore, shortcutHintAfter] = t.createOrder.shortcutHint.split('{key}');
-
   return (
     <Container>
       <PageHeader
@@ -313,6 +284,7 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
             <h3>{t.createOrder.currentOrder}</h3>
             <span className="item-count">{formatMessage(t.createOrder.itemsCount, { count: items.length })}</span>
           </div>
+          {error && <div className="table-error">{error}</div>}
 
           <ScrollArea ref={scrollAreaRef}>
             <DataTable
@@ -372,49 +344,11 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
             </MemberSection>
           )}
 
-          <ScannerSection>
-            <h3>{t.createOrder.scanProduct}</h3>
-            <ScannerBox $isScanning={isScanning} $flash={scanFlash}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
-                <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
-                <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
-                <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
-                <path d="M8 7v10"></path>
-                <path d="M12 7v10"></path>
-                <path d="M16 7v10"></path>
-              </svg>
-              <p>{t.createOrder.readyToScan}</p>
-            </ScannerBox>
-
-            <form onSubmit={handleScan}>
-              <InputField
-                label={t.createOrder.manualBarcodeEntry}
-                value={barcodeInput}
-                onChange={(e) => setBarcodeInput(e.target.value)}
-                placeholder={t.createOrder.manualBarcodePlaceholder}
-                disabled={isScanning}
-                ref={inputRef}
-              />
-              {error && <span style={{ color: 'var(--color-error, #ef4444)', fontSize: '0.875rem' }}>{error}</span>}
-              <Button type="submit" isLoading={isScanning} style={{ marginTop: '0.5rem' }}>
-                {t.createOrder.addProduct}
-              </Button>
-            </form>
-            <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--color-text-secondary, #94a3b8)', fontStyle: 'italic' }}>
-              {scanHintBefore}<strong>8850123456789</strong>{scanHintMid}<strong>1234567890123</strong>{scanHintAfter}
-            </div>
-          </ScannerSection>
-
           <OrderSummary>
             <div className="summary-content">
-              <div className="summary-row">
-                <span>{t.createOrder.promo}</span>
-                <span>-</span>
-              </div>
               <div className="summary-row total">
                 <span>{t.createOrder.total}</span>
-                <span>${total.toFixed(2)}</span>
+                <span>{total.toFixed(2)}</span>
               </div>
               <Button
                 disabled={items.length === 0}
@@ -423,9 +357,6 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
               >
                 {t.createOrder.proceedToPayment}
               </Button>
-              <div className="shortcut-hint">
-                {shortcutHintBefore}<kbd>Space</kbd>{shortcutHintAfter}
-              </div>
             </div>
           </OrderSummary>
         </SidePanel>

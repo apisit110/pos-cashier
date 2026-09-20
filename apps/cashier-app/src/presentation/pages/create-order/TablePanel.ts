@@ -26,6 +26,15 @@ export const TablePanel = styled.section`
     }
   }
 
+  .table-error {
+    margin: 0 1.5rem 1rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: ${({ theme }) => theme.borderRadius.md};
+    background: rgba(239, 68, 68, 0.1);
+    color: ${({ theme }) => theme.semantics.colors.status.error};
+    font-size: 0.875rem;
+  }
+
   tr.new-item {
     animation: ${rowIn} 0.5s ease-out;
   }
