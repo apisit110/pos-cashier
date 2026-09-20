@@ -7,10 +7,6 @@ import { LoginHeader } from './LoginHeader';
 import { BrandLogo } from './BrandLogo';
 import { ErrorMessage } from './ErrorMessage';
 import { LoginForm } from './LoginForm';
-import { FormActions } from './FormActions';
-import { ForgotPassword } from './ForgotPassword';
-import { LoginFooter } from './LoginFooter';
-import { DemoHint } from './DemoHint';
 import { LoginUseCase } from '../../../domain/use-cases/LoginUseCase';
 import { ApiAuthRepository } from '../../../infrastructure/repositories/ApiAuthRepository';
 import { useTranslation } from '../../i18n/LanguageContext';
@@ -74,7 +70,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             </svg>
           </BrandLogo>
           <h1>{t.login.title}</h1>
-          <p>{t.login.subtitle}</p>
         </LoginHeader>
 
         {error && <ErrorMessage>{error}</ErrorMessage>}
@@ -99,21 +94,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             boxSize="2.75rem"
           />
 
-          <FormActions>
-            <ForgotPassword href="#">{t.login.forgotPin}</ForgotPassword>
-          </FormActions>
-
           <Button type="submit" isLoading={isLoading}>
             {t.login.signIn}
           </Button>
         </LoginForm>
-
-        <LoginFooter>
-          <p>{t.login.noAccount} <a href="#">{t.login.contactSupport}</a></p>
-          <DemoHint>
-            <small>{t.login.demoCredentials} <code>00010001</code> / <code>123456</code></small>
-          </DemoHint>
-        </LoginFooter>
       </LoginCard>
     </LoginContainer>
   );
