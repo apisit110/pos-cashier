@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { PageHeader, DataTable, type Column, Button, PageContainer, PageContent, FilterBar, TextFilter } from '@apisit110/pos-ui';
 import { PriceTag } from '../../components/PriceTag';
-import { ProductImage } from '../../components/ProductImage';
-import { ImageFallback } from '../../components/ImageFallback';
 import { SyncButton } from '../../components/SyncButton';
 import { BrandBadge } from '../../components/BrandBadge';
 import { Loading } from '../../components/Loading';
@@ -12,26 +10,6 @@ import type { SyncProductsUseCase } from '../../../domain/use-cases/SyncProducts
 import type { Product } from '../../../domain/entities/Product';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { formatMessage } from '../../i18n/format';
-
-const ProductImageCell: React.FC<{ product: Product }> = ({ product }) => {
-  const [error, setError] = React.useState(false);
-
-  if (product.image && !error) {
-    return (
-      <ProductImage
-        src={product.image}
-        alt={product.name}
-        onError={() => setError(true)}
-      />
-    );
-  }
-
-  return (
-    <ImageFallback>
-      {product.name.charAt(0).toUpperCase()}
-    </ImageFallback>
-  );
-};
 
 interface ProductListPageProps {
   onBack: () => void;
@@ -115,12 +93,6 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavi
   };
 
   const columns: Column<Product>[] = [
-    {
-      header: t.productList.columnImage,
-      key: 'image',
-      width: '80px',
-      render: (product) => <ProductImageCell product={product} />
-    },
     {
       header: t.productList.columnBarcode,
       key: 'barcode',

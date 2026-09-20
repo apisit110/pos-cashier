@@ -168,7 +168,6 @@ export interface Translations {
     createProduct: string;
     syncProducts: string;
     syncing: string;
-    columnImage: string;
     columnBarcode: string;
     columnName: string;
     columnBrand: string;
@@ -391,7 +390,6 @@ export const en: Translations = {
     createProduct: '+ Create Product',
     syncProducts: 'Sync Products',
     syncing: 'Syncing...',
-    columnImage: 'Image',
     columnBarcode: 'Barcode',
     columnName: 'Product Name',
     columnBrand: 'Brand',
@@ -614,7 +612,6 @@ export const th: Translations = {
     createProduct: '+ สร้างสินค้า',
     syncProducts: 'ซิงค์สินค้า',
     syncing: 'กำลังซิงค์...',
-    columnImage: 'รูปภาพ',
     columnBarcode: 'บาร์โค้ด',
     columnName: 'ชื่อสินค้า',
     columnBrand: 'แบรนด์',
