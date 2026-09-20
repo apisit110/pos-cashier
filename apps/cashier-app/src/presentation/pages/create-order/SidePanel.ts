@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const SidePanel = styled.aside`
-  width: 320px;
+  width: 400px;
   border-left: 1px solid ${({ theme }) => theme.semantics.colors.border.subtle};
   padding: 1rem;
   display: flex;
