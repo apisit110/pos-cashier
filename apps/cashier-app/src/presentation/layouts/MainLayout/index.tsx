@@ -105,6 +105,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         navItems={navItems}
         user={staff ? { name: staff.username, subtitle: staff.role } : undefined}
         onLogout={logout}
+        logoutLabel={t.mainLayout.logout}
       />
       <RightColumn>
         <TopBar

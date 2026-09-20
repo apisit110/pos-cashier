@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useTheme } from 'styled-components';
 import { InputField, Button, PageHeader, PaymentModal, DataTable, type Column } from '@apisit110/pos-ui';
 import { Container } from './Container';
 import { Main } from './Main';
@@ -44,6 +45,7 @@ interface CreateOrderPageProps {
 
 export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogout, staff }) => {
   const { t } = useTranslation();
+  const theme = useTheme();
   const [items, setItems] = useState<OrderItem[]>([]);
   const [memberInput, setMemberInput] = useState('');
   const [member, setMember] = useState<Member | null>(null);
@@ -275,6 +277,7 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
         onBack={onBack}
         user={staff}
         onLogout={onLogout}
+        logoutLabel={t.mainLayout.logout}
         extraContent={null}
       />
 
@@ -353,7 +356,13 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
               <Button
                 disabled={items.length === 0}
                 onClick={() => setIsPaymentModalOpen(true)}
-                style={{ height: 56, fontSize: '1.125rem', fontWeight: 600 }}
+                style={{
+                  height: 56,
+                  fontSize: '1.125rem',
+                  fontWeight: 600,
+                  backgroundColor: theme.components.button.success.bg,
+                  color: theme.components.button.success.text,
+                }}
               >
                 {t.createOrder.proceedToPayment}
               </Button>

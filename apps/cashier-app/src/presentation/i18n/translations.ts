@@ -18,6 +18,7 @@ export interface Translations {
     products: string;
     staffs: string;
     createStaff: string;
+    logout: string;
   };
   login: {
     title: string;
@@ -240,6 +241,7 @@ export const en: Translations = {
     products: 'Products',
     staffs: 'Staffs',
     createStaff: 'Staffs',
+    logout: 'Logout',
   },
   login: {
     title: 'Lightning POS',
@@ -462,6 +464,7 @@ export const th: Translations = {
     products: 'สินค้า',
     staffs: 'พนักงาน',
     createStaff: 'พนักงาน',
+    logout: 'ออกจากระบบ',
   },
   login: {
     title: 'Lightning POS',

@@ -24,6 +24,7 @@ export const primitives = {
     green: {
       400: '#4ade80',
       500: '#22c55e',
+      600: '#00a94f',
     },
     red: {
       500: '#ef4444',
@@ -177,6 +178,11 @@ export const lightComponents = {
       hover: lightSemantics.colors.accent.hover,
       text: primitives.colors.white,
     },
+    success: {
+      bg: primitives.colors.green[600],
+      hover: primitives.colors.green[500],
+      text: primitives.colors.white,
+    },
     error: {
       text: lightSemantics.colors.text.error,
     }
@@ -216,6 +222,11 @@ export const components = {
       bg: semantics.colors.accent.primary,
       hover: semantics.colors.accent.hover,
       text: semantics.colors.text.primary,
+    },
+    success: {
+      bg: primitives.colors.green[600],
+      hover: primitives.colors.green[500],
+      text: primitives.colors.white,
     },
     error: {
       text: semantics.colors.text.error,

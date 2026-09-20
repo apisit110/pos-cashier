@@ -68,8 +68,8 @@ importers:
   apps/cashier-app:
     dependencies:
       '@apisit110/pos-ui':
-        specifier: ^0.6.0
-        version: 0.6.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(styled-components@6.4.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
+        specifier: ^0.6.2
+        version: 0.6.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(styled-components@6.4.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
       '@lightning-pos/datetime':
         specifier: workspace:*
         version: link:../../packages/datetime
@@ -596,8 +596,8 @@ importers:
 
 packages:
 
-  '@apisit110/pos-ui@0.6.0':
-    resolution: {integrity: sha512-xZZgc3IoNJtp/EBEfwoxeE/BwhI3QG/8Y2K7jDDIOcAa1ENL7hdOUPM4TKM+fORVHUKQ92aGgXA/dLslGelguw==, tarball: https://npm.pkg.github.com/download/@apisit110/pos-ui/0.6.0/38ba5e689ccdb74fb162576bde5bb3963b6055ea}
+  '@apisit110/pos-ui@0.6.2':
+    resolution: {integrity: sha512-8X2z0kgOsJruaoVxMLmc2FzIfwH9CdtAJWFlxCcEm9np1rM8wAEyhrGqmfXnaXYf3OXbf/5bHOxg0wcTqHsegA==, tarball: https://npm.pkg.github.com/download/@apisit110/pos-ui/0.6.2/950df0a4d0c0c7f2af703f2c5f89e81f8bb94108}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
@@ -3781,7 +3781,7 @@ packages:
 
 snapshots:
 
-  '@apisit110/pos-ui@0.6.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(styled-components@6.4.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))':
+  '@apisit110/pos-ui@0.6.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(styled-components@6.4.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))':
     dependencies:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
