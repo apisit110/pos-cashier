@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { ErrorResponseDto } from '@lightning-pos/http-response';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -7,7 +8,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    res.status(401).json({ message: 'No token provided' });
+    res.status(401).json(ErrorResponseDto.of('401', 'No token provided'));
     return;
   }
 
@@ -18,7 +19,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
     (req as any).user = payload;
     next();
   } catch {
-    res.status(401).json({ message: 'Invalid or expired token' });
+    res.status(401).json(ErrorResponseDto.of('401', 'Invalid or expired token'));
   }
 }
 
@@ -28,7 +29,7 @@ export function requireScope(requiredScope: string) {
     const grantedScopes = scope.split(' ');
 
     if (!grantedScopes.includes(requiredScope)) {
-      res.status(403).json({ message: 'Insufficient scope' });
+      res.status(403).json(ErrorResponseDto.of('403', 'Insufficient scope'));
       return;
     }
 

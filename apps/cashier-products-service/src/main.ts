@@ -11,12 +11,12 @@ import { SqliteSyncMetadataRepositoryImpl } from './infrastructure/repositories/
 import { SqliteSyncOutboxRepositoryImpl } from './infrastructure/repositories/SqliteSyncOutboxRepositoryImpl';
 import { HttpProductSyncGatewayImpl } from './infrastructure/gateways/HttpProductSyncGatewayImpl';
 import { OutboxWorker } from './infrastructure/workers/OutboxWorker';
-import { GetProductByBarcodeUseCase } from './domain/use-cases/GetProductByBarcodeUseCase';
-import { GetProductByIdUseCase } from './domain/use-cases/GetProductByIdUseCase';
-import { GetProductsUseCase } from './domain/use-cases/GetProductsUseCase';
-import { SyncProductsUseCase } from './domain/use-cases/SyncProductsUseCase';
-import { CreateProductUseCase } from './domain/use-cases/CreateProductUseCase';
-import { UpdateProductUseCase } from './domain/use-cases/UpdateProductUseCase';
+import { GetProductByBarcodeUseCase } from './application/usecases/GetProductByBarcodeUseCase';
+import { GetProductByIdUseCase } from './application/usecases/GetProductByIdUseCase';
+import { GetProductsUseCase } from './application/usecases/GetProductsUseCase';
+import { SyncProductsUseCase } from './application/usecases/SyncProductsUseCase';
+import { CreateProductUseCase } from './application/usecases/CreateProductUseCase';
+import { UpdateProductUseCase } from './application/usecases/UpdateProductUseCase';
 import { createApp } from './presentation/app';
 
 const PORT = process.env.PORT ?? 3001;

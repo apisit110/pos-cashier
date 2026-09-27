@@ -12,10 +12,10 @@ import { SqliteStaffRepositoryImpl } from './infrastructure/repositories/SqliteS
 import { SqliteStaffPinRepositoryImpl } from './infrastructure/repositories/SqliteStaffPinRepositoryImpl';
 import { SqlitePermissionRepositoryImpl } from './infrastructure/repositories/SqlitePermissionRepositoryImpl';
 import { HttpStaffSyncGatewayImpl } from './infrastructure/gateways/HttpStaffSyncGatewayImpl';
-import { LoginUseCase } from './domain/use-cases/LoginUseCase';
-import { CreateStaffUseCase } from './domain/use-cases/CreateStaffUseCase';
-import { GetStaffsUseCase } from './domain/use-cases/GetStaffsUseCase';
-import { SyncStaffsUseCase } from './domain/use-cases/SyncStaffsUseCase';
+import { LoginUseCase } from './application/usecases/LoginUseCase';
+import { CreateStaffUseCase } from './application/usecases/CreateStaffUseCase';
+import { GetStaffsUseCase } from './application/usecases/GetStaffsUseCase';
+import { SyncStaffsUseCase } from './application/usecases/SyncStaffsUseCase';
 import { createApp } from './presentation/app';
 
 const PORT = process.env.PORT ?? 3005;

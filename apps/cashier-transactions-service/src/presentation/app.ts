@@ -3,9 +3,9 @@ import cors from 'cors';
 import { loggingMiddleware } from './middleware/loggingMiddleware';
 import { authMiddleware } from './middleware/authMiddleware';
 import { transactionRoutes } from './routes/transactionRoutes';
-import { GetTransactionsUseCase } from '../domain/use-cases/GetTransactionsUseCase';
-import { GetTransactionByIdUseCase } from '../domain/use-cases/GetTransactionByIdUseCase';
-import { GetTransactionSummaryUseCase } from '../domain/use-cases/GetTransactionSummaryUseCase';
+import { GetTransactionsUseCase } from '../application/usecases/GetTransactionsUseCase';
+import { GetTransactionByIdUseCase } from '../application/usecases/GetTransactionByIdUseCase';
+import { GetTransactionSummaryUseCase } from '../application/usecases/GetTransactionSummaryUseCase';
 
 export function createApp(
   getTransactionsUseCase: GetTransactionsUseCase,

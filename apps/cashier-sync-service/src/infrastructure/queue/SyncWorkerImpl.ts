@@ -1,6 +1,6 @@
 import { Worker, Job } from 'bullmq';
-import { SyncOrderUseCase } from '../../domain/use-cases/SyncOrderUseCase';
-import { SyncTransactionUseCase } from '../../domain/use-cases/SyncTransactionUseCase';
+import { SyncOrderUseCase } from '../../application/usecases/SyncOrderUseCase';
+import { SyncTransactionUseCase } from '../../application/usecases/SyncTransactionUseCase';
 import { SYNC_JOBS, SYNC_QUEUE_NAME } from './sync-queue.constants';
 
 export function createSyncWorker(

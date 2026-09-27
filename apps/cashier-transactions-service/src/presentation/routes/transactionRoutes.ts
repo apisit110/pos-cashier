@@ -1,8 +1,15 @@
 import { Router } from 'express';
-import { GetTransactionsUseCase } from '../../domain/use-cases/GetTransactionsUseCase';
-import { GetTransactionByIdUseCase, NotFoundError } from '../../domain/use-cases/GetTransactionByIdUseCase';
-import { GetTransactionSummaryUseCase } from '../../domain/use-cases/GetTransactionSummaryUseCase';
-import { GetTransactionsFilterSchema, GetTransactionSummaryQuerySchema } from '../schemas/transactionSchemas';
+import { z } from 'zod';
+import { GetTransactionsUseCase } from '../../application/usecases/GetTransactionsUseCase';
+import { GetTransactionByIdUseCase, NotFoundError } from '../../application/usecases/GetTransactionByIdUseCase';
+import { GetTransactionSummaryUseCase } from '../../application/usecases/GetTransactionSummaryUseCase';
+import { GetTransactionsRequestDto } from '../dto/requests/GetTransactionsRequestDto';
+import { GetTransactionSummaryRequestDto } from '../dto/requests/GetTransactionSummaryRequestDto';
+import { GetTransactionByIdRequestDto } from '../dto/requests/GetTransactionByIdRequestDto';
+import { GetTransactionsResponseDto } from '../dto/responses/GetTransactionsResponseDto';
+import { TransactionSummaryResponseDto } from '../dto/responses/TransactionSummaryResponseDto';
+import { TransactionResponseDto } from '../dto/responses/TransactionResponseDto';
+import { SuccessResponseDto, ErrorResponseDto } from '@lightning-pos/http-response';
 import { requireScope } from '../middleware/authMiddleware';
 
 export function transactionRoutes(
@@ -16,50 +23,53 @@ export function transactionRoutes(
 
   router.get('/', async (req, res) => {
     try {
-      const parsed = GetTransactionsFilterSchema.safeParse(req.query);
-      if (!parsed.success) {
-        res.status(400).json({ message: 'Invalid query parameters', errors: parsed.error.issues });
+      const requestDto = GetTransactionsRequestDto.from(req.query);
+      const result = await getTransactionsUseCase.execute(requestDto.page, requestDto.limit, requestDto.filter);
+      res.json(SuccessResponseDto.of(GetTransactionsResponseDto.fromResult(result)));
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(ErrorResponseDto.of('400', 'Validation failed', JSON.stringify(error.issues)));
         return;
       }
-      const { page, limit, ...filter } = parsed.data;
-      const result = await getTransactionsUseCase.execute(page!, limit!, filter);
-      res.json(result);
-    } catch (error) {
-      res.status(500).json({ message: (error as Error).message });
+      res.status(500).json(ErrorResponseDto.of('500', (error as Error).message));
     }
   });
 
   // Registered before /:id so "summary" isn't swallowed as a transaction id param.
   router.get('/summary', async (req, res) => {
     try {
-      const parsed = GetTransactionSummaryQuerySchema.safeParse(req.query);
-      if (!parsed.success) {
-        res.status(400).json({ message: 'Invalid query parameters', errors: parsed.error.issues });
+      const requestDto = GetTransactionSummaryRequestDto.from(req.query);
+      const result = await getTransactionSummaryUseCase.execute({
+        period: requestDto.period,
+        startDate: requestDto.startDate,
+        endDate: requestDto.endDate,
+        storeId: requestDto.storeId,
+      });
+      res.json(SuccessResponseDto.of(TransactionSummaryResponseDto.fromResult(result)));
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(ErrorResponseDto.of('400', 'Validation failed', JSON.stringify(error.issues)));
         return;
       }
-      const { period, startDate, endDate, storeId } = parsed.data;
-      const result = await getTransactionSummaryUseCase.execute({
-        period,
-        startDate: new Date(startDate),
-        endDate: new Date(endDate),
-        storeId,
-      });
-      res.json({ buckets: result });
-    } catch (error) {
-      res.status(500).json({ message: (error as Error).message });
+      res.status(500).json(ErrorResponseDto.of('500', (error as Error).message));
     }
   });
 
   router.get('/:id', async (req, res) => {
     try {
-      const transaction = await getTransactionByIdUseCase.execute(req.params.id);
-      res.json(transaction);
+      const requestDto = GetTransactionByIdRequestDto.from(req.params);
+      const transaction = await getTransactionByIdUseCase.execute(requestDto.id);
+      res.json(SuccessResponseDto.of(TransactionResponseDto.fromEntity(transaction)));
     } catch (error) {
-      if (error instanceof NotFoundError) {
-        res.status(404).json({ message: error.message });
+      if (error instanceof z.ZodError) {
+        res.status(400).json(ErrorResponseDto.of('400', 'Validation failed', JSON.stringify(error.issues)));
         return;
       }
-      res.status(500).json({ message: (error as Error).message });
+      if (error instanceof NotFoundError) {
+        res.status(404).json(ErrorResponseDto.of('404', error.message));
+        return;
+      }
+      res.status(500).json(ErrorResponseDto.of('500', (error as Error).message));
     }
   });
 

@@ -3,9 +3,9 @@ import { createDatabase } from '@lightning-pos/database';
 import { SqliteTransactionRepositoryImpl } from './infrastructure/repositories/SqliteTransactionRepositoryImpl';
 import { SqliteOrderServiceImpl } from './infrastructure/services/SqliteOrderServiceImpl';
 import { SqliteProductServiceImpl } from './infrastructure/services/SqliteProductServiceImpl';
-import { GetTransactionsUseCase } from './domain/use-cases/GetTransactionsUseCase';
-import { GetTransactionByIdUseCase } from './domain/use-cases/GetTransactionByIdUseCase';
-import { GetTransactionSummaryUseCase } from './domain/use-cases/GetTransactionSummaryUseCase';
+import { GetTransactionsUseCase } from './application/usecases/GetTransactionsUseCase';
+import { GetTransactionByIdUseCase } from './application/usecases/GetTransactionByIdUseCase';
+import { GetTransactionSummaryUseCase } from './application/usecases/GetTransactionSummaryUseCase';
 import { createApp } from './presentation/app';
 
 const PORT = process.env.PORT ?? 3006;

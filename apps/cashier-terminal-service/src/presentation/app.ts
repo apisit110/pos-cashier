@@ -2,7 +2,7 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import { loggingMiddleware } from './middleware/loggingMiddleware';
 import { terminalRoutes } from './routes/terminalRoutes';
-import { ActivateTerminalUseCase } from '../domain/use-cases/ActivateTerminalUseCase';
+import { ActivateTerminalUseCase } from '../application/usecases/ActivateTerminalUseCase';
 
 export function createApp(activateTerminalUseCase: ActivateTerminalUseCase): Application {
   const app = express();

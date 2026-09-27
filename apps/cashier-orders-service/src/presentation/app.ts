@@ -5,10 +5,10 @@ import { schema } from '@lightning-pos/model';
 import { SqliteOrderRepositoryImpl } from '../infrastructure/repositories/SqliteOrderRepositoryImpl';
 import { SqliteStaffServiceImpl } from '../infrastructure/services/SqliteStaffServiceImpl';
 import { SyncQueueServiceImpl } from '../infrastructure/queue/SyncQueueServiceImpl';
-import { CalculateOrderUseCase } from '../domain/use-cases/CalculateOrderUseCase';
-import { CheckoutUseCase } from '../domain/use-cases/CheckoutUseCase';
-import { CreateOrderUseCase } from '../domain/use-cases/CreateOrderUseCase';
-import { UpdateOrderStatusUseCase } from '../domain/use-cases/UpdateOrderStatusUseCase';
+import { CalculateOrderUseCase } from '../application/usecases/CalculateOrderUseCase';
+import { CheckoutUseCase } from '../application/usecases/CheckoutUseCase';
+import { CreateOrderUseCase } from '../application/usecases/CreateOrderUseCase';
+import { UpdateOrderStatusUseCase } from '../application/usecases/UpdateOrderStatusUseCase';
 import { createOrderRouter } from './routes/orderRoutes';
 
 export function createApp(db: BetterSQLite3Database<typeof schema>): Application {

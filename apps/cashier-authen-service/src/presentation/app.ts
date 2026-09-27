@@ -4,10 +4,10 @@ import { loggingMiddleware } from './middleware/loggingMiddleware';
 import { authMiddleware } from './middleware/authMiddleware';
 import { authRoutes } from './routes/authRoutes';
 import { staffRoutes } from './routes/staffRoutes';
-import { LoginUseCase } from '../domain/use-cases/LoginUseCase';
-import { GetStaffsUseCase } from '../domain/use-cases/GetStaffsUseCase';
-import { CreateStaffUseCase } from '../domain/use-cases/CreateStaffUseCase';
-import { SyncStaffsUseCase } from '../domain/use-cases/SyncStaffsUseCase';
+import { LoginUseCase } from '../application/usecases/LoginUseCase';
+import { GetStaffsUseCase } from '../application/usecases/GetStaffsUseCase';
+import { CreateStaffUseCase } from '../application/usecases/CreateStaffUseCase';
+import { SyncStaffsUseCase } from '../application/usecases/SyncStaffsUseCase';
 
 export function createApp(
   loginUseCase: LoginUseCase,

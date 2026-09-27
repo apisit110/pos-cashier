@@ -4,8 +4,8 @@ import { SqliteOrderRepositoryImpl } from './infrastructure/repositories/SqliteO
 import { SqliteTransactionRepositoryImpl } from './infrastructure/repositories/SqliteTransactionRepositoryImpl';
 import { HttpOrderSyncGatewayImpl } from './infrastructure/gateways/HttpOrderSyncGatewayImpl';
 import { HttpTransactionSyncGatewayImpl } from './infrastructure/gateways/HttpTransactionSyncGatewayImpl';
-import { SyncOrderUseCase } from './domain/use-cases/SyncOrderUseCase';
-import { SyncTransactionUseCase } from './domain/use-cases/SyncTransactionUseCase';
+import { SyncOrderUseCase } from './application/usecases/SyncOrderUseCase';
+import { SyncTransactionUseCase } from './application/usecases/SyncTransactionUseCase';
 import { createSyncWorker } from './infrastructure/queue/SyncWorkerImpl';
 
 const db = createDatabase();

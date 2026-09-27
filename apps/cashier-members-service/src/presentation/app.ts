@@ -2,7 +2,7 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import { authMiddleware } from './middleware/authMiddleware';
 import { memberRoutes } from './routes/memberRoutes';
-import { GetMemberByIdUseCase } from '../domain/use-cases/GetMemberByIdUseCase';
+import { GetMemberByIdUseCase } from '../application/usecases/GetMemberByIdUseCase';
 
 export function createApp(getMemberByIdUseCase: GetMemberByIdUseCase): Application {
   const app = express();

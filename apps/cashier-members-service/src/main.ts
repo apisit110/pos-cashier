@@ -7,7 +7,7 @@ if (!process.env.JWT_SECRET) {
 
 import { createDatabase } from '@lightning-pos/database';
 import { SqliteMemberRepositoryImpl } from './infrastructure/repositories/SqliteMemberRepositoryImpl';
-import { GetMemberByIdUseCase } from './domain/use-cases/GetMemberByIdUseCase';
+import { GetMemberByIdUseCase } from './application/usecases/GetMemberByIdUseCase';
 import { createApp } from './presentation/app';
 
 const PORT = process.env.PORT ?? 3004;

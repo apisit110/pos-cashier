@@ -25,7 +25,12 @@ export class ApiAuthRepository implements AuthRepository {
     if (!session) return null;
 
     try {
-      return JSON.parse(session) as AuthResponse;
+      const parsed = JSON.parse(session) as AuthResponse;
+      if (!parsed?.staff?.id || !parsed.accessToken) {
+        localStorage.removeItem(STORAGE_KEY);
+        return null;
+      }
+      return parsed;
     } catch {
       localStorage.removeItem(STORAGE_KEY);
       return null;

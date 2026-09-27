@@ -3,12 +3,12 @@ import cors from 'cors';
 import { authMiddleware } from './middleware/authMiddleware';
 import { productRoutes } from './routes/productRoutes';
 import { internalProductRoutes } from './routes/internalProductRoutes';
-import { GetProductByBarcodeUseCase } from '../domain/use-cases/GetProductByBarcodeUseCase';
-import { GetProductByIdUseCase } from '../domain/use-cases/GetProductByIdUseCase';
-import { GetProductsUseCase } from '../domain/use-cases/GetProductsUseCase';
-import { SyncProductsUseCase } from '../domain/use-cases/SyncProductsUseCase';
-import { CreateProductUseCase } from '../domain/use-cases/CreateProductUseCase';
-import { UpdateProductUseCase } from '../domain/use-cases/UpdateProductUseCase';
+import { GetProductByBarcodeUseCase } from '../application/usecases/GetProductByBarcodeUseCase';
+import { GetProductByIdUseCase } from '../application/usecases/GetProductByIdUseCase';
+import { GetProductsUseCase } from '../application/usecases/GetProductsUseCase';
+import { SyncProductsUseCase } from '../application/usecases/SyncProductsUseCase';
+import { CreateProductUseCase } from '../application/usecases/CreateProductUseCase';
+import { UpdateProductUseCase } from '../application/usecases/UpdateProductUseCase';
 
 export function createApp(
   getProductByBarcodeUseCase: GetProductByBarcodeUseCase,
