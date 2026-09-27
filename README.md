@@ -99,6 +99,8 @@ rm -f pos-cashier.db pos-cashier.db-*
 
 pnpm --filter @lightning-pos/model build
 pnpm --filter @lightning-pos/database db:generate
+pnpm --filter @lightning-pos/database db:migrate
+pnpm --filter @lightning-pos/database db:seed all
 pnpm run dev
 ```
 

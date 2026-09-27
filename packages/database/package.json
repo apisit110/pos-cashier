@@ -12,6 +12,7 @@
   "scripts": {
     "build": "tsc",
     "db:generate": "drizzle-kit generate",
+    "db:migrate": "ts-node src/cli/migrate.ts",
     "db:seed": "ts-node src/cli/seed.ts"
   },
   "dependencies": {
