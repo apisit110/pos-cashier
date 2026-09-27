@@ -10,7 +10,7 @@ export default function Pos() {
 
   return (
     <CreateOrderPage
-      onBack={staff?.role === 'manager' ? () => router.push('/dashboard') : undefined}
+      onBack={staff?.scope.includes('dashboard:view') ? () => router.push('/dashboard') : undefined}
       onLogout={logout}
       staff={staff}
     />

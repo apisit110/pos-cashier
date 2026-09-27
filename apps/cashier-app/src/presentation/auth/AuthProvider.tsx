@@ -7,6 +7,7 @@ import { TerminalSetupPage } from '../pages/terminal-setup/TerminalSetupPage';
 import { useTranslation } from '../i18n/LanguageContext';
 import { authRepository, getSessionUseCase } from '../di/container';
 import { AuthContext, homeRouteFor, type AuthStaff, type LoginSuccessData } from './AuthContext';
+import { decodeJwtScopes } from './decodeJwtScopes';
 
 const InitializingLoader = styled.div`
   height: 100vh;
@@ -36,6 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             username: session.staff.fullName,
             roleId: session.staff.roleId,
             role: session.staff.roleId === 1 ? 'manager' : 'cashier',
+            scope: decodeJwtScopes(session.accessToken),
             accessToken: session.accessToken,
             refreshToken: session.refreshToken,
           });
@@ -56,6 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       username: data.username,
       roleId: data.roleId,
       role: data.roleId === 1 ? 'manager' : 'cashier',
+      scope: decodeJwtScopes(data.accessToken),
       accessToken: data.accessToken,
       refreshToken: data.refreshToken,
     });

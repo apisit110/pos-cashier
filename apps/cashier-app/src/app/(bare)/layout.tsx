@@ -1,21 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../../presentation/auth/AuthContext';
+import { useAuthGuard } from '../../presentation/auth/useAuthGuard';
 import { BareLayout } from '../../presentation/layouts/BareLayout';
 
 export default function BareAreaLayout({ children }: { children: React.ReactNode }) {
-  const { staff } = useAuth();
-  const router = useRouter();
+  const { allowed } = useAuthGuard();
 
-  useEffect(() => {
-    if (!staff) {
-      router.replace('/login');
-    }
-  }, [staff, router]);
-
-  if (!staff) {
+  if (!allowed) {
     return null;
   }
 

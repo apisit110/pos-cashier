@@ -9,6 +9,7 @@ import { MainContent } from '../MainContent';
 import { useThemeMode } from '../../ThemeContext';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useAuth } from '../../auth/AuthContext';
+import { PAGE_PERMISSIONS } from '../../auth/pageAccess';
 
 const RightColumn = styled.div`
   flex: 1;
@@ -75,16 +76,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const pathname = usePathname();
   const router = useRouter();
 
-  const isManager = staff?.role === 'manager';
+  const scope = staff?.scope ?? [];
+  const canAccess = (path: keyof typeof PAGE_PERMISSIONS) => scope.includes(PAGE_PERMISSIONS[path]);
 
   const navItems = [
-    ...(isManager ? [{ label: t.mainLayout.dashboard, icon: <DashboardIcon />, active: pathname === '/dashboard', onClick: () => router.push('/dashboard') }] : []),
+    ...(canAccess('/dashboard') ? [{ label: t.mainLayout.dashboard, icon: <DashboardIcon />, active: pathname === '/dashboard', onClick: () => router.push('/dashboard') }] : []),
     { label: t.mainLayout.posTerminal, icon: <PosIcon />, active: pathname === '/pos', onClick: () => router.push('/pos') },
-    ...(isManager ? [
-      { label: t.mainLayout.transactions, icon: <TransactionIcon />, active: pathname.startsWith('/transactions'), onClick: () => router.push('/transactions') },
-      { label: t.mainLayout.products, icon: <ProductIcon />, active: pathname.startsWith('/products'), onClick: () => router.push('/products') },
-      { label: t.mainLayout.staffs, icon: <StaffIcon />, active: pathname.startsWith('/staff'), onClick: () => router.push('/staff') },
-    ] : []),
+    ...(canAccess('/transactions') ? [{ label: t.mainLayout.transactions, icon: <TransactionIcon />, active: pathname.startsWith('/transactions'), onClick: () => router.push('/transactions') }] : []),
+    ...(canAccess('/products') ? [{ label: t.mainLayout.products, icon: <ProductIcon />, active: pathname.startsWith('/products'), onClick: () => router.push('/products') }] : []),
+    ...(canAccess('/staff') ? [{ label: t.mainLayout.staffs, icon: <StaffIcon />, active: pathname.startsWith('/staff'), onClick: () => router.push('/staff') }] : []),
   ];
 
   const pageTitle = (() => {

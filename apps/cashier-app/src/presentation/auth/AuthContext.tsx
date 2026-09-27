@@ -5,6 +5,7 @@ export interface AuthStaff {
   username: string;
   role: string;
   roleId: number;
+  scope: string[];
   accessToken: string;
   refreshToken?: string;
 }
