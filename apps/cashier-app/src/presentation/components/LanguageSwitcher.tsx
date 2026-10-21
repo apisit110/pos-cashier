@@ -32,7 +32,7 @@ export const LanguageSwitcher: React.FC<{ className?: string; style?: React.CSSP
       onClick={() => setLanguage(language === 'en' ? 'th' : 'en')}
       aria-label="Toggle language"
     >
-      {language === 'en' ? '🇹🇭 ไทย' : '🇬🇧 EN'}
+      {language === 'en' ? '🇬🇧 EN' : '🇹🇭 TH'}
     </SwitcherButton>
   );
 };
