@@ -124,6 +124,7 @@ export interface Translations {
   transactionList: {
     title: string;
     totalTransactions: string;
+    dateRange: string;
     startDate: string;
     endDate: string;
     transactionId: string;
@@ -359,6 +360,7 @@ export const en: Translations = {
   transactionList: {
     title: 'Sales History',
     totalTransactions: 'Total: {count} Transactions',
+    dateRange: 'Date Range',
     startDate: 'Start Date',
     endDate: 'End Date',
     transactionId: 'Transaction ID',
@@ -594,6 +596,7 @@ export const th: Translations = {
   transactionList: {
     title: 'ประวัติการขาย',
     totalTransactions: 'ทั้งหมด: {count} รายการ',
+    dateRange: 'ช่วงวันที่',
     startDate: 'วันที่เริ่มต้น',
     endDate: 'วันที่สิ้นสุด',
     transactionId: 'รหัสรายการ',

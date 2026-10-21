@@ -68,8 +68,8 @@ importers:
   apps/cashier-app:
     dependencies:
       '@apisit110/pos-ui':
-        specifier: ^0.6.2
-        version: 0.6.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(styled-components@6.4.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
+        specifier: ^0.6.5
+        version: 0.6.5(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(styled-components@6.4.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
       '@lightning-pos/datetime':
         specifier: workspace:*
         version: link:../../packages/datetime
@@ -253,12 +253,12 @@ importers:
       '@lightning-pos/database':
         specifier: workspace:*
         version: link:../../packages/database
-      '@lightning-pos/http-response':
-        specifier: workspace:*
-        version: link:../../packages/http-response
       '@lightning-pos/datetime':
         specifier: workspace:*
         version: link:../../packages/datetime
+      '@lightning-pos/http-response':
+        specifier: workspace:*
+        version: link:../../packages/http-response
       '@lightning-pos/model':
         specifier: workspace:*
         version: link:../../packages/model
@@ -488,12 +488,12 @@ importers:
       '@lightning-pos/database':
         specifier: workspace:*
         version: link:../../packages/database
-      '@lightning-pos/http-response':
-        specifier: workspace:*
-        version: link:../../packages/http-response
       '@lightning-pos/datetime':
         specifier: workspace:*
         version: link:../../packages/datetime
+      '@lightning-pos/http-response':
+        specifier: workspace:*
+        version: link:../../packages/http-response
       '@lightning-pos/model':
         specifier: workspace:*
         version: link:../../packages/model
@@ -632,8 +632,8 @@ importers:
 
 packages:
 
-  '@apisit110/pos-ui@0.6.2':
-    resolution: {integrity: sha512-8X2z0kgOsJruaoVxMLmc2FzIfwH9CdtAJWFlxCcEm9np1rM8wAEyhrGqmfXnaXYf3OXbf/5bHOxg0wcTqHsegA==, tarball: https://npm.pkg.github.com/download/@apisit110/pos-ui/0.6.2/950df0a4d0c0c7f2af703f2c5f89e81f8bb94108}
+  '@apisit110/pos-ui@0.6.5':
+    resolution: {integrity: sha512-5PSRncqVcNvX56wnoLmrM3CbFA60b7aCzLjy3YDbH+Wdnziy+AMAefIHqFA/BmarccMMylSEZOv8iokqQh1BRg==, tarball: https://npm.pkg.github.com/download/@apisit110/pos-ui/0.6.5/e7509ed2bfc7ea171f7eae7c167b1ef5b6b1137b}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
@@ -3817,7 +3817,7 @@ packages:
 
 snapshots:
 
-  '@apisit110/pos-ui@0.6.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(styled-components@6.4.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))':
+  '@apisit110/pos-ui@0.6.5(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(styled-components@6.4.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))':
     dependencies:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)

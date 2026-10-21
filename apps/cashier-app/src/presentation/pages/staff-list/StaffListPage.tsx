@@ -6,7 +6,6 @@ import type { GetStaffsUseCase } from '../../../domain/use-cases/GetStaffsUseCas
 import type { SyncStaffUseCase } from '../../../domain/use-cases/SyncStaffUseCase';
 import type { Staff } from '../../../domain/repositories/StaffRepository';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { formatMessage } from '../../i18n/format';
 
 const isOnlineMode = process.env.NEXT_PUBLIC_APP_MODE === 'online';
 
@@ -63,7 +62,6 @@ export const StaffListPage: React.FC<StaffListPageProps> = ({ onBack, onNavigate
         onBack={onBack}
         extraContent={
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <span className="total-count">{formatMessage(t.staffList.totalStaffs, { count: total })}</span>
             <Button variant="primary" style={{ width: 'auto', gap: '0.5rem' }} onClick={onNavigateToCreateStaff}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: 18, height: 18 }}>
                 <line x1="12" y1="5" x2="12" y2="19" />

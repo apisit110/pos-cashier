@@ -3,8 +3,9 @@ import styled from 'styled-components';
 import dayjs, { formatDateTime } from '@lightning-pos/datetime';
 import {
   PageHeader, DataTable, Badge, Button, PageContainer, PageContent,
-  FilterBar, DateFilter, TextFilter, SelectFilter, ClearFilterButton,
+  FilterBar, DateRangeFilter, TextFilter, SelectFilter, ClearFilterButton,
 } from '@apisit110/pos-ui';
+import type { DateRange } from '@apisit110/pos-ui';
 import type { GetTransactionsUseCase } from '../../../domain/use-cases/GetTransactionsUseCase';
 import type { Transaction, TransactionFilter } from '../../../domain/repositories/TransactionRepository';
 import { useTranslation } from '../../i18n/LanguageContext';
@@ -18,7 +19,11 @@ declare module '@apisit110/pos-ui' {
 }
 
 const SearchFilterBar = styled(FilterBar)`
-  grid-template-columns: repeat(7, minmax(0, 1fr)) 120px;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) 120px;
+`;
+
+const DateRangeWrapper = styled.div`
+  grid-column: span 2;
 `;
 
 const SearchButtonWrapper = styled.div`
@@ -47,6 +52,19 @@ interface TransactionListPageProps {
 
 const RANGE_DAYS = 31;
 
+const getDateBounds = () => {
+  const today = dayjs().tz('Asia/Bangkok');
+  return {
+    min: today.subtract(1, 'year').format('YYYY-MM-DD'),
+    max: today.format('YYYY-MM-DD'),
+  };
+};
+
+const clampDate = (date: string): string => {
+  const { min, max } = getDateBounds();
+  return date < min ? min : date > max ? max : date;
+};
+
 const getDefaultFilters = (): TransactionFilter => {
   const today = dayjs().tz('Asia/Bangkok');
   return {
@@ -57,6 +75,7 @@ const getDefaultFilters = (): TransactionFilter => {
 
 export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack, onViewDetail, getTransactionsUseCase }) => {
   const { t } = useTranslation();
+  const dateBounds = getDateBounds();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -99,6 +118,17 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
     });
   };
 
+  const handleDateRangeChange = ({ start, end }: DateRange) => {
+    setFilters(prev => {
+      const { startDate, endDate, ...rest } = prev;
+      return {
+        ...rest,
+        ...(start && { startDate: clampDate(start) }),
+        ...(end && { endDate: clampDate(end) }),
+      };
+    });
+  };
+
   const handleSearch = () => {
     setIsLoading(true);
     setAppliedFilters(filters);
@@ -122,17 +152,15 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
 
       <PageContent>
         <SearchFilterBar>
-          <DateFilter
-            label={t.transactionList.startDate}
-            value={filters.startDate || ''}
-            onChange={(value) => handleFilterChange('startDate', value)}
-          />
-
-          <DateFilter
-            label={t.transactionList.endDate}
-            value={filters.endDate || ''}
-            onChange={(value) => handleFilterChange('endDate', value)}
-          />
+          <DateRangeWrapper>
+            <DateRangeFilter
+              label={t.transactionList.dateRange}
+              value={{ start: filters.startDate || '', end: filters.endDate || '' }}
+              min={dateBounds.min}
+              max={dateBounds.max}
+              onChange={handleDateRangeChange}
+            />
+          </DateRangeWrapper>
 
           <TextFilter
             label={t.transactionList.transactionId}
@@ -146,18 +174,6 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
             placeholder={t.transactionList.orderIdPlaceholder}
             value={filters.orderId || ''}
             onChange={(value) => handleFilterChange('orderId', value)}
-          />
-
-          <SelectFilter
-            label={t.transactionList.method}
-            value={filters.method || ''}
-            onChange={(value) => handleFilterChange('method', value)}
-            placeholder={t.transactionList.methodAll}
-            options={[
-              { value: 'CASH', label: t.transactionList.methodCash },
-              { value: 'CREDIT', label: t.transactionList.methodCredit },
-              { value: 'QR', label: t.transactionList.methodQr },
-            ]}
           />
 
           <SelectFilter
