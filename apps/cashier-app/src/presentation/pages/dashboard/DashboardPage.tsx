@@ -5,8 +5,9 @@ import { DashboardHeader, DashboardTitle, DashboardSubtitle } from './DashboardH
 import {
   StatGrid, StatCard, StatLabel, StatValue,
   ChartSection, ChartCard, ChartTitle,
-  BarChart, BarColumn, Bar, BarAxisLabel, EmptyState,
+  EmptyState,
 } from './DashboardSummary';
+import { RevenueBarChart } from './RevenueBarChart';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { formatMessage } from '../../i18n/format';
 import type { GetTransactionSummaryUseCase } from '../../../domain/use-cases/GetTransactionSummaryUseCase';
@@ -111,8 +112,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   const rangeRevenue = dailyBuckets.reduce((sum, b) => sum + b.totalAmount, 0);
   const rangeOrders = dailyBuckets.reduce((sum, b) => sum + b.orderCount, 0);
 
-  const hourlyMax = Math.max(1, ...hourlyBuckets.map((b) => b.totalAmount));
-  const dailyMax = Math.max(1, ...dailyBuckets.map((b) => b.totalAmount));
 
   return (
     <DashboardContainer>
@@ -152,14 +151,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           ) : todayOrders === 0 ? (
             <EmptyState>{t.dashboard.noSalesToday}</EmptyState>
           ) : (
-            <BarChart>
-              {hourlyBuckets.map((b) => (
-                <BarColumn key={b.bucket}>
-                  <Bar $heightPercent={(b.totalAmount / hourlyMax) * 100} title={`${b.label} — ${formatCurrency(b.totalAmount)} (${b.orderCount})`} />
-                  <BarAxisLabel>{b.label}</BarAxisLabel>
-                </BarColumn>
-              ))}
-            </BarChart>
+            <RevenueBarChart buckets={hourlyBuckets} formatValue={formatCurrency} />
           )}
         </ChartCard>
 
@@ -170,14 +162,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           ) : rangeOrders === 0 ? (
             <EmptyState>{t.dashboard.noSalesRecent}</EmptyState>
           ) : (
-            <BarChart>
-              {dailyBuckets.map((b) => (
-                <BarColumn key={b.bucket}>
-                  <Bar $heightPercent={(b.totalAmount / dailyMax) * 100} title={`${b.label} — ${formatCurrency(b.totalAmount)} (${b.orderCount})`} />
-                  <BarAxisLabel>{b.label}</BarAxisLabel>
-                </BarColumn>
-              ))}
-            </BarChart>
+            <RevenueBarChart buckets={dailyBuckets} formatValue={formatCurrency} />
           )}
         </ChartCard>
       </ChartSection>

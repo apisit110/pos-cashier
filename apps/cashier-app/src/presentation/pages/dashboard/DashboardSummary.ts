@@ -50,36 +50,9 @@ export const ChartTitle = styled.h2`
   margin: 0 0 1.25rem 0;
 `;
 
-export const BarChart = styled.div`
-  display: flex;
-  align-items: flex-end;
-  gap: 0.5rem;
-  height: 180px;
-`;
-
-export const BarColumn = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  height: 100%;
-  gap: 0.375rem;
-`;
-
-export const Bar = styled.div<{ $heightPercent: number }>`
-  width: 100%;
-  max-width: 28px;
-  height: ${({ $heightPercent }) => Math.max($heightPercent, 2)}%;
-  border-radius: 4px 4px 0 0;
-  background: ${({ theme }) => theme.semantics.colors.accent.primary};
-  transition: height 0.3s ease;
-`;
-
-export const BarAxisLabel = styled.div`
-  font-size: 0.6875rem;
-  color: ${({ theme }) => theme.semantics.colors.text.secondary};
-  white-space: nowrap;
+export const ChartCanvas = styled.div`
+  position: relative;
+  height: 220px;
 `;
 
 export const EmptyState = styled.div`
