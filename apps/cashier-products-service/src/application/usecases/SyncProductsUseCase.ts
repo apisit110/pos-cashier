@@ -1,12 +1,12 @@
 import { IProductRepository } from '../../domain/repositories/IProductRepository';
 import { ISyncMetadataRepository } from '../../domain/repositories/ISyncMetadataRepository';
-import { IProductSyncGateway } from '../../domain/repositories/IProductSyncGateway';
+import { IProductCenterRepository } from '../../domain/repositories/IProductCenterRepository';
 
 export class SyncProductsUseCase {
   constructor(
     private readonly productRepository: IProductRepository,
     private readonly syncMetadataRepository: ISyncMetadataRepository,
-    private readonly productSyncGateway: IProductSyncGateway,
+    private readonly productCenterRepository: IProductCenterRepository,
     private readonly appMode: 'online' | 'offline' = 'online',
   ) {}
 
@@ -27,7 +27,7 @@ export class SyncProductsUseCase {
 
       await this.syncMetadataRepository.updateStatus('SYNCING');
 
-      const { products, syncVersion } = await this.productSyncGateway.fetchProducts(
+      const { products, syncVersion } = await this.productCenterRepository.fetchProducts(
         mid,
         sid,
         lastSyncVersion,

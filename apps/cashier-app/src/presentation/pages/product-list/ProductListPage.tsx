@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { PageHeader, DataTable, type Column, Button, PageContainer, PageContent, FilterBar, TextFilter } from '@apisit110/pos-ui';
+import styled from 'styled-components';
+import { PageHeader, DataTable, type Column, Button, PageContainer, PageContent, FilterBar, TextFilter, ClearFilterButton } from '@apisit110/pos-ui';
 import { PriceTag } from '../../components/PriceTag';
 import { SyncButton } from '../../components/SyncButton';
 import { BrandBadge } from '../../components/BrandBadge';
@@ -9,7 +10,29 @@ import type { GetProductsUseCase } from '../../../domain/use-cases/GetProductsUs
 import type { SyncProductsUseCase } from '../../../domain/use-cases/SyncProductsUseCase';
 import type { Product } from '../../../domain/entities/Product';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { formatMessage } from '../../i18n/format';
+import { formatAmount } from '../../utils/formatAmount';
+
+const SearchFilterBar = styled(FilterBar)`
+  grid-template-columns: repeat(4, minmax(0, 1fr)) 120px;
+`;
+
+const SearchButtonWrapper = styled.div`
+  grid-row: 1;
+  grid-column: -2 / -1;
+  align-self: end;
+  justify-self: end;
+  margin-bottom: 8px;
+`;
+
+const RightClearFilterButton = styled(ClearFilterButton)`
+  grid-row: 2;
+  grid-column: -2 / -1;
+  justify-self: end;
+  width: 120px;
+  height: 36px;
+  padding-top: 0;
+  padding-bottom: 0;
+`;
 
 interface ProductListPageProps {
   onBack: () => void;
@@ -35,10 +58,12 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavi
     brand: '',
   });
 
+  const [appliedFilters, setAppliedFilters] = useState(filters);
+
   const fetchProducts = useCallback(async () => {
     setIsLoading(true);
     try {
-      const activeFilters = Object.entries(filters).reduce((acc, [key, value]) => {
+      const activeFilters = Object.entries(appliedFilters).reduce((acc, [key, value]) => {
         if (value !== '') {
           acc[key as keyof typeof filters] = value;
         }
@@ -52,16 +77,11 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavi
     } finally {
       setIsLoading(false);
     }
-  }, [getProductsUseCase, filters]);
+  }, [getProductsUseCase, appliedFilters]);
 
   useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      fetchProducts();
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [filters, fetchProducts]);
+    fetchProducts();
+  }, [fetchProducts]);
 
   const handleSync = async () => {
     setIsSyncing(true);
@@ -89,6 +109,17 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavi
 
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleSearch = () => {
+    setAppliedFilters(filters);
+    setCurrentPage(1);
+  };
+
+  const clearFilters = () => {
+    const empty = { barcode: '', name: '', price: '', brand: '' };
+    setFilters(empty);
+    setAppliedFilters(empty);
     setCurrentPage(1);
   };
 
@@ -111,7 +142,7 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavi
       key: 'price',
       width: '150px',
       textAlign: 'right',
-      render: (product) => <PriceTag>฿{product.price.toFixed(2)}</PriceTag>
+      render: (product) => <PriceTag>{formatAmount(product.price, '฿')}</PriceTag>
     },
     {
       header: t.productList.columnActions,
@@ -135,9 +166,6 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavi
         onBack={onBack}
         extraContent={
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <span className="total-count">
-              {formatMessage(t.productList.totalProducts, { count: products.length })}
-            </span>
             <Button variant="primary" style={{ width: 'auto' }} disabled={isSyncing || isLoading} onClick={onNavigateToCreateProduct}>
               {t.productList.createProduct}
             </Button>
@@ -149,7 +177,7 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavi
       />
 
       <PageContent>
-        <FilterBar>
+        <SearchFilterBar>
           <TextFilter
             label={t.productList.filterBarcode}
             placeholder={t.productList.filterBarcodePlaceholder}
@@ -174,7 +202,13 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavi
             value={filters.price}
             onChange={(value) => handleFilterChange('price', value)}
           />
-        </FilterBar>
+          <SearchButtonWrapper>
+            <Button variant="primary" style={{ width: '120px', height: '36px', padding: 0 }} disabled={isLoading} onClick={handleSearch}>
+              {t.productList.search}
+            </Button>
+          </SearchButtonWrapper>
+          <RightClearFilterButton onClick={clearFilters}>{t.productList.clearFilters}</RightClearFilterButton>
+        </SearchFilterBar>
 
         <DataTable
           columns={columns}

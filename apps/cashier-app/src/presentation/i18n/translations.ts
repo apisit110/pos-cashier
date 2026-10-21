@@ -77,6 +77,15 @@ export interface Translations {
     noProducts: string;
     promo: string;
     total: string;
+    amountDue: string;
+    receivedAmount: string;
+    paymentMethod: string;
+    cash: string;
+    change: string;
+    clear: string;
+    delete: string;
+    enter: string;
+    errorInsufficientAmount: string;
     proceedToPayment: string;
     errorProductNotFound: string;
     errorMemberNotFound: string;
@@ -133,6 +142,7 @@ export interface Translations {
     statusSuccess: string;
     statusFailed: string;
     statusRefunded: string;
+    search: string;
     clearFilters: string;
     columnDate: string;
     columnTime: string;
@@ -182,6 +192,8 @@ export interface Translations {
     filterBrandPlaceholder: string;
     filterPrice: string;
     filterPricePlaceholder: string;
+    search: string;
+    clearFilters: string;
     emptyMessage: string;
     syncFailedTitle: string;
     syncingLabel: string;
@@ -300,6 +312,15 @@ export const en: Translations = {
     noProducts: 'No products added yet. Scan a product to begin.',
     promo: 'Promo',
     total: 'Total',
+    amountDue: 'Amount Due',
+    receivedAmount: 'Received Amount',
+    paymentMethod: 'Payment Method',
+    cash: 'Cash',
+    change: 'Change',
+    clear: 'Cancel',
+    delete: 'Delete',
+    enter: 'Enter',
+    errorInsufficientAmount: 'Received amount is less than the total.',
     proceedToPayment: 'Proceed to Payment',
     errorProductNotFound: 'Product not found.',
     errorMemberNotFound: 'Member not found.',
@@ -356,6 +377,7 @@ export const en: Translations = {
     statusSuccess: 'Success',
     statusFailed: 'Failed',
     statusRefunded: 'Refunded',
+    search: 'Search',
     clearFilters: 'Clear Filters',
     columnDate: 'Date',
     columnTime: 'Time',
@@ -405,6 +427,8 @@ export const en: Translations = {
     filterBrandPlaceholder: 'Search brand...',
     filterPrice: 'Price',
     filterPricePlaceholder: 'Search price...',
+    search: 'Search',
+    clearFilters: 'Clear Filters',
     emptyMessage: 'No products found matching your filters.',
     syncFailedTitle: 'Sync Failed',
     syncingLabel: 'Synchronizing data...',
@@ -523,6 +547,15 @@ export const th: Translations = {
     noProducts: 'ยังไม่มีสินค้าที่เพิ่ม สแกนสินค้าเพื่อเริ่มต้น',
     promo: 'โปรโมชั่น',
     total: 'ยอดรวม',
+    amountDue: 'ยอดที่ต้องชำระ',
+    receivedAmount: 'เงินที่รับมา',
+    paymentMethod: 'วิธีชำระเงิน',
+    cash: 'เงินสด',
+    change: 'เงินทอน',
+    clear: 'ยกเลิก',
+    delete: 'ลบ',
+    enter: 'ตกลง',
+    errorInsufficientAmount: 'เงินที่รับมาไม่เพียงพอ',
     proceedToPayment: 'คิดเงิน',
     errorProductNotFound: 'ไม่พบสินค้า',
     errorMemberNotFound: 'ไม่พบสมาชิก',
@@ -579,6 +612,7 @@ export const th: Translations = {
     statusSuccess: 'สำเร็จ',
     statusFailed: 'ล้มเหลว',
     statusRefunded: 'คืนเงินแล้ว',
+    search: 'ค้นหา',
     clearFilters: 'ล้างตัวกรอง',
     columnDate: 'วันที่',
     columnTime: 'เวลา',
@@ -628,6 +662,8 @@ export const th: Translations = {
     filterBrandPlaceholder: 'ค้นหาแบรนด์...',
     filterPrice: 'ราคา',
     filterPricePlaceholder: 'ค้นหาราคา...',
+    search: 'ค้นหา',
+    clearFilters: 'ล้างตัวกรอง',
     emptyMessage: 'ไม่พบสินค้าที่ตรงกับตัวกรองของคุณ',
     syncFailedTitle: 'ซิงค์ไม่สำเร็จ',
     syncingLabel: 'กำลังซิงค์ข้อมูล...',

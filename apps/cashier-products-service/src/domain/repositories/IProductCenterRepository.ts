@@ -1,6 +1,6 @@
 import { Product } from '../entities/Product';
 
-export interface IProductSyncGateway {
+export interface IProductCenterRepository {
   fetchProducts(
     mid: string,
     sid: string,

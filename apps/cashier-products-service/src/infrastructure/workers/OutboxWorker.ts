@@ -1,12 +1,12 @@
 import { ISyncOutboxRepository } from '../../domain/repositories/ISyncOutboxRepository';
-import { IProductSyncGateway } from '../../domain/repositories/IProductSyncGateway';
+import { IProductCenterRepository } from '../../domain/repositories/IProductCenterRepository';
 
 export class OutboxWorker {
   private intervalId: NodeJS.Timeout | null = null;
 
   constructor(
     private readonly outboxRepository: ISyncOutboxRepository,
-    private readonly productSyncGateway: IProductSyncGateway,
+    private readonly productCenterRepository: IProductCenterRepository,
     private readonly intervalMs = 30 * 1000,
   ) {}
 
@@ -30,7 +30,7 @@ export class OutboxWorker {
 
     for (const entry of entries) {
       try {
-        await this.productSyncGateway.pushProduct(entry.product);
+        await this.productCenterRepository.pushProduct(entry.product);
         await this.outboxRepository.markDone(entry.id);
         console.log(`[OutboxWorker] Synced product ${entry.product.id}`);
       } catch (error) {

@@ -7,7 +7,7 @@ export class ApiProductRepository implements ProductRepository {
     try {
       const response = await api.get(`/products/barcode/${barcode}`);
       const data = response.data;
-      return new Product(data.id, data.barcode, data.name, data.price, data.imageUrl, data.brand);
+      return new Product(data.id, barcode, data.name, data.price, data.imageUrl, data.brand);
     } catch (error: any) {
       if (error.response?.status === 404) return null;
       throw error;

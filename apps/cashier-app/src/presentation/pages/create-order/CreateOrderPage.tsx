@@ -1,16 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useTheme } from 'styled-components';
-import { InputField, Button, PageHeader, PaymentModal, DataTable, type Column } from '@apisit110/pos-ui';
+import { InputField, Button, PageHeader, DataTable, type Column } from '@apisit110/pos-ui';
 import { Container } from './Container';
 import { Main } from './Main';
 import { SidePanel } from './SidePanel';
+import { CashKeypad } from './CashKeypad';
 import { MemberSection } from './MemberSection';
 import { MemberCard } from './MemberCard';
 import { TablePanel } from './TablePanel';
 import { ScrollArea } from './ScrollArea';
 import { QtyControls } from './QtyControls';
 import { EmptyState } from './EmptyState';
-import { OrderSummary } from './OrderSummary';
 import { ApiProductRepository } from '../../../infrastructure/repositories/ApiProductRepository';
 import { ApiMemberRepository } from '../../../infrastructure/repositories/ApiMemberRepository';
 import { ApiOrderRepository } from '../../../infrastructure/repositories/ApiOrderRepository';
@@ -20,7 +19,8 @@ import { Member } from '../../../domain/entities/Member';
 import { IdentifyMemberUseCase } from '../../../domain/use-cases/IdentifyMemberUseCase';
 import type { PromotionResult } from '../../../domain/use-cases/CalculatePromotionUseCase';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { formatMessage } from '../../i18n/format';
+import { keyCodeToChar } from './keyCodeToChar';
+import { formatAmount } from '../../utils/formatAmount';
 
 interface OrderItem {
   product: Product;
@@ -45,21 +45,20 @@ interface CreateOrderPageProps {
 
 export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogout, staff }) => {
   const { t } = useTranslation();
-  const theme = useTheme();
   const [items, setItems] = useState<OrderItem[]>([]);
   const [memberInput, setMemberInput] = useState('');
   const [member, setMember] = useState<Member | null>(null);
   const [promotionResult, setPromotionResult] = useState<PromotionResult | null>(null);
   const [lastScannedId, setLastScannedId] = useState<string | null>(null);
-  const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
   const [isIdentifyingMember, setIsIdentifyingMember] = useState(false);
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [receivedInput, setReceivedInput] = useState('');
   // Stays the same across retries of one checkout attempt (e.g. network timeout, double-submit)
   // so the backend can dedupe instead of charging/creating an order twice. Cleared whenever the
   // modal (re)opens for a fresh cart.
   const checkoutIdempotencyKeyRef = useRef<string | null>(null);
 
+  const receivedInputRef = useRef<HTMLInputElement>(null);
   const memberInputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -101,10 +100,6 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
   const performScan = async (barcode: string) => {
     if (!barcode.trim()) return;
 
-    if (isPaymentModalOpen && isPaymentSuccess) {
-      handlePaymentSuccess();
-    }
-
     setError(null);
     try {
       const product = await scanUseCase.execute(barcode.trim());
@@ -125,39 +120,56 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
   useEffect(() => {
     let buffer = '';
     let lastKeyTime = Date.now();
+    // Value of the focused input before the first key of the current burst; the first scanner
+    // character can't be told apart from human typing, so it leaks into the input and is rolled back.
+    let valueBeforeBurst = '';
+    const setInputValue = (input: HTMLInputElement, value: string) => {
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set?.call(input, value);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    };
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
-
-      if (target.tagName === 'INPUT') return;
-
-      if (isPaymentModalOpen && !isPaymentSuccess) return;
+      const input = target.tagName === 'INPUT' ? (target as HTMLInputElement) : null;
 
       const currentTime = Date.now();
-      if (currentTime - lastKeyTime > 50) buffer = '';
+      const isFast = currentTime - lastKeyTime <= 50;
       lastKeyTime = currentTime;
+      if (!isFast) {
+        buffer = '';
+        if (input) valueBeforeBurst = input.value;
+      }
 
-      if (e.key === 'Enter') {
+      if (e.code === 'Enter' || e.code === 'NumpadEnter') {
         if (buffer.length >= 3) {
           e.preventDefault();
+          e.stopPropagation();
+          if (input) setInputValue(input, valueBeforeBurst);
           performScan(buffer);
           buffer = '';
-        } else if (items.length > 0 && !isPaymentModalOpen) {
+        } else if (!input && items.length > 0) {
           e.preventDefault();
-          setIsPaymentModalOpen(true);
+          receivedInputRef.current?.focus();
         }
-      } else if (e.key.length === 1) buffer += e.key;
+      } else {
+        const char = keyCodeToChar(e.code, e.shiftKey);
+        if (char) {
+          buffer += char;
+          // Fast follow-up characters are scanner input: keep them out of the input.
+          if (input && isFast && buffer.length > 1) e.preventDefault();
+        }
+      }
     };
-    window.addEventListener('keydown', handleGlobalKeyDown);
-    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [items, isPaymentModalOpen]);
+    window.addEventListener('keydown', handleGlobalKeyDown, true);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown, true);
+  }, [items]);
 
   const handleUpdateQty = (productId: string, delta: number) => {
-    setItems(prev => prev.map(item => {
+    setItems(prev => prev.flatMap(item => {
       if (item.product.id === productId) {
-        const newQty = Math.max(1, item.quantity + delta);
-        return { ...item, quantity: newQty };
+        if (item.quantity + delta < 1) return [];
+        return [{ ...item, quantity: item.quantity + delta }];
       }
-      return item;
+      return [item];
     }));
   };
 
@@ -182,46 +194,43 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
   };
 
   const handleRemoveMember = () => setMember(null);
-  const handleRemove = (productId: string) => setItems((prev) => prev.filter(i => i.product.id !== productId));
   const handlePaymentSuccess = () => {
     setItems([]);
     setMember(null);
     setPromotionResult(null);
     setError(null);
+    setReceivedInput('');
     checkoutIdempotencyKeyRef.current = null;
   };
 
-  const handleProcessPayment = async (method: 'CASH', receivedAmount?: number) => {
+  const handleCheckout = async () => {
+    const received = Number(receivedInput) || 0;
+    if (items.length === 0) return;
+    if (received < total) {
+      setError(t.createOrder.errorInsufficientAmount);
+      return;
+    }
     if (!checkoutIdempotencyKeyRef.current) {
       checkoutIdempotencyKeyRef.current = crypto.randomUUID();
     }
-    const itemDtos = items.map(i => ({
-      productId: i.product.id,
-      quantity: i.quantity,
-      price: i.product.price
-    }));
-    return await orderRepository.checkout({
-      items: itemDtos,
-      memberId: member?.id,
-      paymentMethod: method,
-      receivedAmount,
-      idempotencyKey: checkoutIdempotencyKeyRef.current
-    });
+    try {
+      await orderRepository.checkout({
+        items: items.map(i => ({
+          productId: i.product.id,
+          quantity: i.quantity,
+          price: i.product.price
+        })),
+        memberId: member?.id,
+        paymentMethod: 'CASH',
+        receivedAmount: received,
+        idempotencyKey: checkoutIdempotencyKeyRef.current
+      });
+      handlePaymentSuccess();
+    } catch (err: any) {
+      setError(err.message || t.createOrder.errorInsufficientAmount);
+    }
   };
-
   const columns: Column<OrderItem>[] = [
-    {
-      header: t.createOrder.columnNumber,
-      key: 'number',
-      width: '48px',
-      textAlign: 'center',
-      render: (item) => <span style={{ color: 'var(--color-text-secondary, #94a3b8)' }}>{items.indexOf(item) + 1}</span>
-    },
-    {
-      header: t.createOrder.columnBarcode,
-      key: 'barcode',
-      render: (item) => <code style={{ background: 'rgba(255,255,255,0.05)', padding: '2px 4px', borderRadius: 4 }}>{item.product.barcode}</code>
-    },
     {
       header: t.createOrder.columnName,
       key: 'name',
@@ -244,27 +253,13 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
       header: t.createOrder.columnPrice,
       key: 'price',
       textAlign: 'right',
-      render: (item) => `$${item.product.price.toFixed(2)}`
+      render: (item) => formatAmount(item.product.price, '฿')
     },
     {
       header: t.createOrder.columnTotal,
       key: 'total',
       textAlign: 'right',
-      render: (item) => <span style={{ fontWeight: 600 }}>${(item.product.price * item.quantity).toFixed(2)}</span>
-    },
-    {
-      header: t.createOrder.columnAction,
-      key: 'actions',
-      textAlign: 'center',
-      width: '60px',
-      render: (item) => (
-        <button
-          onClick={() => handleRemove(item.product.id)}
-          style={{ background: 'none', border: 'none', color: 'var(--color-error, #ef4444)', cursor: 'pointer', padding: 8 }}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-        </button>
-      )
+      render: (item) => <span style={{ fontWeight: 600 }}>{formatAmount(item.product.price * item.quantity, '฿')}</span>
     }
   ];
 
@@ -283,10 +278,6 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
 
       <Main>
         <TablePanel>
-          <div className="table-header">
-            <h3>{t.createOrder.currentOrder}</h3>
-            <span className="item-count">{formatMessage(t.createOrder.itemsCount, { count: items.length })}</span>
-          </div>
           {error && <div className="table-error">{error}</div>}
 
           <ScrollArea ref={scrollAreaRef}>
@@ -347,41 +338,10 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
             </MemberSection>
           )}
 
-          <OrderSummary>
-            <div className="summary-content">
-              <div className="summary-row total">
-                <span>{t.createOrder.total}</span>
-                <span>{total.toFixed(2)}</span>
-              </div>
-              <Button
-                disabled={items.length === 0}
-                onClick={() => setIsPaymentModalOpen(true)}
-                style={{
-                  height: 56,
-                  fontSize: '1.125rem',
-                  fontWeight: 600,
-                  backgroundColor: theme.components.button.success.bg,
-                  color: theme.components.button.success.text,
-                }}
-              >
-                {t.createOrder.proceedToPayment}
-              </Button>
-            </div>
-          </OrderSummary>
+          <CashKeypad total={total} value={receivedInput} onChange={setReceivedInput} onSubmit={handleCheckout} inputRef={receivedInputRef} disabled={items.length === 0} />
         </SidePanel>
       </Main>
 
-      <PaymentModal
-        isOpen={isPaymentModalOpen}
-        onClose={() => {
-          setIsPaymentModalOpen(false);
-          checkoutIdempotencyKeyRef.current = null;
-        }}
-        totalAmount={total}
-        onPaymentSuccess={handlePaymentSuccess}
-        onProcessPayment={handleProcessPayment}
-        onStepChange={(step) => setIsPaymentSuccess(step === 'success')}
-      />
     </Container>
   );
 };

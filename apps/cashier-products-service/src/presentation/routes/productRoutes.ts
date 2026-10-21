@@ -49,7 +49,8 @@ export function productRoutes(
     try {
       const requestDto = GetProductByBarcodeRequestDto.from(req.params);
       const product = await getProductByBarcodeUseCase.execute(requestDto.barcode);
-      res.json(SuccessResponseDto.of(ProductResponseDto.fromEntity(product)));
+      const { barcode: _barcode, ...body } = ProductResponseDto.fromEntity(product).toJSON();
+      res.json(SuccessResponseDto.of(body));
     } catch (error) {
       if (error instanceof z.ZodError) {
         res.status(400).json(ErrorResponseDto.of('400', 'Validation failed', JSON.stringify(error.issues)));

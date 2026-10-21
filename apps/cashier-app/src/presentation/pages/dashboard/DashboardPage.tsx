@@ -11,6 +11,7 @@ import { useTranslation } from '../../i18n/LanguageContext';
 import { formatMessage } from '../../i18n/format';
 import type { GetTransactionSummaryUseCase } from '../../../domain/use-cases/GetTransactionSummaryUseCase';
 import type { TransactionSummaryBucket } from '../../../domain/repositories/TransactionRepository';
+import { formatAmount } from '../../utils/formatAmount';
 
 interface DashboardPageProps {
   staff: { uid: string; username: string; role: string; accessToken: string } | null;
@@ -28,7 +29,7 @@ const HOURLY_KEY_FORMAT = 'YYYY-MM-DD HH:00';
 const DAILY_KEY_FORMAT = 'YYYY-MM-DD';
 const DAILY_RANGE_DAYS = 7;
 
-const formatCurrency = (amount: number) => `฿${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const formatCurrency = (amount: number) => formatAmount(amount, '฿');
 
 function fillHourlyBuckets(data: TransactionSummaryBucket[]): FilledBucket[] {
   const byBucket = new Map(data.map((d) => [d.bucket, d]));

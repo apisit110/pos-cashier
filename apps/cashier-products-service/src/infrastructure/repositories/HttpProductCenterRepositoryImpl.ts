@@ -1,8 +1,8 @@
-import { IProductSyncGateway } from '../../domain/repositories/IProductSyncGateway';
+import { IProductCenterRepository } from '../../domain/repositories/IProductCenterRepository';
 import { Product } from '../../domain/entities/Product';
 import { httpClient } from '../http/axiosInstance';
 
-export class HttpProductSyncGatewayImpl implements IProductSyncGateway {
+export class HttpProductCenterRepositoryImpl implements IProductCenterRepository {
   async pushProduct(product: Product): Promise<void> {
     const mid = process.env.MID;
     const sid = process.env.SID;
@@ -33,7 +33,7 @@ export class HttpProductSyncGatewayImpl implements IProductSyncGateway {
         throw new Error(`pos-center failed to upload product ${product.id}`);
       }
     } catch (error: any) {
-      console.error('[HttpProductSyncGatewayImpl] Error uploading product:', error.message);
+      console.error('[HttpProductCenterRepositoryImpl] Error uploading product:', error.message);
       throw error;
     }
   }
@@ -59,7 +59,7 @@ export class HttpProductSyncGatewayImpl implements IProductSyncGateway {
 
       return { products, syncVersion: newSyncVersion };
     } catch (error) {
-      console.error('[HttpProductSyncGatewayImpl] Error fetching products:', error);
+      console.error('[HttpProductCenterRepositoryImpl] Error fetching products:', error);
       throw error;
     }
   }

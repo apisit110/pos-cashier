@@ -12,6 +12,7 @@ import { formatDateTime } from '@lightning-pos/datetime';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { formatMessage } from '../../i18n/format';
 import type { Translations } from '../../i18n/translations';
+import { formatAmount } from '../../utils/formatAmount';
 
 type IndexedOrderItem = OrderItem & { _rowIndex: number };
 
@@ -50,7 +51,7 @@ const getOrderItemColumns = (t: Translations) => [
     key: 'unitPrice',
     textAlign: 'right' as const,
     render: (item: IndexedOrderItem) => (
-      <span style={{ fontVariantNumeric: 'tabular-nums' }}>฿{item.unitPrice.toFixed(2)}</span>
+      <span style={{ fontVariantNumeric: 'tabular-nums' }}>{formatAmount(item.unitPrice, '฿')}</span>
     ),
   },
   {
@@ -65,7 +66,7 @@ const getOrderItemColumns = (t: Translations) => [
     key: 'total',
     textAlign: 'right' as const,
     render: (item: IndexedOrderItem) => (
-      <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>฿{item.total.toFixed(2)}</span>
+      <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{formatAmount(item.total, '฿')}</span>
     ),
   },
 ];
@@ -127,7 +128,7 @@ export const TransactionDetailPage: React.FC<TransactionDetailPageProps> = ({
             <Card>
               <DetailItem>
                 <label>{t.transactionDetail.amountTotal}</label>
-                <span className="amount">฿{transaction.amount.toFixed(2)}</span>
+                <span className="amount">{formatAmount(transaction.amount, '฿')}</span>
               </DetailItem>
 
               <DetailGrid>

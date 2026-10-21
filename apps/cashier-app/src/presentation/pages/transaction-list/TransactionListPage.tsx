@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import styled from 'styled-components';
 import dayjs, { formatDateTime } from '@lightning-pos/datetime';
 import {
-  PageHeader, DataTable, Badge, PageContainer, PageContent,
+  PageHeader, DataTable, Badge, Button, PageContainer, PageContent,
   FilterBar, DateFilter, TextFilter, SelectFilter, ClearFilterButton,
 } from '@apisit110/pos-ui';
 import type { GetTransactionsUseCase } from '../../../domain/use-cases/GetTransactionsUseCase';
 import type { Transaction, TransactionFilter } from '../../../domain/repositories/TransactionRepository';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { formatMessage } from '../../i18n/format';
+import { formatAmount } from '../../utils/formatAmount';
 
 declare module '@apisit110/pos-ui' {
   interface Column<T> {
@@ -16,11 +17,43 @@ declare module '@apisit110/pos-ui' {
   }
 }
 
+const SearchFilterBar = styled(FilterBar)`
+  grid-template-columns: repeat(7, minmax(0, 1fr)) 120px;
+`;
+
+const SearchButtonWrapper = styled.div`
+  grid-row: 1;
+  grid-column: -2 / -1;
+  align-self: end;
+  justify-self: end;
+  margin-bottom: 8px;
+`;
+
+const RightClearFilterButton = styled(ClearFilterButton)`
+  grid-row: 2;
+  grid-column: -2 / -1;
+  justify-self: end;
+  width: 120px;
+  height: 36px;
+  padding-top: 0;
+  padding-bottom: 0;
+`;
+
 interface TransactionListPageProps {
   onBack: () => void;
   onViewDetail: (id: string) => void;
   getTransactionsUseCase: GetTransactionsUseCase;
 }
+
+const RANGE_DAYS = 31;
+
+const getDefaultFilters = (): TransactionFilter => {
+  const today = dayjs().tz('Asia/Bangkok');
+  return {
+    startDate: today.subtract(RANGE_DAYS - 1, 'day').format('YYYY-MM-DD'),
+    endDate: today.format('YYYY-MM-DD'),
+  };
+};
 
 export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack, onViewDetail, getTransactionsUseCase }) => {
   const { t } = useTranslation();
@@ -29,12 +62,14 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [isLoading, setIsLoading] = useState(true);
-  const [filters, setFilters] = useState<TransactionFilter>({});
+  const [filters, setFilters] = useState<TransactionFilter>(getDefaultFilters);
+
+  const [appliedFilters, setAppliedFilters] = useState<TransactionFilter>(filters);
 
   const fetchTransactions = useCallback(async () => {
     setIsLoading(true);
     try {
-      const apiFilters = { ...filters };
+      const apiFilters = { ...appliedFilters };
 
       if (apiFilters.startDate) {
         apiFilters.startDate = dayjs.tz(apiFilters.startDate, 'Asia/Bangkok').startOf('day').utc().toISOString();
@@ -52,23 +87,29 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
     } finally {
       setIsLoading(false);
     }
-  }, [getTransactionsUseCase, currentPage, pageSize, filters]);
+  }, [getTransactionsUseCase, currentPage, pageSize, appliedFilters]);
 
   useEffect(() => { fetchTransactions(); }, [fetchTransactions]);
 
   const handleFilterChange = (key: keyof TransactionFilter, value: string) => {
-    setIsLoading(true);
     setFilters(prev => {
       const newFilters = { ...prev, [key]: value || undefined };
       if (!value) delete newFilters[key];
       return newFilters;
     });
+  };
+
+  const handleSearch = () => {
+    setIsLoading(true);
+    setAppliedFilters(filters);
     setCurrentPage(1);
   };
 
   const clearFilters = () => {
     setIsLoading(true);
-    setFilters({});
+    const defaults = getDefaultFilters();
+    setFilters(defaults);
+    setAppliedFilters(defaults);
     setCurrentPage(1);
   };
 
@@ -77,11 +118,10 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
       <PageHeader
         title={t.transactionList.title}
         onBack={onBack}
-        extraContent={<span className="total-count">{formatMessage(t.transactionList.totalTransactions, { count: total })}</span>}
       />
 
       <PageContent>
-        <FilterBar>
+        <SearchFilterBar>
           <DateFilter
             label={t.transactionList.startDate}
             value={filters.startDate || ''}
@@ -145,8 +185,13 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
             ]}
           />
 
-          <ClearFilterButton onClick={clearFilters}>{t.transactionList.clearFilters}</ClearFilterButton>
-        </FilterBar>
+          <SearchButtonWrapper>
+            <Button variant="primary" style={{ width: '120px', height: '36px', padding: 0 }} disabled={isLoading} onClick={handleSearch}>
+              {t.transactionList.search}
+            </Button>
+          </SearchButtonWrapper>
+          <RightClearFilterButton onClick={clearFilters}>{t.transactionList.clearFilters}</RightClearFilterButton>
+        </SearchFilterBar>
 
         <DataTable
           columns={[
@@ -170,44 +215,22 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
             {
               header: t.transactionList.columnAmount,
               key: 'amount',
-              render: (tx) => <span style={{ fontWeight: 700 }}>฿{tx.amount.toFixed(2)}</span>
+              textAlign: 'right',
+              render: (tx) => <span style={{ fontWeight: 700 }}>{formatAmount(tx.amount, '฿')}</span>
             },
             {
               header: t.transactionList.columnStatus,
               key: 'status',
+              textAlign: 'center',
               render: (tx) => (
                 <Badge $variant={tx.status.toLowerCase() === 'success' ? 'success' : 'error'}>
                   {tx.status}
                 </Badge>
               )
             },
-            {
-              header: t.transactionList.columnActions,
-              key: 'actions',
-              textAlign: 'right',
-              render: (tx) => (
-                <button
-                  onClick={() => onViewDetail(tx.id)}
-                  style={{
-                    background: 'none',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    color: '#818cf8',
-                    padding: '0.4rem 0.8rem',
-                    borderRadius: '6px',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseOver={(e) => { e.currentTarget.style.borderColor = '#818cf8'; e.currentTarget.style.background = 'rgba(129, 140, 248, 0.05)'; }}
-                  onMouseOut={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'none'; }}
-                >
-                  {t.transactionList.viewDetails}
-                </button>
-              )
-            },
           ]}
           data={transactions}
+          onRowClick={(tx) => onViewDetail(tx.id)}
           isLoading={isLoading}
           totalItems={total}
           currentPage={currentPage}
