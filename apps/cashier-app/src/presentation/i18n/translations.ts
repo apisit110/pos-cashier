@@ -201,19 +201,30 @@ export interface Translations {
   };
   createProduct: {
     title: string;
-    barcode: string;
-    barcodePlaceholder: string;
-    name: string;
-    namePlaceholder: string;
-    brand: string;
-    brandPlaceholder: string;
-    price: string;
-    createButton: string;
-    creatingLabel: string;
+    columnsHint: string;
+    chooseFile: string;
+    downloadTemplate: string;
+    previewTitle: string;
+    itemsCount: string;
+    invalidCount: string;
+    clear: string;
+    importButton: string;
+    importingLabel: string;
+    errorNoFile: string;
+    errorEmptyFile: string;
+    errorRow: string;
+    resultTitle: string;
+    resultSummary: string;
+    columnRow: string;
+    columnBarcode: string;
+    columnName: string;
+    columnBrand: string;
+    columnPrice: string;
+    columnStatus: string;
+    statusValid: string;
     errorBarcodeRequired: string;
     errorNameRequired: string;
     errorPriceInvalid: string;
-    errorFailed: string;
   };
   editProduct: {
     title: string;
@@ -413,7 +424,7 @@ export const en: Translations = {
   productList: {
     title: 'Products Inventory',
     totalProducts: 'Total: {count} Products',
-    createProduct: '+ Create Product',
+    createProduct: '+ Import Products',
     syncProducts: 'Sync Products',
     syncing: 'Syncing...',
     columnBarcode: 'Barcode',
@@ -436,20 +447,31 @@ export const en: Translations = {
     syncingLabel: 'Synchronizing data...',
   },
   createProduct: {
-    title: 'Create New Product',
-    barcode: 'Barcode',
-    barcodePlaceholder: 'Enter product barcode',
-    name: 'Product Name',
-    namePlaceholder: 'Enter product name',
-    brand: 'Brand',
-    brandPlaceholder: 'Enter brand (optional)',
-    price: 'Price',
-    createButton: 'Create Product',
-    creatingLabel: 'Creating product...',
-    errorBarcodeRequired: 'Please enter a barcode',
-    errorNameRequired: 'Please enter a product name',
-    errorPriceInvalid: 'Please enter a valid price',
-    errorFailed: 'Failed to create product',
+    title: 'Import Products',
+    columnsHint: 'Upload an .xlsx file with a header row and columns: barcode, name, brand (optional), price',
+    chooseFile: 'Choose .xlsx file',
+    downloadTemplate: 'Download sample file',
+    previewTitle: 'Preview Products',
+    itemsCount: '{count} items',
+    invalidCount: '{count} invalid',
+    clear: 'Clear',
+    importButton: 'Import {count} Product(s)',
+    importingLabel: 'Importing products...',
+    errorNoFile: 'Please choose an .xlsx file',
+    errorEmptyFile: 'The file has no data rows',
+    errorRow: 'Row {row}: {message}',
+    resultTitle: 'Import Result',
+    resultSummary: 'Imported {success} of {total} products',
+    columnRow: 'Row',
+    columnBarcode: 'Barcode',
+    columnName: 'Product Name',
+    columnBrand: 'Brand',
+    columnPrice: 'Price',
+    columnStatus: 'Status',
+    statusValid: 'OK',
+    errorBarcodeRequired: 'Barcode is required',
+    errorNameRequired: 'Product name is required',
+    errorPriceInvalid: 'Price is invalid',
   },
   editProduct: {
     title: 'Edit Product',
@@ -649,7 +671,7 @@ export const th: Translations = {
   productList: {
     title: 'คลังสินค้า',
     totalProducts: 'ทั้งหมด: {count} รายการ',
-    createProduct: '+ สร้างสินค้า',
+    createProduct: '+ นำเข้าสินค้า',
     syncProducts: 'ซิงค์สินค้า',
     syncing: 'กำลังซิงค์...',
     columnBarcode: 'บาร์โค้ด',
@@ -672,20 +694,31 @@ export const th: Translations = {
     syncingLabel: 'กำลังซิงค์ข้อมูล...',
   },
   createProduct: {
-    title: 'สร้างสินค้าใหม่',
-    barcode: 'บาร์โค้ด',
-    barcodePlaceholder: 'กรอกบาร์โค้ดสินค้า',
-    name: 'ชื่อสินค้า',
-    namePlaceholder: 'กรอกชื่อสินค้า',
-    brand: 'แบรนด์',
-    brandPlaceholder: 'กรอกแบรนด์ (ไม่บังคับ)',
-    price: 'ราคา',
-    createButton: 'สร้างสินค้า',
-    creatingLabel: 'กำลังสร้างสินค้า...',
+    title: 'นำเข้าสินค้า',
+    columnsHint: 'อัปโหลดไฟล์ .xlsx ที่มีแถวหัวคอลัมน์: barcode, name, brand (ไม่บังคับ), price',
+    chooseFile: 'เลือกไฟล์ .xlsx',
+    downloadTemplate: 'ดาวน์โหลดไฟล์ตัวอย่าง',
+    previewTitle: 'ตัวอย่างสินค้า',
+    itemsCount: '{count} รายการ',
+    invalidCount: 'ไม่ถูกต้อง {count}',
+    clear: 'ล้าง',
+    importButton: 'นำเข้าสินค้า {count} รายการ',
+    importingLabel: 'กำลังนำเข้าสินค้า...',
+    errorNoFile: 'กรุณาเลือกไฟล์ .xlsx',
+    errorEmptyFile: 'ไฟล์ไม่มีข้อมูล',
+    errorRow: 'แถว {row}: {message}',
+    resultTitle: 'ผลการนำเข้า',
+    resultSummary: 'นำเข้าสำเร็จ {success} จาก {total} รายการ',
+    columnRow: 'แถว',
+    columnBarcode: 'บาร์โค้ด',
+    columnName: 'ชื่อสินค้า',
+    columnBrand: 'แบรนด์',
+    columnPrice: 'ราคา',
+    columnStatus: 'สถานะ',
+    statusValid: 'ปกติ',
     errorBarcodeRequired: 'กรุณากรอกบาร์โค้ด',
     errorNameRequired: 'กรุณากรอกชื่อสินค้า',
-    errorPriceInvalid: 'กรุณากรอกราคาที่ถูกต้อง',
-    errorFailed: 'สร้างสินค้าไม่สำเร็จ',
+    errorPriceInvalid: 'ราคาไม่ถูกต้อง',
   },
   editProduct: {
     title: 'แก้ไขสินค้า',
