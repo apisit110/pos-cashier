@@ -1,8 +1,8 @@
 import { schema, ROLE_ID, STAFF_STATUS, SYNC_STATUS } from '@lightning-pos/model';
 
 const OFFLINE_STAFFS = [
-  { username: '00010001', fullName: 'manager', roleId: ROLE_ID.MANAGER, pin: '123456' },
-  { username: '00010002', fullName: 'cashier', roleId: ROLE_ID.CASHIER, pin: '123456' },
+  { username: '00010001', fullName: 'ผู้จัดการ ทดสอบ', roleId: ROLE_ID.MANAGER, pin: '123456' },
+  { username: '00010002', fullName: 'แคชเชียร์ ทดสอบ', roleId: ROLE_ID.CASHIER, pin: '123456' },
 ];
 
 const MANAGER_PERMISSIONS = [
