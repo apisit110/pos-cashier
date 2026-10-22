@@ -1,3 +1,3 @@
 export { createDatabase } from './createDatabase';
-export { seedAuth } from './seed/auth';
-export { seedTerminal } from './seed/terminal';
+export { seedAuth } from './seed/auth.seed';
+export { seedTerminals } from './seed/terminals.seed';

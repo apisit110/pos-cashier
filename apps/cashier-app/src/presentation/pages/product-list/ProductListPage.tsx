@@ -10,6 +10,7 @@ import type { GetProductsUseCase } from '../../../domain/use-cases/GetProductsUs
 import type { SyncProductsUseCase } from '../../../domain/use-cases/SyncProductsUseCase';
 import type { Product } from '../../../domain/entities/Product';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { useAuth } from '../../auth/AuthContext';
 import { formatAmount } from '../../utils/formatAmount';
 
 const SearchFilterBar = styled(FilterBar)`
@@ -44,6 +45,10 @@ interface ProductListPageProps {
 
 export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavigateToCreateProduct, onNavigateToEditProduct, getProductsUseCase, syncProductsUseCase }) => {
   const { t } = useTranslation();
+  const { staff } = useAuth();
+  const canCreate = staff?.scope.includes('product:create') ?? false;
+  const canEdit = staff?.scope.includes('product:edit') ?? false;
+  const canSync = staff?.scope.includes('products:sync') ?? false;
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -123,7 +128,7 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavi
     setCurrentPage(1);
   };
 
-  const columns: Column<Product>[] = [
+  const allColumns: Column<Product>[] = [
     {
       header: t.productList.columnBarcode,
       key: 'barcode',
@@ -156,6 +161,7 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavi
       ),
     },
   ];
+  const columns = allColumns.filter((column) => canEdit || column.key !== 'id');
 
   const paginatedProducts = products.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
@@ -166,12 +172,16 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavi
         onBack={onBack}
         extraContent={
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <Button variant="primary" style={{ width: 'auto' }} disabled={isSyncing || isLoading} onClick={onNavigateToCreateProduct}>
-              {t.productList.createProduct}
-            </Button>
-            <Button variant="primary" style={{ width: 'auto' }} isLoading={isSyncing} disabled={isLoading} onClick={handleSync}>
-              {isSyncing ? t.productList.syncing : t.productList.syncProducts}
-            </Button>
+            {canCreate && (
+              <Button variant="primary" style={{ width: 'auto' }} disabled={isSyncing || isLoading} onClick={onNavigateToCreateProduct}>
+                {t.productList.createProduct}
+              </Button>
+            )}
+            {canSync && (
+              <Button variant="primary" style={{ width: 'auto' }} isLoading={isSyncing} disabled={isLoading} onClick={handleSync}>
+                {isSyncing ? t.productList.syncing : t.productList.syncProducts}
+              </Button>
+            )}
           </div>
         }
       />

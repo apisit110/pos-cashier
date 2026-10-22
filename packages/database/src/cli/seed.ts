@@ -1,26 +1,28 @@
 import 'dotenv/config';
 import { createDatabase } from '../createDatabase';
-import { seedAuth } from '../seed/auth';
-import { seedTerminal } from '../seed/terminal';
+import { seedAuth } from '../seed/auth.seed';
+import { seedTerminals } from '../seed/terminals.seed';
 
-const seeders: Record<string, (db: ReturnType<typeof createDatabase>) => void> = {
-  auth: seedAuth,
-  terminal: seedTerminal,
-};
+function seed() {
+  console.log('🌱 Setting up initial system data...');
 
-const target = process.argv[2];
+  const db = createDatabase();
 
-if (!target || (!seeders[target] && target !== 'all')) {
-  console.error(`Usage: pnpm db:seed <${[...Object.keys(seeders), 'all'].join('|')}>`);
-  process.exit(1);
-}
+  try {
+    db.transaction((tx) => {
+      // seed auth
+      seedAuth(tx);
 
-const db = createDatabase();
+      // seed terminal
+      seedTerminals(tx);
+    });
 
-if (target === 'all') {
-  for (const seed of Object.values(seeders)) {
-    seed(db);
+    console.log('✅ System setup completed successfully!');
+    process.exit(0);
+  } catch (error) {
+    console.error('❌ System setup failed:', error);
+    process.exit(1);
   }
-} else {
-  seeders[target](db);
 }
+
+seed();

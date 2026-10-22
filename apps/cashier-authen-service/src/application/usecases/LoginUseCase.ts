@@ -16,6 +16,7 @@ export class LoginUseCase {
     private readonly staffRepository: IStaffRepository,
     private readonly staffPinRepository: IStaffPinRepository,
     private readonly permissionRepository: IPermissionRepository,
+    private readonly appMode: 'online' | 'offline' = 'online',
   ) {}
 
   async execute(username: string, pin: string) {
@@ -38,6 +39,7 @@ export class LoginUseCase {
     const permissions = await this.permissionRepository.findByRoleId(staff.roleId);
     const scope = permissions
       .filter((permission) => permission.isGranted)
+      .filter((permission) => !(this.appMode === 'offline' && permission.permissionKey === 'products:sync'))
       .map((permission) => permission.permissionKey)
       .join(' ');
 

@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { rowIn } from './keyframes';
 
 export const TablePanel = styled.section`
-  flex: 2;
+  flex: 6;
   min-width: 0;
   display: flex;
   flex-direction: column;

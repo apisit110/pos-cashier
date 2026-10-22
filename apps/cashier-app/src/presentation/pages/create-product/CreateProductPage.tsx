@@ -57,6 +57,16 @@ const PreviewActions = styled.div`
   gap: 0.75rem;
 `;
 
+const ResultCard = styled(UploadCard)`
+  gap: 0.5rem;
+`;
+
+const ResultText = styled.p`
+  margin: 0;
+  white-space: pre-wrap;
+  color: ${({ theme }) => theme.semantics.colors.text.primary};
+`;
+
 interface PreviewRow {
   row: number;
   barcode: string;
@@ -92,6 +102,7 @@ export const CreateProductPage: React.FC<CreateProductPageProps> = ({ onBack, cr
 
   const handleFile = async (selected: File) => {
     setFile(selected);
+    setResultMessage(null);
     setPreviewRows([]);
     setCurrentPage(1);
     setIsLoading(true);
@@ -139,6 +150,7 @@ export const CreateProductPage: React.FC<CreateProductPageProps> = ({ onBack, cr
 
     setIsLoading(true);
     setErrorMessage(null);
+    setResultMessage(null);
     const failures: string[] = [];
     let success = 0;
     for (const r of validRows) {
@@ -193,14 +205,6 @@ export const CreateProductPage: React.FC<CreateProductPageProps> = ({ onBack, cr
         description={errorMessage ?? undefined}
         buttons={[{ label: t.common.ok, onClick: () => setErrorMessage(null), variant: 'primary' }]}
         onClose={() => setErrorMessage(null)}
-      />
-
-      <AlertDialog
-        open={resultMessage !== null}
-        title={t.createProduct.resultTitle}
-        description={resultMessage ?? undefined}
-        buttons={[{ label: t.common.ok, onClick: () => setResultMessage(null), variant: 'primary' }]}
-        onClose={() => setResultMessage(null)}
       />
 
       <WideFormContent>
@@ -261,6 +265,13 @@ export const CreateProductPage: React.FC<CreateProductPageProps> = ({ onBack, cr
               {t.createProduct.importButton.replace('{count}', String(validRows.length))}
             </Button>
           </Form>
+        )}
+
+        {resultMessage !== null && (
+          <ResultCard>
+            <PreviewTitle>{t.createProduct.resultTitle}</PreviewTitle>
+            <ResultText>{resultMessage}</ResultText>
+          </ResultCard>
         )}
       </WideFormContent>
     </Container>

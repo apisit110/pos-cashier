@@ -81,6 +81,7 @@ User Access Management (UAM)
 | transaction:view | [ ]   | [x]     | [ ]     |
 | products:view    | [ ]   | [x]     | [ ]     |
 | product:create   | [ ]   | [x]     | [ ]     |
+| product:edit     | [ ]   | [x]     | [ ]     |
 | products:sync    | [ ]   | [x]     | [ ]     |
 | staff:view       | [ ]   | [x]     | [ ]     |
 | staff:create     | [ ]   | [x]     | [ ]     |

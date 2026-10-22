@@ -83,7 +83,7 @@ export function productRoutes(
     }
   });
 
-  router.put('/:id', requireScope('product:create'), async (req, res) => {
+  router.put('/:id', requireScope('product:edit'), async (req, res) => {
     try {
       const paramsDto = ProductIdParamRequestDto.from(req.params);
       const requestDto = UpdateProductRequestDto.from(req.body);

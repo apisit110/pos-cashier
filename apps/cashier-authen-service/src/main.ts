@@ -26,7 +26,12 @@ const staffPinRepository = new SqliteStaffPinRepositoryImpl(db);
 const permissionRepository = new SqlitePermissionRepositoryImpl(db);
 const staffSyncGateway = new HttpStaffSyncGatewayImpl();
 
-const loginUseCase = new LoginUseCase(staffRepository, staffPinRepository, permissionRepository);
+const loginUseCase = new LoginUseCase(
+  staffRepository,
+  staffPinRepository,
+  permissionRepository,
+  process.env.APP_MODE === 'offline' ? 'offline' : 'online',
+);
 const getStaffsUseCase = new GetStaffsUseCase(staffRepository);
 const createStaffUseCase = new CreateStaffUseCase(staffRepository, staffPinRepository);
 const syncStaffsUseCase = new SyncStaffsUseCase(staffRepository, staffPinRepository, staffSyncGateway);
