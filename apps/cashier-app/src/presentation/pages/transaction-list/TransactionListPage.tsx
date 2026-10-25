@@ -121,17 +121,23 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
   const handleDateRangeChange = ({ start, end }: DateRange) => {
     setFilters(prev => {
       const { startDate, endDate, ...rest } = prev;
+      const nextStart = start ? clampDate(start) : undefined;
+      let nextEnd = end ? clampDate(end) : undefined;
+      // end date must not be earlier than start date
+      if (nextStart && nextEnd && nextEnd < nextStart) {
+        nextEnd = nextStart;
+      }
       return {
         ...rest,
-        ...(start && { startDate: clampDate(start) }),
-        ...(end && { endDate: clampDate(end) }),
+        ...(nextStart && { startDate: nextStart }),
+        ...(nextEnd && { endDate: nextEnd }),
       };
     });
   };
 
   const handleSearch = () => {
     setIsLoading(true);
-    setAppliedFilters(filters);
+    setAppliedFilters({ ...filters });
     setCurrentPage(1);
   };
 
