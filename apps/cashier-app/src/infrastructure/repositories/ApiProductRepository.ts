@@ -25,8 +25,8 @@ export class ApiProductRepository implements ProductRepository {
     }
   }
 
-  async syncProducts(mid: string, sid: string): Promise<{ success: boolean; count: number }> {
-    const response = await api.post('/products/sync', { mid, sid });
+  async syncProducts(): Promise<{ success: boolean; count: number }> {
+    const response = await api.post('/products/sync');
     return response.data;
   }
 

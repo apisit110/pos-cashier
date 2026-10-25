@@ -92,14 +92,7 @@ export const ProductListPage: React.FC<ProductListPageProps> = ({ onBack, onNavi
     setIsSyncing(true);
     setSyncError(null);
     try {
-      const mid = process.env.NEXT_PUBLIC_MID;
-      const sid = process.env.NEXT_PUBLIC_SID;
-
-      if (!mid || !sid) {
-        throw new Error('MID or SID not configured in environment');
-      }
-
-      const result = await syncProductsUseCase.execute(mid, sid);
+      const result = await syncProductsUseCase.execute();
       if (!result.success) {
         throw new Error('Sync failed: server returned unsuccessful response');
       }

@@ -10,7 +10,6 @@ import { GetProductByBarcodeRequestDto } from '../dto/requests/GetProductByBarco
 import { CreateProductRequestDto } from '../dto/requests/CreateProductRequestDto';
 import { UpdateProductRequestDto } from '../dto/requests/UpdateProductRequestDto';
 import { ProductIdParamRequestDto } from '../dto/requests/ProductIdParamRequestDto';
-import { SyncProductsRequestDto } from '../dto/requests/SyncProductsRequestDto';
 import { GetProductsResponseDto } from '../dto/responses/GetProductsResponseDto';
 import { ProductResponseDto } from '../dto/responses/ProductResponseDto';
 import { SyncProductsResponseDto } from '../dto/responses/SyncProductsResponseDto';
@@ -106,16 +105,11 @@ export function productRoutes(
     }
   });
 
-  router.post('/sync', requireScope('products:sync'), async (req, res) => {
+  router.post('/sync', requireScope('products:sync'), async (_req, res) => {
     try {
-      const requestDto = SyncProductsRequestDto.from(req.body);
-      const result = await syncProductsUseCase.execute(requestDto.mid, requestDto.sid);
+      const result = await syncProductsUseCase.execute();
       res.json(SuccessResponseDto.of(SyncProductsResponseDto.fromResult(result)));
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json(ErrorResponseDto.of('400', 'Validation failed', JSON.stringify(error.issues)));
-        return;
-      }
       res.status(500).json(ErrorResponseDto.of('500', (error as Error).message));
     }
   });

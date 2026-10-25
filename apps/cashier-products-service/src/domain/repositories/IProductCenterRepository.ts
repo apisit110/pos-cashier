@@ -1,10 +1,5 @@
 import { Product } from '../entities/Product';
 
 export interface IProductCenterRepository {
-  fetchProducts(
-    mid: string,
-    sid: string,
-    lastSyncVersion: number,
-  ): Promise<{ products: Product[]; syncVersion: number }>;
   pushProduct(product: Product): Promise<void>;
 }

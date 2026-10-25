@@ -17,6 +17,7 @@
     "@lightning-pos/sync-client": "workspace:*",
     "axios": "^1.16.0",
     "better-sqlite3": "^12.9.0",
+    "bullmq": "^5.76.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.45.2",

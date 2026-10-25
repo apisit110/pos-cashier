@@ -42,11 +42,3 @@ const app = createApp(loginUseCase, getStaffsUseCase, createStaffUseCase, syncSt
 app.listen(PORT, () => {
   console.log(`Staff Auth Service is running on http://localhost:${PORT}`);
 });
-
-// online mode has no seeded staffs, pull them from pos-center so they can log in
-if (APP_MODE === 'online') {
-  syncStaffsUseCase
-    .execute()
-    .then(({ results }) => console.log(`[SyncStaffsUseCase] Pulled ${results.length} staffs from pos-center`))
-    .catch((error) => console.error('[SyncStaffsUseCase] Failed to pull staffs from pos-center:', error.message));
-}

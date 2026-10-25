@@ -4,15 +4,8 @@ import { getHttpClient } from '../http/axiosInstance';
 
 export class HttpProductCenterRepositoryImpl implements IProductCenterRepository {
   async pushProduct(product: Product): Promise<void> {
-    const mid = process.env.MID;
-    const sid = process.env.SID;
-    if (!mid || !sid) {
-      throw new Error('MID and SID environment variables are required for product upload');
-    }
-
+    // mid / sid are taken from the sync token
     const payload = {
-      mid,
-      sid,
       products: [
         {
           id: product.id,
@@ -34,32 +27,6 @@ export class HttpProductCenterRepositoryImpl implements IProductCenterRepository
       }
     } catch (error: any) {
       console.error('[HttpProductCenterRepositoryImpl] Error uploading product:', error.message);
-      throw error;
-    }
-  }
-
-  async fetchProducts(
-    mid: string,
-    sid: string,
-    lastSyncVersion: number,
-  ): Promise<{ products: Product[]; syncVersion: number }> {
-    try {
-      const response = await getHttpClient().post('/pull/products', { mid, sid, syncVersion: lastSyncVersion });
-      const data = response.data as { products: any[]; count: number; message?: string };
-
-      const products = data.products.map(
-        (p: any) =>
-          new Product(p.id, p.barcode, p.name, p.basePrice, p.imageUrl, p.unitName ?? null, p.brand),
-      );
-
-      const newSyncVersion = data.products.reduce(
-        (max: number, p: any) => Math.max(max, p.syncVersion ?? 0),
-        lastSyncVersion,
-      );
-
-      return { products, syncVersion: newSyncVersion };
-    } catch (error) {
-      console.error('[HttpProductCenterRepositoryImpl] Error fetching products:', error);
       throw error;
     }
   }

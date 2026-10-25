@@ -7,9 +7,9 @@ if (!process.env.JWT_SECRET) {
 
 import { createDatabase } from '@lightning-pos/database';
 import { SqliteProductRepositoryImpl } from './infrastructure/repositories/SqliteProductRepositoryImpl';
-import { SqliteSyncMetadataRepositoryImpl } from './infrastructure/repositories/SqliteSyncMetadataRepositoryImpl';
 import { SqliteSyncOutboxRepositoryImpl } from './infrastructure/repositories/SqliteSyncOutboxRepositoryImpl';
 import { HttpProductCenterRepositoryImpl } from './infrastructure/repositories/HttpProductCenterRepositoryImpl';
+import { SyncQueueServiceImpl } from './infrastructure/queue/SyncQueueServiceImpl';
 import { OutboxWorker } from './infrastructure/workers/OutboxWorker';
 import { GetProductByBarcodeUseCase } from './application/usecases/GetProductByBarcodeUseCase';
 import { GetProductByIdUseCase } from './application/usecases/GetProductByIdUseCase';
@@ -24,19 +24,14 @@ const APP_MODE = process.env.APP_MODE === 'offline' ? 'offline' : 'online';
 
 const db = createDatabase();
 const productRepository = new SqliteProductRepositoryImpl(db);
-const syncMetadataRepository = new SqliteSyncMetadataRepositoryImpl(db);
 const syncOutboxRepository = new SqliteSyncOutboxRepositoryImpl(db);
 const productCenterRepository = new HttpProductCenterRepositoryImpl();
+const syncQueueService = new SyncQueueServiceImpl();
 
 const getProductByBarcodeUseCase = new GetProductByBarcodeUseCase(productRepository);
 const getProductByIdUseCase = new GetProductByIdUseCase(productRepository);
 const getProductsUseCase = new GetProductsUseCase(productRepository);
-const syncProductsUseCase = new SyncProductsUseCase(
-  productRepository,
-  syncMetadataRepository,
-  productCenterRepository,
-  APP_MODE,
-);
+const syncProductsUseCase = new SyncProductsUseCase(syncQueueService, APP_MODE);
 const createProductUseCase = new CreateProductUseCase(productRepository, syncOutboxRepository);
 const updateProductUseCase = new UpdateProductUseCase(productRepository, syncOutboxRepository);
 

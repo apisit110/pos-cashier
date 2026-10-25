@@ -85,33 +85,4 @@ export class SqliteProductRepositoryImpl implements IProductRepository {
     if (!updated) throw new Error(`Product with id "${id}" not found after update`);
     return updated;
   }
-
-  async upsertMany(products: Product[]): Promise<void> {
-    if (products.length === 0) return;
-
-    for (const product of products) {
-      await this.db
-        .insert(schema.products)
-        .values({
-          id: product.id,
-          barcode: product.barcode,
-          name: product.name,
-          price: product.price,
-          imageUrl: product.imageUrl,
-          unitName: product.unitName,
-          brand: product.brand,
-        })
-        .onConflictDoUpdate({
-          target: schema.products.barcode,
-          set: {
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            imageUrl: product.imageUrl,
-            unitName: product.unitName,
-            brand: product.brand,
-          },
-        });
-    }
-  }
 }

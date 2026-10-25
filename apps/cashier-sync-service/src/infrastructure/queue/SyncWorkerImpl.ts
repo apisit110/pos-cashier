@@ -1,11 +1,13 @@
 import { Worker, Job } from 'bullmq';
 import { SyncOrderUseCase } from '../../application/usecases/SyncOrderUseCase';
 import { SyncTransactionUseCase } from '../../application/usecases/SyncTransactionUseCase';
+import { SyncProductsUseCase } from '../../application/usecases/SyncProductsUseCase';
 import { SYNC_JOBS, SYNC_QUEUE_NAME } from './sync-queue.constants';
 
 export function createSyncWorker(
   syncOrderUseCase: SyncOrderUseCase,
   syncTransactionUseCase: SyncTransactionUseCase,
+  syncProductsUseCase: SyncProductsUseCase,
 ): Worker {
   const worker = new Worker(
     SYNC_QUEUE_NAME,
@@ -17,6 +19,9 @@ export function createSyncWorker(
         case SYNC_JOBS.SYNC_TRANSACTION:
           await syncTransactionUseCase.execute(job.data.transactionId);
           break;
+        case SYNC_JOBS.SYNC_PRODUCTS:
+          // return value is read back by cashier-products-service via job.waitUntilFinished
+          return syncProductsUseCase.execute();
         default:
           console.warn(`Unknown job name: ${job.name}`);
       }

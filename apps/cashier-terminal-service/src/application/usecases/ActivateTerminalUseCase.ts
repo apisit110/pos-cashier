@@ -1,5 +1,6 @@
 import { ITerminalRepository } from '../../domain/repositories/ITerminalRepository';
 import { ITerminalCenterGateway } from '../../domain/repositories/ITerminalCenterGateway';
+import { IStaffRepository } from '../../domain/repositories/IStaffRepository';
 
 export interface ActivateTerminalResult {
   tid: string;
@@ -25,17 +26,19 @@ export class ActivateTerminalUseCase {
   constructor(
     private readonly terminalRepository: ITerminalRepository,
     private readonly terminalCenterGateway: ITerminalCenterGateway,
+    private readonly staffRepository: IStaffRepository,
     private readonly appMode: 'online' | 'offline' = 'online',
   ) {}
 
   async execute(tid: string): Promise<ActivateTerminalResult> {
-    // online mode has no seeded terminals, the terminal comes from pos-center
+    // online mode has no seeded terminals and staffs, they come from the cashier profile of pos-center
     if (this.appMode === 'online') {
-      const centerTerminal = await this.terminalCenterGateway.findByTid(tid);
-      if (!centerTerminal) {
+      const profile = await this.terminalCenterGateway.pullCashierProfile(tid);
+      if (!profile) {
         throw new NotFoundError(`Terminal '${tid}' not found`);
       }
-      await this.terminalRepository.upsert(centerTerminal);
+      await this.terminalRepository.upsert(profile.terminal);
+      await this.staffRepository.upsertFromCenter(profile.staffs);
     }
 
     const terminal = await this.terminalRepository.findByTid(tid);
