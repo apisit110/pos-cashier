@@ -16,10 +16,20 @@ export class CreateProductUseCase {
     private readonly syncOutboxRepository: ISyncOutboxRepository,
   ) {}
 
-  async execute(input: CreateProductInput): Promise<Product> {
+  /**
+   * Upserts by barcode: updates the detail of an existing product (keeping its id), otherwise inserts a new one.
+   * Both cases are enqueued to the sync outbox to be pushed to pos-center
+   */
+  async execute(input: CreateProductInput): Promise<{ product: Product; created: boolean }> {
     const existing = await this.productRepository.findByBarcode(input.barcode);
     if (existing) {
-      throw new Error(`Product with barcode "${input.barcode}" already exists`);
+      const updated = await this.productRepository.update(existing.id, {
+        name: input.name,
+        price: input.price,
+        brand: input.brand,
+      });
+      await this.syncOutboxRepository.enqueue(updated);
+      return { product: updated, created: false };
     }
 
     const product = new Product(
@@ -34,6 +44,6 @@ export class CreateProductUseCase {
 
     const created = await this.productRepository.create(product);
     await this.syncOutboxRepository.enqueue(created);
-    return created;
+    return { product: created, created: true };
   }
 }

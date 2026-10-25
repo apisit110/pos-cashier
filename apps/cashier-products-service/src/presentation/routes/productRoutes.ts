@@ -66,13 +66,13 @@ export function productRoutes(
   router.post('/', requireScope('product:create'), async (req, res) => {
     try {
       const requestDto = CreateProductRequestDto.from(req.body);
-      const product = await createProductUseCase.execute({
+      const { product, created } = await createProductUseCase.execute({
         barcode: requestDto.barcode,
         name: requestDto.name,
         price: requestDto.price,
         brand: requestDto.brand,
       });
-      res.status(201).json(SuccessResponseDto.of(ProductResponseDto.fromEntity(product)));
+      res.status(created ? 201 : 200).json(SuccessResponseDto.of(ProductResponseDto.fromEntity(product)));
     } catch (error) {
       if (error instanceof z.ZodError) {
         res.status(400).json(ErrorResponseDto.of('400', 'Validation failed', JSON.stringify(error.issues)));
