@@ -11,5 +11,11 @@ export function createDatabase(): BetterSQLite3Database<typeof schema> {
   const sqlite = new Database(dbPath);
   sqlite.pragma('journal_mode = WAL');
 
+  // one-time data fix: transaction status `SUCCESS` was renamed to `APPROVED` (same as pos-center), no-op once migrated
+  const hasTransactions = sqlite.prepare(`SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'transactions'`).get();
+  if (hasTransactions) {
+    sqlite.prepare(`UPDATE transactions SET status = 'APPROVED' WHERE status = 'SUCCESS'`).run();
+  }
+
   return drizzle(sqlite, { schema });
 }

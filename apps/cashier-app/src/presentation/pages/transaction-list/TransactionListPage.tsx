@@ -201,8 +201,10 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
             onChange={(value) => handleFilterChange('status', value)}
             placeholder={t.transactionList.statusAll}
             options={[
-              { value: 'SUCCESS', label: t.transactionList.statusSuccess },
+              { value: 'PENDING', label: t.transactionList.statusPending },
+              { value: 'APPROVED', label: t.transactionList.statusApproved },
               { value: 'FAILED', label: t.transactionList.statusFailed },
+              { value: 'VOIDED', label: t.transactionList.statusVoided },
               { value: 'REFUNDED', label: t.transactionList.statusRefunded },
             ]}
           />
@@ -245,7 +247,7 @@ export const TransactionListPage: React.FC<TransactionListPageProps> = ({ onBack
               key: 'status',
               textAlign: 'center',
               render: (tx) => (
-                <Badge $variant={tx.status.toLowerCase() === 'success' ? 'success' : 'error'}>
+                <Badge $variant={tx.status.toLowerCase() === 'approved' ? 'success' : 'error'}>
                   {tx.status}
                 </Badge>
               )

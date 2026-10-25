@@ -139,7 +139,7 @@ export class CheckoutUseCase {
           terminalId: order.terminalId,
           amount: order.totalAmount,
           paymentMethod: data.paymentMethod,
-          status: 'SUCCESS',
+          status: 'APPROVED',
           staffName: staff.fullName,
           isSynced: false,
           createdAt: new Date(),

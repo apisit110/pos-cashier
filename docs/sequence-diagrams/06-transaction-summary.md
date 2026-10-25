@@ -11,7 +11,7 @@
 `GET /api/v1/transactions/summary?period=hourly|daily&startDate=...&endDate=...&storeId=...` (ผ่าน `api-gateway` proxy ไปยัง `cashier-transactions-service`)
 
 - `period`: `hourly` group ด้วย `strftime('%Y-%m-%d %H:00', created_at, 'unixepoch', 'localtime')`, `daily` group ด้วย `strftime('%Y-%m-%d', created_at, 'unixepoch', 'localtime')` — ใช้ `'localtime'` ของเครื่องที่รัน service (สมมติฐานเดียวกับ `TransactionListPage` ที่ fix เป็น `Asia/Bangkok` ฝั่ง frontend เพราะระบบเป็น local-first รันอยู่ที่ร้านจริง ไม่ใช่ cloud หลายโซนเวลา)
-- นับเฉพาะ transaction ที่ `status = 'SUCCESS'`
+- นับเฉพาะ transaction ที่ `status = 'APPROVED'`
 - Route `/summary` ถูก register ก่อน `/:id` ใน `transactionRoutes.ts` เพื่อไม่ให้ Express จับคำว่า `summary` เป็น transaction id
 
 Response: `{ buckets: [{ bucket: string; orderCount: number; totalAmount: number }] }`
@@ -30,7 +30,7 @@ sequenceDiagram
     par ยอดขายรายชั่วโมง (วันนี้)
         App->>GW: GET /api/v1/transactions/summary?period=hourly&startDate=...&endDate=...
         GW->>Txn: proxy -> GET /transactions/summary
-        Txn->>DB: SELECT strftime(...) AS bucket, COUNT(*), SUM(amount)<br/>WHERE status='SUCCESS' AND created_at BETWEEN ...<br/>GROUP BY bucket
+        Txn->>DB: SELECT strftime(...) AS bucket, COUNT(*), SUM(amount)<br/>WHERE status='APPROVED' AND created_at BETWEEN ...<br/>GROUP BY bucket
         DB-->>Txn: rows (เฉพาะชั่วโมงที่มี transaction)
         Txn-->>GW: 200 { buckets: [...] }
         GW-->>App: 200
@@ -38,7 +38,7 @@ sequenceDiagram
     and ยอดขายรายวัน (7 วันล่าสุด)
         App->>GW: GET /api/v1/transactions/summary?period=daily&startDate=...&endDate=...
         GW->>Txn: proxy -> GET /transactions/summary
-        Txn->>DB: SELECT strftime(...) AS bucket, COUNT(*), SUM(amount)<br/>WHERE status='SUCCESS' AND created_at BETWEEN ...<br/>GROUP BY bucket
+        Txn->>DB: SELECT strftime(...) AS bucket, COUNT(*), SUM(amount)<br/>WHERE status='APPROVED' AND created_at BETWEEN ...<br/>GROUP BY bucket
         DB-->>Txn: rows (เฉพาะวันที่มี transaction)
         Txn-->>GW: 200 { buckets: [...] }
         GW-->>App: 200

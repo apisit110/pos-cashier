@@ -140,8 +140,10 @@ export interface Translations {
     amountRangeAny: string;
     status: string;
     statusAll: string;
-    statusSuccess: string;
+    statusPending: string;
+    statusApproved: string;
     statusFailed: string;
+    statusVoided: string;
     statusRefunded: string;
     search: string;
     clearFilters: string;
@@ -387,8 +389,10 @@ export const en: Translations = {
     amountRangeAny: 'Any Amount',
     status: 'Status',
     statusAll: 'All Status',
-    statusSuccess: 'Success',
+    statusPending: 'Pending',
+    statusApproved: 'Approved',
     statusFailed: 'Failed',
+    statusVoided: 'Voided',
     statusRefunded: 'Refunded',
     search: 'Search',
     clearFilters: 'Clear Filters',
@@ -634,8 +638,10 @@ export const th: Translations = {
     amountRangeAny: 'ทุกยอดเงิน',
     status: 'สถานะ',
     statusAll: 'ทุกสถานะ',
-    statusSuccess: 'สำเร็จ',
+    statusPending: 'รอดำเนินการ',
+    statusApproved: 'อนุมัติ',
     statusFailed: 'ล้มเหลว',
+    statusVoided: 'ยกเลิก',
     statusRefunded: 'คืนเงินแล้ว',
     search: 'ค้นหา',
     clearFilters: 'ล้างตัวกรอง',

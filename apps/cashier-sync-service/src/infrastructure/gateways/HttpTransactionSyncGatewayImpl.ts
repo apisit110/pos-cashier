@@ -16,6 +16,8 @@ export class HttpTransactionSyncGatewayImpl implements ITransactionSyncGateway {
           store_id: transaction.storeId,
           terminal_id: transaction.terminalId,
           amount: transaction.amount,
+          received_amount: transaction.receivedAmount ?? null,
+          change_amount: transaction.changeAmount ?? null,
           payment_method: transaction.paymentMethod,
           status: transaction.status,
           staff_name: transaction.staffName,

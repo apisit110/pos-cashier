@@ -10,7 +10,17 @@ export class SqliteTransactionRepositoryImpl implements ITransactionRepository {
     const result = await this.db.query.transactions.findFirst({
       where: eq(schema.transactions.id, id),
     });
-    return result ?? null;
+    if (!result) return null;
+
+    // received / change amount live on the payment of the order
+    const payment = await this.db.query.payments.findFirst({
+      where: eq(schema.payments.orderId, result.orderId),
+    });
+    return {
+      ...result,
+      receivedAmount: payment?.receivedAmount ?? null,
+      changeAmount: payment?.changeAmount ?? null,
+    };
   }
 
   async markAsSynced(id: string): Promise<void> {

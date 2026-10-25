@@ -160,7 +160,7 @@ export const TransactionDetailPage: React.FC<TransactionDetailPageProps> = ({
                   <label>{t.transactionDetail.status}</label>
                   <div>
                     <Badge
-                      $variant={transaction.status.toLowerCase() === 'success' ? 'success' : 'error'}
+                      $variant={transaction.status.toLowerCase() === 'approved' ? 'success' : 'error'}
                       $shape="pill"
                       $size="md"
                     >

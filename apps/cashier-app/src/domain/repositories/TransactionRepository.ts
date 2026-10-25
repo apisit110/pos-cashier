@@ -11,7 +11,7 @@ export interface Transaction {
   orderId: string;
   amount: number;
   paymentMethod: 'cash' | 'credit_card' | 'qr_promptpay';
-  status: 'success' | 'failed' | 'refunded';
+  status: 'pending' | 'approved' | 'failed' | 'voided' | 'refunded';
   createdAt: string;
   staffName: string;
   orderItems?: OrderItem[];

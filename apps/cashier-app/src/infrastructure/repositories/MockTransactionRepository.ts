@@ -13,7 +13,7 @@ export class MockTransactionRepository implements TransactionRepository {
       orderId: 'ORD-001',
       amount: 150.50,
       paymentMethod: 'cash',
-      status: 'success',
+      status: 'approved',
       createdAt: new Date().toISOString(),
       staffName: 'Admin Manager',
       orderItems: [
@@ -27,7 +27,7 @@ export class MockTransactionRepository implements TransactionRepository {
       orderId: 'ORD-002',
       amount: 45.00,
       paymentMethod: 'qr_promptpay',
-      status: 'success',
+      status: 'approved',
       createdAt: new Date(Date.now() - 3600000).toISOString(),
       staffName: 'Cashier One',
       orderItems: [
@@ -39,7 +39,7 @@ export class MockTransactionRepository implements TransactionRepository {
       orderId: 'ORD-003',
       amount: 220.00,
       paymentMethod: 'credit_card',
-      status: 'success',
+      status: 'approved',
       createdAt: new Date(Date.now() - 7200000).toISOString(),
       staffName: 'Admin Manager',
       orderItems: [
@@ -66,7 +66,7 @@ export class MockTransactionRepository implements TransactionRepository {
       orderId: 'ORD-005',
       amount: 1200.00,
       paymentMethod: 'credit_card',
-      status: 'success',
+      status: 'approved',
       createdAt: new Date(Date.now() - 14400000).toISOString(),
       staffName: 'Admin Manager',
       orderItems: [
@@ -134,7 +134,7 @@ export class MockTransactionRepository implements TransactionRepository {
     const buckets = new Map<string, TransactionSummaryBucket>();
 
     for (const t of this.transactions) {
-      if (t.status !== 'success') continue;
+      if (t.status !== 'approved') continue;
       const createdAt = new Date(t.createdAt);
       if (createdAt < start || createdAt > end) continue;
 

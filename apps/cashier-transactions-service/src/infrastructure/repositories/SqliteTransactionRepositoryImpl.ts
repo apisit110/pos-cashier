@@ -107,7 +107,7 @@ export class SqliteTransactionRepositoryImpl implements ITransactionRepository {
         : sql`strftime('%Y-%m-%d', ${schema.transactions.createdAt}, 'unixepoch', 'localtime')`;
 
     const whereConditions: SQL[] = [
-      eq(schema.transactions.status, 'SUCCESS'),
+      eq(schema.transactions.status, 'APPROVED'),
       gte(schema.transactions.createdAt, filter.startDate),
       lte(schema.transactions.createdAt, filter.endDate),
     ];

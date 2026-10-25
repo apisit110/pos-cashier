@@ -10,7 +10,7 @@ export const GetTransactionsFilterSchema = z.object({
   endDate: z.string().optional().transform((val) => (val ? new Date(val) : undefined)),
   method: z.enum(['CASH', 'CREDIT', 'QR']).optional(),
   amountRange: z.enum(['0-99', '100-299', '300-499', '500+']).optional(),
-  status: z.enum(['SUCCESS', 'FAILED', 'REFUNDED']).optional(),
+  status: z.enum(['PENDING', 'APPROVED', 'FAILED', 'VOIDED', 'REFUNDED']).optional(),
 });
 
 export class GetTransactionsRequestDto {
