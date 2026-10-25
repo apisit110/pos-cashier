@@ -1,24 +1,13 @@
-import { IStaffSyncGateway, SyncStaffRequestDTO, SyncStaffResponseDTO } from '../../domain/repositories/IStaffSyncGateway';
+import { IStaffSyncGateway, CashierProfileDTO } from '../../domain/repositories/IStaffSyncGateway';
+import { getHttpClient } from '../http/axiosInstance';
 
 export class HttpStaffSyncGatewayImpl implements IStaffSyncGateway {
-  private readonly centerUrl = 'http://localhost:4002/v1/sync/users';
-
-  async syncStaffs(data: SyncStaffRequestDTO): Promise<SyncStaffResponseDTO> {
+  async pullCashierProfile(): Promise<CashierProfileDTO> {
     try {
-      const response = await fetch(this.centerUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ users: data.staffs }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to sync staffs: ${response.status} ${errorText}`);
-      }
-
-      return (await response.json()) as SyncStaffResponseDTO;
-    } catch (error) {
-      console.error('[HttpStaffSyncGatewayImpl] Error syncing staffs:', error);
+      const response = await getHttpClient().post<CashierProfileDTO>('/pull/cashier-profile');
+      return response.data;
+    } catch (error: any) {
+      console.error('[HttpStaffSyncGatewayImpl] Error pulling cashier profile:', error.message);
       throw error;
     }
   }

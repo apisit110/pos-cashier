@@ -146,6 +146,15 @@ importers:
       '@lightning-pos/model':
         specifier: workspace:*
         version: link:../../packages/model
+      '@lightning-pos/sync-client':
+        specifier: workspace:*
+        version: link:../../packages/sync-client
+      axios:
+        specifier: ^1.16.0
+        version: 1.16.0
+      bcryptjs:
+        specifier: ^3.0.2
+        version: 3.0.3
       better-sqlite3:
         specifier: ^12.9.0
         version: 12.9.0
@@ -338,6 +347,9 @@ importers:
       '@lightning-pos/model':
         specifier: workspace:*
         version: link:../../packages/model
+      '@lightning-pos/sync-client':
+        specifier: workspace:*
+        version: link:../../packages/sync-client
       axios:
         specifier: ^1.16.0
         version: 1.16.0
@@ -399,6 +411,9 @@ importers:
       '@lightning-pos/model':
         specifier: workspace:*
         version: link:../../packages/model
+      '@lightning-pos/sync-client':
+        specifier: workspace:*
+        version: link:../../packages/sync-client
       axios:
         specifier: ^1.15.0
         version: 1.16.0
@@ -448,6 +463,12 @@ importers:
       '@lightning-pos/model':
         specifier: workspace:*
         version: link:../../packages/model
+      '@lightning-pos/sync-client':
+        specifier: workspace:*
+        version: link:../../packages/sync-client
+      axios:
+        specifier: ^1.16.0
+        version: 1.16.0
       better-sqlite3:
         specifier: ^12.9.0
         version: 12.9.0
@@ -626,6 +647,22 @@ importers:
       drizzle-orm:
         specifier: ^0.45.2
         version: 0.45.2(@types/better-sqlite3@7.6.13)(better-sqlite3@12.9.0)(pg@8.20.0)
+    devDependencies:
+      '@lightning-pos/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: ^24.0.0
+        version: 24.12.2
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+
+  packages/sync-client:
+    dependencies:
+      axios:
+        specifier: ^1.16.0
+        version: 1.16.0
     devDependencies:
       '@lightning-pos/tsconfig':
         specifier: workspace:*
@@ -1947,6 +1984,10 @@ packages:
   baseline-browser-mapping@2.10.18:
     resolution: {integrity: sha512-VSnGQAOLtP5mib/DPyg2/t+Tlv65NTBz83BJBJvmLVHHuKJVaDOBvJJykiT5TR++em5nfAySPccDZDa4oSrn8A==}
     engines: {node: '>=6.0.0'}
+    hasBin: true
+
+  bcryptjs@3.0.3:
+    resolution: {integrity: sha512-GlF5wPWnSa/X5LKM1o0wz0suXIINz1iHRLvTS+sLyi7XPbe5ycmYI3DlZqVGZZtDgl4DmasFg7gOB3JYbphV5g==}
     hasBin: true
 
   better-sqlite3@12.9.0:
@@ -4960,6 +5001,8 @@ snapshots:
   base64-js@1.5.1: {}
 
   baseline-browser-mapping@2.10.18: {}
+
+  bcryptjs@3.0.3: {}
 
   better-sqlite3@12.9.0:
     dependencies:

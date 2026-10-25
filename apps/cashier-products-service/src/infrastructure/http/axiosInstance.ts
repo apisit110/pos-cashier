@@ -1,9 +1,10 @@
-import axios from 'axios';
+import { AxiosInstance } from 'axios';
+import { createSyncClient, syncConfigFromEnv } from '@lightning-pos/sync-client';
 
-export const httpClient = axios.create({
-  baseURL: 'http://127.0.0.1:4002/v1/sync',
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+let httpClient: AxiosInstance | null = null;
+
+// created on first use so offline mode does not need the pos-sync-service credential
+export function getHttpClient(): AxiosInstance {
+  httpClient ??= createSyncClient(syncConfigFromEnv());
+  return httpClient;
+}

@@ -1,9 +1,7 @@
-import axios from 'axios';
+import { getHttpClient } from '../http/axiosInstance';
 import { IOrderSyncGateway } from '../../domain/repositories/IOrderSyncGateway';
 
 export class HttpOrderSyncGatewayImpl implements IOrderSyncGateway {
-  private readonly serviceCenterUrl = 'http://localhost:4002/v1/sync/orders';
-
   async syncOrder(order: any): Promise<void> {
     console.log(`Syncing order ${order.id} to service center...`);
 
@@ -29,7 +27,7 @@ export class HttpOrderSyncGatewayImpl implements IOrderSyncGateway {
     };
 
     try {
-      const response = await axios.post(this.serviceCenterUrl, payload);
+      const response = await getHttpClient().post('/push/orders', payload);
       console.log(`Service center response: ${JSON.stringify(response.data)}`);
 
       const result = response.data?.results?.[0];

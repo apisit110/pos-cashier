@@ -11,6 +11,14 @@ export interface IStaffRepository {
     status: string;
     syncStatus: string;
   }): Promise<Staff>;
+  upsertByUsername(staff: {
+    username: string;
+    fullName: string;
+    roleId: number;
+    status: string;
+    syncStatus: string;
+    syncId: string;
+  }): Promise<Staff>;
   findAllToSync(): Promise<Staff[]>;
   updateSyncStatus(id: number, username: string, syncStatus: string): Promise<void>;
   countAll(): Promise<number>;

@@ -1,4 +1,5 @@
 import { ITerminalRepository } from '../../domain/repositories/ITerminalRepository';
+import { ITerminalCenterGateway } from '../../domain/repositories/ITerminalCenterGateway';
 
 export interface ActivateTerminalResult {
   tid: string;
@@ -21,9 +22,22 @@ export class ConflictError extends Error {
 }
 
 export class ActivateTerminalUseCase {
-  constructor(private readonly terminalRepository: ITerminalRepository) {}
+  constructor(
+    private readonly terminalRepository: ITerminalRepository,
+    private readonly terminalCenterGateway: ITerminalCenterGateway,
+    private readonly appMode: 'online' | 'offline' = 'online',
+  ) {}
 
   async execute(tid: string): Promise<ActivateTerminalResult> {
+    // online mode has no seeded terminals, the terminal comes from pos-center
+    if (this.appMode === 'online') {
+      const centerTerminal = await this.terminalCenterGateway.findByTid(tid);
+      if (!centerTerminal) {
+        throw new NotFoundError(`Terminal '${tid}' not found`);
+      }
+      await this.terminalRepository.upsert(centerTerminal);
+    }
+
     const terminal = await this.terminalRepository.findByTid(tid);
 
     if (!terminal) {

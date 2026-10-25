@@ -30,6 +30,17 @@ export class SqliteStaffPinRepositoryImpl implements IStaffPinRepository {
     return this.mapToEntity(result);
   }
 
+  async upsert(data: { userId: number; pinHash: string }): Promise<void> {
+    const now = new Date();
+    await this.db
+      .insert(schema.staffPins)
+      .values({ userId: data.userId, pinHash: data.pinHash, createdAt: now, updatedAt: now })
+      .onConflictDoUpdate({
+        target: schema.staffPins.userId,
+        set: { pinHash: data.pinHash, updatedAt: now },
+      });
+  }
+
   private mapToEntity(result: any): StaffPin {
     return new StaffPin(
       result.id,

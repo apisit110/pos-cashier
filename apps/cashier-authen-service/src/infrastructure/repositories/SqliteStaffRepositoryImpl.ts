@@ -62,6 +62,32 @@ export class SqliteStaffRepositoryImpl implements IStaffRepository {
     return this.mapToEntity(result);
   }
 
+  async upsertByUsername(staffData: {
+    username: string;
+    fullName: string;
+    roleId: number;
+    status: string;
+    syncStatus: string;
+    syncId: string;
+  }): Promise<Staff> {
+    const values = {
+      fullName: staffData.fullName,
+      roleId: staffData.roleId,
+      status: staffData.status as any,
+      syncStatus: staffData.syncStatus as any,
+      syncId: staffData.syncId,
+      updatedAt: new Date(),
+    };
+
+    const [result] = await this.db
+      .insert(schema.staffs)
+      .values({ username: staffData.username, ...values })
+      .onConflictDoUpdate({ target: schema.staffs.username, set: values })
+      .returning();
+
+    return this.mapToEntity(result);
+  }
+
   async findAllToSync(): Promise<Staff[]> {
     const results = await this.db.query.staffs.findMany({
       where: eq(schema.staffs.syncStatus, StaffSyncStatus.PENDING as any),

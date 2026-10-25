@@ -1,9 +1,7 @@
-import axios from 'axios';
+import { getHttpClient } from '../http/axiosInstance';
 import { ITransactionSyncGateway } from '../../domain/repositories/ITransactionSyncGateway';
 
 export class HttpTransactionSyncGatewayImpl implements ITransactionSyncGateway {
-  private readonly serviceCenterUrl = 'http://localhost:4002/v1/sync/transactions';
-
   async syncTransaction(transaction: any): Promise<void> {
     console.log(`Syncing transaction ${transaction.id} to service center...`);
 
@@ -25,8 +23,13 @@ export class HttpTransactionSyncGatewayImpl implements ITransactionSyncGateway {
     };
 
     try {
-      const response = await axios.post(this.serviceCenterUrl, payload);
+      const response = await getHttpClient().post('/push/transactions', payload);
       console.log(`Service center response: ${JSON.stringify(response.data)}`);
+
+      const result = response.data?.results?.[0];
+      if (result?.status === 'error') {
+        throw new Error(`pos-center failed to sync transaction ${transaction.id}`);
+      }
     } catch (error: any) {
       console.error(`Failed to sync transaction to service center: ${error.message}`);
       if (error.response) {

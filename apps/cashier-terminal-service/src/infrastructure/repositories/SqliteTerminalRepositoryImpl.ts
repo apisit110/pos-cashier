@@ -17,6 +17,16 @@ export class SqliteTerminalRepositoryImpl implements ITerminalRepository {
     return new Terminal(result.tid, result.mid, result.sid, result.isAvailable);
   }
 
+  async upsert(terminal: { tid: string; mid: string; sid: string }): Promise<void> {
+    await this.db
+      .insert(schema.terminals)
+      .values({ ...terminal, isAvailable: true })
+      .onConflictDoUpdate({
+        target: schema.terminals.tid,
+        set: { mid: terminal.mid, sid: terminal.sid },
+      });
+  }
+
   async updateAvailability(tid: string, isAvailable: boolean): Promise<void> {
     await this.db
       .update(schema.terminals)

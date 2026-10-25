@@ -3,6 +3,7 @@ import { IStaffPinRepository } from '../../domain/repositories/IStaffPinReposito
 import { IPermissionRepository } from '../../domain/repositories/IPermissionRepository';
 import { generateTokenPair } from '../../infrastructure/auth/TokenService';
 import { StaffStatus } from '../../domain/entities/Staff';
+import bcrypt from 'bcryptjs';
 
 export class UnauthorizedError extends Error {
   constructor(message: string) {
@@ -32,7 +33,7 @@ export class LoginUseCase {
 
     const staffPin = await this.staffPinRepository.findByUserId(staff.id);
 
-    if (!staffPin || staffPin.pinHash !== pin) {
+    if (!staffPin || !(await this.verifyPin(pin, staffPin.pinHash))) {
       throw new UnauthorizedError('Invalid credentials');
     }
 
@@ -63,5 +64,13 @@ export class LoginUseCase {
       accessToken,
       refreshToken,
     };
+  }
+
+  // staffs pulled from pos-center have a bcrypt pin hash, staffs created on this POS keep the plain pin
+  private async verifyPin(pin: string, pinHash: string): Promise<boolean> {
+    if (pinHash.startsWith('$2')) {
+      return bcrypt.compare(pin, pinHash);
+    }
+    return pinHash === pin;
   }
 }

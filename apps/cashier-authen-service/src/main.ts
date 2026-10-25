@@ -19,6 +19,7 @@ import { SyncStaffsUseCase } from './application/usecases/SyncStaffsUseCase';
 import { createApp } from './presentation/app';
 
 const PORT = process.env.PORT ?? 3005;
+const APP_MODE = process.env.APP_MODE === 'offline' ? 'offline' : 'online';
 
 const db = createDatabase();
 const staffRepository = new SqliteStaffRepositoryImpl(db);
@@ -30,7 +31,7 @@ const loginUseCase = new LoginUseCase(
   staffRepository,
   staffPinRepository,
   permissionRepository,
-  process.env.APP_MODE === 'offline' ? 'offline' : 'online',
+  APP_MODE,
 );
 const getStaffsUseCase = new GetStaffsUseCase(staffRepository);
 const createStaffUseCase = new CreateStaffUseCase(staffRepository, staffPinRepository);
@@ -41,3 +42,11 @@ const app = createApp(loginUseCase, getStaffsUseCase, createStaffUseCase, syncSt
 app.listen(PORT, () => {
   console.log(`Staff Auth Service is running on http://localhost:${PORT}`);
 });
+
+// online mode has no seeded staffs, pull them from pos-center so they can log in
+if (APP_MODE === 'online') {
+  syncStaffsUseCase
+    .execute()
+    .then(({ results }) => console.log(`[SyncStaffsUseCase] Pulled ${results.length} staffs from pos-center`))
+    .catch((error) => console.error('[SyncStaffsUseCase] Failed to pull staffs from pos-center:', error.message));
+}

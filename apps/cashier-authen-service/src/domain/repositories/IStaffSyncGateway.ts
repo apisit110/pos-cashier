@@ -1,23 +1,21 @@
-export interface SyncStaffRequestDTO {
-  staffs: {
-    userId: string;
-    fullName: string;
-    pinHash: string;
-    roleId: number;
-    branchIds: number[];
-    status: 'active' | 'inactive';
-    originBranchId: number;
-  }[];
+export interface CashierProfileStaffDTO {
+  uid: string;
+  username: string;
+  full_name: string;
+  status: 'PENDING' | 'ACTIVE' | 'SUSPENDED' | 'INACTIVE';
+  roles: string[];
+  pin_hash: string;
+  updated_at: string;
 }
 
-export interface SyncStaffResponseDTO {
+export interface CashierProfileDTO {
   message: string;
-  results: {
-    userId: string;
-    status: 'synced' | 'already_synced' | 'error';
-  }[];
+  merchant: { uid: string; partner_id: string; name_en: string; name_th: string };
+  store: { uid: string; sid: string; name_en: string; name_th: string };
+  terminal: { uid: string; tid: string; name_en: string; name_th: string };
+  staffs: CashierProfileStaffDTO[];
 }
 
 export interface IStaffSyncGateway {
-  syncStaffs(data: SyncStaffRequestDTO): Promise<SyncStaffResponseDTO>;
+  pullCashierProfile(): Promise<CashierProfileDTO>;
 }

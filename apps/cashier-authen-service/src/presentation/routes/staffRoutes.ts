@@ -36,11 +36,6 @@ export function staffRoutes(
     try {
       const requestDto = CreateStaffRequestDto.from(req.body);
       const staff = await createStaffUseCase.execute(requestDto);
-      try {
-        await syncStaffsUseCase.execute();
-      } catch (syncError) {
-        console.error('[staffRoutes] Failed to sync staffs after create:', syncError);
-      }
       res.status(201).json(SuccessResponseDto.of(StaffResponseDto.fromEntity(staff)));
     } catch (error) {
       if (error instanceof z.ZodError) {
