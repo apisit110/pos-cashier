@@ -23,14 +23,16 @@ Participants ที่ใช้ร่วมกัน:
 5. [Sell (ขายสินค้า) — create/checkout — offline / online](./05-sell-checkout.md)
 6. [Transaction Summary (สรุปยอดขาย) — hourly / daily — read-only](./06-transaction-summary.md)
 7. [Staff — create — offline / online](./07-staff-create.md)
+8. [Sync pull — อัตโนมัติหลัง login / หลังขาย — online](./08-sync-pull.md)
 
 ## สรุปแนวคิด offline vs online
 
 | Flow | ส่วนที่ผู้ใช้เห็นผลทันที (local, ทำงานเหมือนกันเสมอ) | ส่วนที่แยก offline/online (background sync) |
 | --- | --- | --- |
-| Login | ตรวจ username/pin กับ SQLite local | — (ไม่มีการเรียก pos-center) |
+| Login | ตรวจ username/pin กับ SQLite local | enqueue `sync-pull` เบื้องหลัง (ไม่รอผล) |
 | Product create/edit | บันทึก/แก้ไขสินค้าใน SQLite local + เข้าคิว outbox | `OutboxWorker` push ไป pos-center ทุก 30s |
 | Product sync | — (flow นี้ต้องออนไลน์เท่านั้น) | เรียก pos-center ดึงสินค้าเข้ามา (pull) |
+| Sync pull | — | หลัง login / หลัง push order-transaction เทียบเวอร์ชันแล้ว pull สินค้า / cashier profile เฉพาะที่เปลี่ยน |
 | Sell/checkout | สร้าง order, ประมวลผลชำระเงิน (รองรับแค่ `CASH`), สร้าง transaction ใน SQLite local, กัน retry ซ้ำด้วย `idempotencyKey` | BullMQ job `sync-order` / `sync-transaction` ไป pos-center |
 | Staff create | บันทึกพนักงาน + PIN (plaintext) ใน SQLite local เสมอ (status: `pending_sync`) | เรียก pos-center **แบบ synchronous ในคำขอเดียวกัน** (ไม่มี outbox/queue, ไม่มี retry อัตโนมัติ) — สำเร็จค่อยตั้ง `active` |
 

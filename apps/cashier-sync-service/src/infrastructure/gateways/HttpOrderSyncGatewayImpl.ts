@@ -1,8 +1,10 @@
 import { getHttpClient } from '../http/axiosInstance';
 import { IOrderSyncGateway } from '../../domain/repositories/IOrderSyncGateway';
+import { SyncState } from '../../domain/entities/SyncState';
+import { toSyncState } from './HttpSyncStateGatewayImpl';
 
 export class HttpOrderSyncGatewayImpl implements IOrderSyncGateway {
-  async syncOrder(order: any): Promise<void> {
+  async syncOrder(order: any): Promise<SyncState | null> {
     console.log(`Syncing order ${order.id} to service center...`);
 
     const payload = {
@@ -34,6 +36,8 @@ export class HttpOrderSyncGatewayImpl implements IOrderSyncGateway {
       if (result?.status === 'error') {
         throw new Error(`pos-center failed to sync order ${order.id}`);
       }
+
+      return toSyncState(response.data?.syncState);
     } catch (error: any) {
       console.error(`Failed to sync order to service center: ${error.message}`);
       if (error.response) {

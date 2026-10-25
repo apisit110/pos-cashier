@@ -6,5 +6,7 @@ export class SyncMetadata {
     public readonly lastProductSyncVersion: number,
     public readonly status: SyncStatus,
     public readonly updatedAt: string,
+    /** profile_version of the last pull cashier-profile, null = never pulled */
+    public readonly profileVersion: string | null = null,
   ) {}
 }

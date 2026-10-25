@@ -21,6 +21,7 @@ export class SqliteSyncMetadataRepositoryImpl implements ISyncMetadataRepository
       result.lastProductSyncVersion,
       result.status as SyncStatus,
       result.updatedAt,
+      result.profileVersion,
     );
   }
 
@@ -33,6 +34,7 @@ export class SqliteSyncMetadataRepositoryImpl implements ISyncMetadataRepository
         .update(schema.syncMetadata)
         .set({
           lastProductSyncVersion: metadata.lastProductSyncVersion ?? existing.lastProductSyncVersion,
+          profileVersion: metadata.profileVersion ?? existing.profileVersion,
           status: metadata.status ?? existing.status,
           updatedAt: now,
         })
@@ -41,6 +43,7 @@ export class SqliteSyncMetadataRepositoryImpl implements ISyncMetadataRepository
       await this.db.insert(schema.syncMetadata).values({
         id: this.DEFAULT_ID,
         lastProductSyncVersion: metadata.lastProductSyncVersion ?? 0,
+        profileVersion: metadata.profileVersion ?? null,
         status: metadata.status ?? 'IDLE',
         updatedAt: now,
       });

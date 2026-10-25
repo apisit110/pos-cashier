@@ -1,13 +1,13 @@
-import { IStaffSyncGateway, CashierProfileDTO } from '../../domain/repositories/IStaffSyncGateway';
 import { getHttpClient } from '../http/axiosInstance';
+import { ICashierProfileGateway, CashierProfileDTO } from '../../domain/repositories/ICashierProfileGateway';
 
-export class HttpStaffSyncGatewayImpl implements IStaffSyncGateway {
+export class HttpCashierProfileGatewayImpl implements ICashierProfileGateway {
   async pullCashierProfile(): Promise<CashierProfileDTO> {
     try {
       const response = await getHttpClient().post<CashierProfileDTO>('/pull/cashier-profile');
       return response.data;
     } catch (error: any) {
-      console.error('[HttpStaffSyncGatewayImpl] Error pulling cashier profile:', error.message);
+      console.error('[HttpCashierProfileGatewayImpl] Error pulling cashier profile:', error.message);
       throw error;
     }
   }

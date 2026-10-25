@@ -1,3 +1,6 @@
+import { SyncState } from '../entities/SyncState';
+
 export interface ITransactionSyncGateway {
-  syncTransaction(transaction: any): Promise<void>;
+  /** returns `syncState` of the response, null when missing */
+  syncTransaction(transaction: any): Promise<SyncState | null>;
 }

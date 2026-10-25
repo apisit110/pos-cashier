@@ -2,6 +2,7 @@ import { IStaffRepository } from '../../domain/repositories/IStaffRepository';
 import { IStaffPinRepository } from '../../domain/repositories/IStaffPinRepository';
 import { IPermissionRepository } from '../../domain/repositories/IPermissionRepository';
 import { ITerminalRepository } from '../../domain/repositories/ITerminalRepository';
+import { ISyncQueueService } from '../../domain/repositories/ISyncQueueService';
 import { generateTokenPair } from '../../infrastructure/auth/TokenService';
 import { StaffStatus } from '../../domain/entities/Staff';
 import bcrypt from 'bcryptjs';
@@ -19,6 +20,7 @@ export class LoginUseCase {
     private readonly staffPinRepository: IStaffPinRepository,
     private readonly permissionRepository: IPermissionRepository,
     private readonly terminalRepository: ITerminalRepository,
+    private readonly syncQueueService: ISyncQueueService,
     private readonly appMode: 'online' | 'offline' = 'online',
   ) {}
 
@@ -65,6 +67,8 @@ export class LoginUseCase {
 
     const { accessToken, refreshToken } = generateTokenPair(String(staff.id), payload);
 
+    this.scheduleSyncPull();
+
     return {
       staff: {
         id: staff.id,
@@ -76,6 +80,14 @@ export class LoginUseCase {
       accessToken,
       refreshToken,
     };
+  }
+
+  // pull what changed in pos-center in the background, login does not wait for it or fail because of it
+  private scheduleSyncPull(): void {
+    if (this.appMode === 'offline') return;
+    this.syncQueueService.addSyncPullJob().catch((error) => {
+      console.error('[LoginUseCase] Failed to schedule sync-pull:', error);
+    });
   }
 
   // staffs pulled from pos-center have a bcrypt pin hash, staffs created on this POS keep the plain pin

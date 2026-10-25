@@ -10,12 +10,13 @@ export interface CashierProfileStaffDTO {
 
 export interface CashierProfileDTO {
   message: string;
+  profile_version: string;
   merchant: { uid: string; partner_id: string; name_en: string; name_th: string };
   store: { uid: string; sid: string; name_en: string; name_th: string };
   terminal: { uid: string; tid: string; name_en: string; name_th: string };
   staffs: CashierProfileStaffDTO[];
 }
 
-export interface IStaffSyncGateway {
+export interface ICashierProfileGateway {
   pullCashierProfile(): Promise<CashierProfileDTO>;
 }

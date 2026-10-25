@@ -12,7 +12,7 @@ import { SqliteStaffRepositoryImpl } from './infrastructure/repositories/SqliteS
 import { SqliteStaffPinRepositoryImpl } from './infrastructure/repositories/SqliteStaffPinRepositoryImpl';
 import { SqlitePermissionRepositoryImpl } from './infrastructure/repositories/SqlitePermissionRepositoryImpl';
 import { SqliteTerminalRepositoryImpl } from './infrastructure/repositories/SqliteTerminalRepositoryImpl';
-import { HttpStaffSyncGatewayImpl } from './infrastructure/gateways/HttpStaffSyncGatewayImpl';
+import { SyncQueueServiceImpl } from './infrastructure/queue/SyncQueueServiceImpl';
 import { LoginUseCase } from './application/usecases/LoginUseCase';
 import { CreateStaffUseCase } from './application/usecases/CreateStaffUseCase';
 import { GetStaffsUseCase } from './application/usecases/GetStaffsUseCase';
@@ -27,18 +27,19 @@ const staffRepository = new SqliteStaffRepositoryImpl(db);
 const staffPinRepository = new SqliteStaffPinRepositoryImpl(db);
 const permissionRepository = new SqlitePermissionRepositoryImpl(db);
 const terminalRepository = new SqliteTerminalRepositoryImpl(db);
-const staffSyncGateway = new HttpStaffSyncGatewayImpl();
+const syncQueueService = new SyncQueueServiceImpl();
 
 const loginUseCase = new LoginUseCase(
   staffRepository,
   staffPinRepository,
   permissionRepository,
   terminalRepository,
+  syncQueueService,
   APP_MODE,
 );
 const getStaffsUseCase = new GetStaffsUseCase(staffRepository);
 const createStaffUseCase = new CreateStaffUseCase(staffRepository, staffPinRepository);
-const syncStaffsUseCase = new SyncStaffsUseCase(staffRepository, staffPinRepository, staffSyncGateway);
+const syncStaffsUseCase = new SyncStaffsUseCase(syncQueueService, APP_MODE);
 
 const app = createApp(loginUseCase, getStaffsUseCase, createStaffUseCase, syncStaffsUseCase);
 

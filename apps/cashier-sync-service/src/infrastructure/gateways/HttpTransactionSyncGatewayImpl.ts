@@ -1,8 +1,10 @@
 import { getHttpClient } from '../http/axiosInstance';
 import { ITransactionSyncGateway } from '../../domain/repositories/ITransactionSyncGateway';
+import { SyncState } from '../../domain/entities/SyncState';
+import { toSyncState } from './HttpSyncStateGatewayImpl';
 
 export class HttpTransactionSyncGatewayImpl implements ITransactionSyncGateway {
-  async syncTransaction(transaction: any): Promise<void> {
+  async syncTransaction(transaction: any): Promise<SyncState | null> {
     console.log(`Syncing transaction ${transaction.id} to service center...`);
 
     const payload = {
@@ -30,6 +32,8 @@ export class HttpTransactionSyncGatewayImpl implements ITransactionSyncGateway {
       if (result?.status === 'error') {
         throw new Error(`pos-center failed to sync transaction ${transaction.id}`);
       }
+
+      return toSyncState(response.data?.syncState);
     } catch (error: any) {
       console.error(`Failed to sync transaction to service center: ${error.message}`);
       if (error.response) {
