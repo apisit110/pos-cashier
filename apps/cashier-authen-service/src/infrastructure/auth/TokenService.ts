@@ -7,6 +7,9 @@ export interface TokenPayload {
   fullName: string;
   roleId: number;
   scope: string;
+  tid: string;
+  mid: string;
+  sid: string;
 }
 
 export interface TokenPair {

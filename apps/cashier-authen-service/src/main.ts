@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-const required = ['MID', 'MANAGER_USERNAME', 'MANAGER_NAME', 'MANAGER_PIN', 'JWT_SECRET'];
+const required = ['MID', 'JWT_SECRET'];
 const missing = required.filter((key) => !process.env[key]);
 if (missing.length > 0) {
   console.error(`Missing required environment variables: ${missing.join(', ')}`);
@@ -11,6 +11,7 @@ import { createDatabase } from '@lightning-pos/database';
 import { SqliteStaffRepositoryImpl } from './infrastructure/repositories/SqliteStaffRepositoryImpl';
 import { SqliteStaffPinRepositoryImpl } from './infrastructure/repositories/SqliteStaffPinRepositoryImpl';
 import { SqlitePermissionRepositoryImpl } from './infrastructure/repositories/SqlitePermissionRepositoryImpl';
+import { SqliteTerminalRepositoryImpl } from './infrastructure/repositories/SqliteTerminalRepositoryImpl';
 import { HttpStaffSyncGatewayImpl } from './infrastructure/gateways/HttpStaffSyncGatewayImpl';
 import { LoginUseCase } from './application/usecases/LoginUseCase';
 import { CreateStaffUseCase } from './application/usecases/CreateStaffUseCase';
@@ -25,12 +26,14 @@ const db = createDatabase();
 const staffRepository = new SqliteStaffRepositoryImpl(db);
 const staffPinRepository = new SqliteStaffPinRepositoryImpl(db);
 const permissionRepository = new SqlitePermissionRepositoryImpl(db);
+const terminalRepository = new SqliteTerminalRepositoryImpl(db);
 const staffSyncGateway = new HttpStaffSyncGatewayImpl();
 
 const loginUseCase = new LoginUseCase(
   staffRepository,
   staffPinRepository,
   permissionRepository,
+  terminalRepository,
   APP_MODE,
 );
 const getStaffsUseCase = new GetStaffsUseCase(staffRepository);

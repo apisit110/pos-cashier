@@ -10,3 +10,8 @@ dist
 pos-cashier.db
 pos-cashier.db-*
 packages/database/drizzle
+
+# env — copy .env.example to .env and fill in real values
+.env
+.env.*
+!.env.example

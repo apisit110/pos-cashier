@@ -34,3 +34,14 @@ export function requireScope(requiredScope: string) {
     next();
   };
 }
+
+// tokens issued before login carried tid/mid/sid are rejected so the cashier logs in again
+export function requireTerminal(req: Request, res: Response, next: NextFunction): void {
+  const { tid, mid, sid } = (req as any).user ?? {};
+  if (!tid || !mid || !sid) {
+    res.status(401).json(ErrorResponseDto.of('401', 'Token has no terminal, please login again'));
+    return;
+  }
+
+  next();
+}

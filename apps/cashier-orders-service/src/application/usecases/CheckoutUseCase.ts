@@ -3,6 +3,7 @@ import { eq, inArray } from 'drizzle-orm';
 import { schema } from '@lightning-pos/model';
 import { Order, OrderItem, OrderStatus } from '../../domain/entities/Order';
 import { PaymentMethod } from '../../domain/entities/PaymentMethod';
+import { Terminal } from '../../domain/entities/Terminal';
 import { IOrderRepository } from '../../domain/repositories/IOrderRepository';
 import { IStaffService } from '../../domain/repositories/IStaffService';
 import { ISyncQueueService } from '../../domain/repositories/ISyncQueueService';
@@ -38,7 +39,7 @@ export class CheckoutUseCase {
     private readonly db: BetterSQLite3Database<typeof schema>,
   ) {}
 
-  async execute(data: CheckoutInput, staffId: number): Promise<Order> {
+  async execute(data: CheckoutInput, staffId: number, terminal: Terminal): Promise<Order> {
     const staff = await this.staffService.findById(staffId);
     if (!staff) throw new NotFoundError(`Staff ${staffId} not found`);
 
@@ -58,9 +59,7 @@ export class CheckoutUseCase {
       return order;
     }
 
-    const merchantId = process.env.MERCHANT_ID ?? 'DEFAULT_MERCHANT';
-    const storeId = process.env.STORE_ID ?? 'DEFAULT_STORE';
-    const terminalId = process.env.TERMINAL_ID ?? 'DEFAULT_TERMINAL';
+    const { mid: merchantId, sid: storeId, tid: terminalId } = terminal;
 
     if (!order) {
       // Prices always come from the products table, never from the client —

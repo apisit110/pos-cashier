@@ -13,7 +13,7 @@ export function authRoutes(loginUseCase: LoginUseCase): Router {
   router.post('/login', async (req, res) => {
     try {
       const requestDto = LoginRequestDto.from(req.body);
-      const result = await loginUseCase.execute(requestDto.username, requestDto.pin);
+      const result = await loginUseCase.execute(requestDto.username, requestDto.pin, requestDto.tid);
       res.json(SuccessResponseDto.of(LoginResponseDto.fromResult(result)));
     } catch (error) {
       if (error instanceof z.ZodError) {

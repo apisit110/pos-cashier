@@ -24,13 +24,7 @@ Functional
 ### onboard - offline mode
 
 - กำหนด env ใน cashier แล้วใช้ได้เลย
-- MANAGER_USERNAME
-- MANAGER_NAME
-- MANAGER_PIN
 - MID
-- MERCHANT_ID
-- STORE_ID
-- TERMINAL_ID
 
 ### onboard - online mode
 
@@ -66,6 +60,8 @@ Functional
 Set up
 
 environment
+
+- คัดลอก `.env.example` เป็น `.env` ในทุก app และ `packages/database` แล้วใส่ค่าจริง (`JWT_SECRET` ต้องเหมือนกันทุก service, `SYNC_CLIENT_ID` / `SYNC_CLIENT_SECRET` ได้จาก pos-center)
 
 - MID คือ merchant id ได้มาจาก pos-center สร้างให้
 - SID คือ store id ได้มาจาก pos-center สร้างให้

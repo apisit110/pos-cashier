@@ -12,7 +12,7 @@ import { CalculateOrderResponseDto } from '../dto/responses/CalculateOrderRespon
 import { CheckoutResponseDto } from '../dto/responses/CheckoutResponseDto';
 import { OrderResponseDto } from '../dto/responses/OrderResponseDto';
 import { SuccessResponseDto, ErrorResponseDto } from '@lightning-pos/http-response';
-import { authMiddleware, requireScope } from '../middleware/authMiddleware';
+import { authMiddleware, requireScope, requireTerminal } from '../middleware/authMiddleware';
 
 export function createOrderRouter(
   calculateOrderUseCase: CalculateOrderUseCase,
@@ -24,6 +24,7 @@ export function createOrderRouter(
 
   router.use(authMiddleware);
   router.use(requireScope('sell:create'));
+  router.use(requireTerminal);
 
   router.post('/calculate', async (req: Request, res: Response) => {
     try {
@@ -45,7 +46,8 @@ export function createOrderRouter(
   router.post('/checkout', async (req: Request, res: Response) => {
     try {
       const requestDto = CheckoutRequestDto.from(req.body);
-      const staffId = parseInt((req as any).user.sub);
+      const { sub, tid, mid, sid } = (req as any).user;
+      const staffId = parseInt(sub);
       const result = await checkoutUseCase.execute(
         {
           items: requestDto.items,
@@ -55,6 +57,7 @@ export function createOrderRouter(
           idempotencyKey: requestDto.idempotencyKey,
         },
         staffId,
+        { tid, mid, sid },
       );
       res.json(SuccessResponseDto.of(CheckoutResponseDto.fromEntity(result as any)));
     } catch (error) {
@@ -69,8 +72,8 @@ export function createOrderRouter(
   router.post('/', async (req: Request, res: Response) => {
     try {
       const requestDto = CreateOrderRequestDto.from(req.body);
-      const staffId = (req as any).user.sub.toString();
-      const result = await createOrderUseCase.execute({ items: requestDto.items }, staffId);
+      const { sub, tid, mid, sid } = (req as any).user;
+      const result = await createOrderUseCase.execute({ items: requestDto.items }, sub.toString(), { tid, mid, sid });
       res.status(201).json(SuccessResponseDto.of(OrderResponseDto.fromEntity(result)));
     } catch (error) {
       if (error instanceof z.ZodError) {

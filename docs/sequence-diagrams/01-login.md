@@ -15,18 +15,20 @@ sequenceDiagram
     participant DB as SQLite (staff table)
 
     User->>App: กรอก username + pin
-    App->>App: LoginUseCase.execute({username, pin})
+    App->>App: LoginUseCase.execute({username, pin})<br/>แนบ tid ที่ได้จากหน้า terminal setup (localStorage)
     App->>GW: POST /api/v1/authen/auth/login
     GW->>Auth: proxy -> POST /auth/login
+    Auth->>DB: findByTid(tid)
+    DB-->>Auth: terminal record (tid, mid, sid)
     Auth->>DB: findByUsername(username)
     DB-->>Auth: staff record (pinHash)
 
-    alt ไม่พบ staff หรือ pin ไม่ตรง
+    alt ไม่พบ terminal, ไม่พบ staff หรือ pin ไม่ตรง
         Auth-->>GW: 401 Unauthorized
         GW-->>App: 401 Unauthorized
         App-->>User: แจ้ง error เข้าสู่ระบบไม่สำเร็จ
     else pin ถูกต้อง
-        Auth->>Auth: jwt.sign(accessToken 60m, refreshToken 30d)
+        Auth->>Auth: jwt.sign(accessToken 60m, refreshToken 30d)<br/>payload มี tid, mid, sid ให้ orders-service ใช้
         Auth-->>GW: 200 {staff, accessToken, refreshToken}
         GW-->>App: 200 {staff, accessToken, refreshToken}
         App->>App: เก็บ session ใน localStorage

@@ -1,6 +1,7 @@
 import { IStaffRepository } from '../../domain/repositories/IStaffRepository';
 import { IStaffPinRepository } from '../../domain/repositories/IStaffPinRepository';
 import { IPermissionRepository } from '../../domain/repositories/IPermissionRepository';
+import { ITerminalRepository } from '../../domain/repositories/ITerminalRepository';
 import { generateTokenPair } from '../../infrastructure/auth/TokenService';
 import { StaffStatus } from '../../domain/entities/Staff';
 import bcrypt from 'bcryptjs';
@@ -17,10 +18,18 @@ export class LoginUseCase {
     private readonly staffRepository: IStaffRepository,
     private readonly staffPinRepository: IStaffPinRepository,
     private readonly permissionRepository: IPermissionRepository,
+    private readonly terminalRepository: ITerminalRepository,
     private readonly appMode: 'online' | 'offline' = 'online',
   ) {}
 
-  async execute(username: string, pin: string) {
+  async execute(username: string, pin: string, tid: string) {
+    // tid comes from the terminal setup page, mid and sid are always read from the activated terminal record
+    const terminal = await this.terminalRepository.findByTid(tid);
+
+    if (!terminal) {
+      throw new UnauthorizedError('Terminal is not activated');
+    }
+
     const staff = await this.staffRepository.findByUsername(username);
 
     if (!staff) {
@@ -49,6 +58,9 @@ export class LoginUseCase {
       fullName: staff.fullName,
       roleId: staff.roleId,
       scope,
+      tid: terminal.tid,
+      mid: terminal.mid,
+      sid: terminal.sid,
     };
 
     const { accessToken, refreshToken } = generateTokenPair(String(staff.id), payload);
