@@ -1,6 +1,6 @@
 import { Order, OrderItem, OrderStatus } from '../../../domain/entities/Order';
 
-interface OrderItemJSON {
+export interface OrderItemJSON {
   productId: string;
   quantity: number;
   price: number;

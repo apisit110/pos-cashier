@@ -17,6 +17,6 @@ export class SqliteRoleRepositoryImpl implements IRoleRepository {
 
   async findAll(): Promise<Role[]> {
     const results = await this.db.query.roles.findMany();
-    return results.map((r) => new Role(r.id, r.roleName as RoleName));
+    return results.map((r) => new Role(r.id as number, r.roleName as RoleName));
   }
 }

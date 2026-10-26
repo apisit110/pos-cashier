@@ -1,0 +1,213 @@
+# copy .env.example to .env (repo root) and fill in real values, then:
+#   docker compose up -d --build
+# web needs NODE_AUTH_TOKEN (GitHub Packages, @apisit110/pos-ui) exported in the shell at build time
+
+name: pos-cashier
+
+x-service: &service
+  restart: unless-stopped
+
+x-db: &db
+  DATABASE_PATH: /data/pos-cashier.db
+
+x-redis: &redis
+  REDIS_HOST: redis
+  REDIS_PORT: 6379
+
+x-sync: &sync
+  SYNC_SERVICE_URL: ${SYNC_SERVICE_URL:-http://host.docker.internal:4002}
+  SYNC_PARTNER_ID: ${SYNC_PARTNER_ID:-}
+  SYNC_CLIENT_ID: ${SYNC_CLIENT_ID:-}
+  SYNC_CLIENT_SECRET: ${SYNC_CLIENT_SECRET:-}
+  SYNC_TID: ${SYNC_TID:-}
+
+x-after-migrate: &after-migrate
+  db-migrate:
+    condition: service_completed_successfully
+
+services:
+  redis:
+    <<: *service
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes", "--save", ""]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # one-off: apply drizzle migrations + seed (idempotent), then exit — every DB service waits for it
+  db-migrate:
+    image: pos-cashier-authen-service
+    build: &authen-build
+      context: .
+      dockerfile: apps/cashier-authen-service/Dockerfile
+    entrypoint: ["/sbin/tini", "--", "sh", "-c"]
+    command:
+      - node node_modules/@lightning-pos/database/dist/cli/migrate.js && node node_modules/@lightning-pos/database/dist/cli/seed.js
+    environment:
+      <<: *db
+      APP_MODE: ${APP_MODE:-online}
+    volumes:
+      - db-data:/data
+
+  cashier-authen-service:
+    <<: *service
+    image: pos-cashier-authen-service
+    build: *authen-build
+    environment:
+      <<: [*db, *redis]
+      APP_MODE: ${APP_MODE:-online}
+      MID: ${MID:?MID is required}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+    volumes:
+      - db-data:/data
+    depends_on:
+      <<: *after-migrate
+      redis:
+        condition: service_healthy
+
+  cashier-members-service:
+    <<: *service
+    image: pos-cashier-members-service
+    build:
+      context: .
+      dockerfile: apps/cashier-members-service/Dockerfile
+    environment:
+      <<: *db
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+    volumes:
+      - db-data:/data
+    depends_on: *after-migrate
+
+  cashier-orders-service:
+    <<: *service
+    image: pos-cashier-orders-service
+    build:
+      context: .
+      dockerfile: apps/cashier-orders-service/Dockerfile
+    environment:
+      <<: [*db, *redis]
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+    volumes:
+      - db-data:/data
+    depends_on:
+      <<: *after-migrate
+      redis:
+        condition: service_healthy
+
+  cashier-products-service:
+    <<: *service
+    image: pos-cashier-products-service
+    build:
+      context: .
+      dockerfile: apps/cashier-products-service/Dockerfile
+    environment:
+      <<: [*db, *redis, *sync]
+      APP_MODE: ${APP_MODE:-online}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+    volumes:
+      - db-data:/data
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    depends_on:
+      <<: *after-migrate
+      redis:
+        condition: service_healthy
+
+  cashier-terminal-service:
+    <<: *service
+    image: pos-cashier-terminal-service
+    build:
+      context: .
+      dockerfile: apps/cashier-terminal-service/Dockerfile
+    environment:
+      <<: [*db, *sync]
+      APP_MODE: ${APP_MODE:-online}
+    volumes:
+      - db-data:/data
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    depends_on: *after-migrate
+
+  cashier-transactions-service:
+    <<: *service
+    image: pos-cashier-transactions-service
+    build:
+      context: .
+      dockerfile: apps/cashier-transactions-service/Dockerfile
+    environment:
+      <<: *db
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+    volumes:
+      - db-data:/data
+    depends_on: *after-migrate
+
+  cashier-sync-service:
+    # exits 0 on purpose when APP_MODE=offline (worker disabled), so only restart on crash
+    restart: on-failure
+    image: pos-cashier-sync-service
+    build:
+      context: .
+      dockerfile: apps/cashier-sync-service/Dockerfile
+    environment:
+      <<: [*db, *redis, *sync]
+      APP_MODE: ${APP_MODE:-online}
+    volumes:
+      - db-data:/data
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    depends_on:
+      <<: *after-migrate
+      redis:
+        condition: service_healthy
+
+  cashier-api-gateway:
+    <<: *service
+    image: pos-cashier-api-gateway
+    build:
+      context: .
+      dockerfile: apps/cashier-api-gateway/Dockerfile
+    environment:
+      AUTHEN_SERVICE_URL: http://cashier-authen-service:3005
+      MEMBERS_SERVICE_URL: http://cashier-members-service:3004
+      ORDERS_SERVICE_URL: http://cashier-orders-service:3002
+      PRODUCTS_SERVICE_URL: http://cashier-products-service:3001
+      TERMINAL_SERVICE_URL: http://cashier-terminal-service:3007
+      TRANSACTIONS_SERVICE_URL: http://cashier-transactions-service:3006
+    ports:
+      - "${GATEWAY_PORT:-3000}:3000"
+    depends_on:
+      - cashier-authen-service
+      - cashier-members-service
+      - cashier-orders-service
+      - cashier-products-service
+      - cashier-terminal-service
+      - cashier-transactions-service
+
+  cashier-app:
+    <<: *service
+    image: pos-cashier-web
+    build:
+      context: .
+      dockerfile: apps/cashier-app/Dockerfile
+      secrets:
+        - NODE_AUTH_TOKEN
+      args:
+        # called from the browser, so it must be reachable from the user's machine (not a compose service name)
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000/api/v1}
+        NEXT_PUBLIC_APP_MODE: ${APP_MODE:-online}
+    ports:
+      - "${WEB_PORT:-3008}:3008"
+    depends_on:
+      - cashier-api-gateway
+
+secrets:
+  NODE_AUTH_TOKEN:
+    environment: NODE_AUTH_TOKEN
+
+volumes:
+  db-data:
+  redis-data:

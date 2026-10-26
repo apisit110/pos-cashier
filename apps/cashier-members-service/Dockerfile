@@ -1,0 +1,58 @@
+# syntax=docker/dockerfile:1
+# build from repo root: docker build -f apps/cashier-members-service/Dockerfile -t pos-cashier-members-service .
+
+ARG NODE_VERSION=22.22.2
+ARG ALPINE_VERSION=3.22
+ARG APP=pos-cashier-members-service
+
+# ---------- stage 1: prune monorepo to only what this app needs ----------
+FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS pruner
+ARG APP
+WORKDIR /repo
+RUN npm install -g turbo@2.9.6
+COPY . .
+RUN turbo prune ${APP} --docker
+
+# ---------- stage 2: install, build, extract production deps ----------
+FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS builder
+ARG APP
+# toolchain for better-sqlite3 in case no prebuilt musl binary is available
+RUN apk add --no-cache python3 make g++ \
+ && corepack enable
+WORKDIR /repo
+
+COPY --from=pruner /repo/out/json/ .
+COPY --from=pruner /repo/out/pnpm-lock.yaml ./pnpm-lock.yaml
+RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile
+
+COPY --from=pruner /repo/out/full/ .
+RUN pnpm turbo build --filter=${APP}
+
+# self-contained copy of the app with prod-only node_modules (workspace packages included with their dist)
+RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
+    pnpm --filter=${APP} deploy --prod --legacy /prod \
+ && find /prod/node_modules -type d \( -path '*/better-sqlite3/deps' -o -path '*/better-sqlite3/src' \) -prune -exec rm -rf {} +
+
+# ---------- stage 3: runtime — bare alpine + node binary only (no npm/yarn/corepack) ----------
+FROM alpine:${ALPINE_VERSION} AS runner
+RUN apk add --no-cache libstdc++ tini \
+ && addgroup -S -g 1000 node \
+ && adduser -S -u 1000 -G node node \
+ && mkdir -p /data && chown node:node /data
+COPY --from=builder /usr/local/bin/node /usr/local/bin/node
+
+ENV NODE_ENV=production \
+    PORT=3004 \
+    DATABASE_PATH=/data/pos-cashier.db
+
+WORKDIR /app
+COPY --from=builder --chown=node:node /prod/package.json ./
+COPY --from=builder --chown=node:node /prod/node_modules ./node_modules
+COPY --from=builder --chown=node:node /prod/dist ./dist
+
+USER node
+VOLUME ["/data"]
+EXPOSE 3004
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["node", "dist/main.js"]

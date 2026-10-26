@@ -123,14 +123,17 @@ todo
 - [ ] - receipt
 - [ ] - void (HOLD)
 
-- client -> order-service - /checkout
-- order-service -> payment-service - /payment/internal
-- order-service -> sync-service - addOrderSyncJob
-- order-service -> transactions-service - /internal/v1/transactions
-- order-service -> sync-service - addTransactionSyncJob
-  - sync-service -> center - /v1/sync/orders
-  - sync-service -> order-service - /internal/v1/orders/:id/synced
-  - sync-service -> center - /v1/sync/transactions
-  - sync-service -> transactions-service - /internal/v1/transactions/:id/synced
+---
 
-[ ] - check id and order id generator of /checkout (doing)
+```bash
+docker build -f apps/<โฟลเดอร์ service>/Dockerfile -t <ชื่อ image> .
+
+docker build -f apps/cashier-api-gateway/Dockerfile          -t pos-cashier-api-gateway .
+docker build -f apps/cashier-authen-service/Dockerfile       -t pos-cashier-authen-service .
+docker build -f apps/cashier-members-service/Dockerfile      -t pos-cashier-members-service .
+docker build -f apps/cashier-orders-service/Dockerfile       -t pos-cashier-orders-service .
+docker build -f apps/cashier-products-service/Dockerfile     -t pos-cashier-products-service .
+docker build -f apps/cashier-terminal-service/Dockerfile     -t pos-cashier-terminal-service .
+docker build -f apps/cashier-transactions-service/Dockerfile -t pos-cashier-transactions-service .
+docker build -f apps/cashier-sync-service/Dockerfile         -t pos-cashier-sync-service .
+```

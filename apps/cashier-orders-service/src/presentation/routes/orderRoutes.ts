@@ -87,7 +87,7 @@ export function createOrderRouter(
   router.patch('/:id/status', async (req: Request, res: Response) => {
     try {
       const requestDto = UpdateOrderStatusRequestDto.from(req.body);
-      const result = await updateOrderStatusUseCase.execute(req.params.id, { status: requestDto.status });
+      const result = await updateOrderStatusUseCase.execute(req.params.id as string, { status: requestDto.status });
       res.json(SuccessResponseDto.of(OrderResponseDto.fromEntity(result)));
     } catch (error) {
       if (error instanceof z.ZodError) {

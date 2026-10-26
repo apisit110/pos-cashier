@@ -1,0 +1,25 @@
+**/node_modules
+**/dist
+**/.next
+**/.turbo
+**/*.tsbuildinfo
+**/*.log
+**/.DS_Store
+.git
+.vscode
+.agents
+**/.agents
+docs
+apps/*/docs
+
+# local database
+*.db
+*.db-*
+
+# env — never bake secrets into images
+**/.env
+**/.env.*
+!**/.env.example
+
+**/Dockerfile
+.dockerignore

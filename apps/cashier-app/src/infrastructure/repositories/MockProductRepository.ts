@@ -1,5 +1,5 @@
 import { Product } from '../../domain/entities/Product';
-import type { ProductRepository } from '../../domain/repositories/ProductRepository';
+import type { CreateProductInput, ProductRepository, UpdateProductInput } from '../../domain/repositories/ProductRepository';
 
 export class MockProductRepository implements ProductRepository {
   private products: Product[] = [
@@ -41,5 +41,22 @@ export class MockProductRepository implements ProductRepository {
   async syncProducts(): Promise<{ success: boolean; count: number }> {
     await new Promise(resolve => setTimeout(resolve, 1000));
     return { success: true, count: 0 };
+  }
+
+  async createProduct(input: CreateProductInput): Promise<Product> {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const product = new Product(String(this.products.length + 1), input.barcode, input.name, input.price, undefined, input.brand);
+    this.products.push(product);
+    return product;
+  }
+
+  async updateProduct(id: string, input: UpdateProductInput): Promise<Product> {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const index = this.products.findIndex(p => p.id === id);
+    if (index === -1) throw new Error('Product not found');
+    const current = this.products[index];
+    const product = new Product(id, current.barcode, input.name, input.price, current.image, input.brand);
+    this.products[index] = product;
+    return product;
   }
 }
