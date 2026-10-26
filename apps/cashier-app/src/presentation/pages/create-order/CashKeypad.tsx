@@ -71,6 +71,20 @@ const Wrapper = styled.section`
     background: #16a34a;
   }
 
+  .key.cancel {
+    color: #fff;
+    border-color: #eab308;
+    background: #eab308;
+  }
+
+  .key.delete {
+    color: #fff;
+    border-color: #dc2626;
+    background: #dc2626;
+  }
+
+  .key.cancel:disabled,
+  .key.delete:disabled,
   .key.confirm:disabled {
     color: #9ca3af;
     border-color: #d1d5db;
@@ -142,9 +156,9 @@ export const CashKeypad: React.FC<CashKeypadProps> = ({ total, value, onChange, 
 
       <div className="keys">
         {['7', '8', '9'].map((d) => <button key={d} type="button" className="key" disabled={disabled} onClick={() => press(d)}>{d}</button>)}
-        <button type="button" className="key" disabled={disabled} onClick={() => onChange('')}>{t.createOrder.clear}</button>
+        <button type="button" className="key cancel" disabled={disabled} onClick={() => onChange('')}>{t.createOrder.clear}</button>
         {['4', '5', '6'].map((d) => <button key={d} type="button" className="key" disabled={disabled} onClick={() => press(d)}>{d}</button>)}
-        <button type="button" className="key" disabled={disabled} onClick={() => onChange(value.slice(0, -1))}>{t.createOrder.delete}</button>
+        <button type="button" className="key delete" disabled={disabled} onClick={() => onChange(value.slice(0, -1))}>{t.createOrder.delete}</button>
         {['1', '2', '3'].map((d) => <button key={d} type="button" className="key" disabled={disabled} onClick={() => press(d)}>{d}</button>)}
         <button type="button" className="key confirm" disabled={!canPay} onClick={onSubmit}>{t.createOrder.enter}</button>
         <span />

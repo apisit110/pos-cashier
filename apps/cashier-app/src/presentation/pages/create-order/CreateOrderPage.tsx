@@ -9,6 +9,7 @@ import { MemberCard } from './MemberCard';
 import { TablePanel } from './TablePanel';
 import { ScrollArea } from './ScrollArea';
 import { QtyControls } from './QtyControls';
+import { PriceButton } from './PriceButton';
 import { EmptyState } from './EmptyState';
 import { ApiProductRepository } from '../../../infrastructure/repositories/ApiProductRepository';
 import { ApiMemberRepository } from '../../../infrastructure/repositories/ApiMemberRepository';
@@ -17,10 +18,12 @@ import { ScanProductUseCase } from '../../../domain/use-cases/ScanProductUseCase
 import { Product } from '../../../domain/entities/Product';
 import { Member } from '../../../domain/entities/Member';
 import { IdentifyMemberUseCase } from '../../../domain/use-cases/IdentifyMemberUseCase';
+import { UpdateProductUseCase } from '../../../domain/use-cases/UpdateProductUseCase';
 import type { PromotionResult } from '../../../domain/use-cases/CalculatePromotionUseCase';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { keyCodeToChar } from './keyCodeToChar';
 import { formatAmount } from '../../utils/formatAmount';
+import { EditPriceModal } from './EditPriceModal';
 
 interface OrderItem {
   product: Product;
@@ -33,6 +36,8 @@ const orderRepository = new ApiOrderRepository();
 
 const scanUseCase = new ScanProductUseCase(productRepository);
 const identifyMemberUseCase = new IdentifyMemberUseCase(memberRepository);
+// Local update always; the products service also pushes it to pos-center when APP_MODE=online
+const updateProductUseCase = new UpdateProductUseCase(productRepository);
 
 // Member system temporarily hidden from UI
 const SHOW_MEMBER_SECTION = false;
@@ -40,7 +45,7 @@ const SHOW_MEMBER_SECTION = false;
 interface CreateOrderPageProps {
   onBack?: () => void;
   onLogout?: () => void;
-  staff: { uid: string; username: string; role: string; accessToken: string } | null;
+  staff: { uid: string; username: string; role: string; scope: string[]; accessToken: string } | null;
 }
 
 export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogout, staff }) => {
@@ -53,6 +58,8 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
   const [isIdentifyingMember, setIsIdentifyingMember] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [receivedInput, setReceivedInput] = useState('');
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const canEditPrice = staff?.scope.includes('product:edit') ?? false;
   // Stays the same across retries of one checkout attempt (e.g. network timeout, double-submit)
   // so the backend can dedupe instead of charging/creating an order twice. Cleared whenever the
   // modal (re)opens for a fresh cart.
@@ -193,6 +200,17 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
     }
   };
 
+  const handleSavePrice = async (price: number) => {
+    if (!editingProduct) return;
+    const updated = await updateProductUseCase.execute(editingProduct.id, {
+      name: editingProduct.name,
+      brand: editingProduct.brand ?? null,
+      price,
+    });
+    setItems(prev => prev.map(i => i.product.id === updated.id ? { ...i, product: updated } : i));
+    setEditingProduct(null);
+  };
+
   const handleRemoveMember = () => setMember(null);
   const handlePaymentSuccess = () => {
     setItems([]);
@@ -253,7 +271,11 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
       header: t.createOrder.columnPrice,
       key: 'price',
       textAlign: 'right',
-      render: (item) => formatAmount(item.product.price, '฿')
+      render: (item) => canEditPrice ? (
+        <PriceButton onClick={() => setEditingProduct(item.product)} title={t.createOrder.editPriceTitle}>
+          {formatAmount(item.product.price, '฿')}
+        </PriceButton>
+      ) : formatAmount(item.product.price, '฿')
     },
     {
       header: t.createOrder.columnTotal,
@@ -341,6 +363,14 @@ export const CreateOrderPage: React.FC<CreateOrderPageProps> = ({ onBack, onLogo
           <CashKeypad total={total} value={receivedInput} onChange={setReceivedInput} onSubmit={handleCheckout} inputRef={receivedInputRef} disabled={items.length === 0} />
         </SidePanel>
       </Main>
+
+      {editingProduct && (
+        <EditPriceModal
+          product={editingProduct}
+          onSave={handleSavePrice}
+          onClose={() => setEditingProduct(null)}
+        />
+      )}
 
     </Container>
   );

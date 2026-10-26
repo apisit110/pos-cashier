@@ -90,6 +90,10 @@ export interface Translations {
     errorProductNotFound: string;
     errorMemberNotFound: string;
     errorIdentifyMember: string;
+    editPriceTitle: string;
+    save: string;
+    errorPriceInvalid: string;
+    errorUpdatePrice: string;
   };
   createStaff: {
     title: string;
@@ -339,6 +343,10 @@ export const en: Translations = {
     errorProductNotFound: 'Product not found.',
     errorMemberNotFound: 'Member not found.',
     errorIdentifyMember: 'Error identifying member.',
+    editPriceTitle: 'Edit Price',
+    save: 'Save',
+    errorPriceInvalid: 'Please enter a valid price.',
+    errorUpdatePrice: 'Failed to update price.',
   },
   createStaff: {
     title: 'Create New Staff',
@@ -588,6 +596,10 @@ export const th: Translations = {
     errorProductNotFound: 'ไม่พบสินค้า',
     errorMemberNotFound: 'ไม่พบสมาชิก',
     errorIdentifyMember: 'เกิดข้อผิดพลาดในการตรวจสอบสมาชิก',
+    editPriceTitle: 'แก้ไขราคา',
+    save: 'บันทึก',
+    errorPriceInvalid: 'กรุณากรอกราคาให้ถูกต้อง',
+    errorUpdatePrice: 'แก้ไขราคาไม่สำเร็จ',
   },
   createStaff: {
     title: 'สร้างพนักงานใหม่',
