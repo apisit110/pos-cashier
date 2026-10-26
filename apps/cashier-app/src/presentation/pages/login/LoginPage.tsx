@@ -92,6 +92,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             onChange={setPin}
             disabled={isLoading}
             boxSize="2.75rem"
+            masked
           />
 
           <Button type="submit" isLoading={isLoading}>

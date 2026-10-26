@@ -8,7 +8,8 @@
     "watch": "nodemon",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "clean-install": "find -E . -mindepth 1 -maxdepth 3 -type d -regex '.*(node_modules|dist|.turbo|.serverless|.next|.out)$' -exec rm -rf {} + && pnpm install"
+    "clean-install": "find -E . -mindepth 1 -maxdepth 3 -type d -regex '.*(node_modules|dist|.turbo|.serverless|.next|.out)$' -exec rm -rf {} + && pnpm install",
+    "clean-install:window": "find . -mindepth 1 -maxdepth 3 \\( -name \"node_modules\" -o -name \"dist\" -o -name \".turbo\" -o -name \".serverless\" -o -name \".next\" -o -name \".out\" \\) -type d -exec rm -rf {} + && pnpm install"
   },
   "devDependencies": {
     "nodemon": "^3.1.14",

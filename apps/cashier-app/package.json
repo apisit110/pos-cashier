@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@apisit110/pos-ui": "^0.6.6",
+    "@apisit110/pos-ui": "^0.6.7",
     "@lightning-pos/datetime": "workspace:*",
     "axios": "^1.7.0",
     "chart.js": "^4.4.9",
