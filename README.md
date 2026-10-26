@@ -128,12 +128,33 @@ todo
 ```bash
 docker build -f apps/<โฟลเดอร์ service>/Dockerfile -t <ชื่อ image> .
 
-docker build -f apps/cashier-api-gateway/Dockerfile          -t pos-cashier-api-gateway .
-docker build -f apps/cashier-authen-service/Dockerfile       -t pos-cashier-authen-service .
-docker build -f apps/cashier-members-service/Dockerfile      -t pos-cashier-members-service .
-docker build -f apps/cashier-orders-service/Dockerfile       -t pos-cashier-orders-service .
-docker build -f apps/cashier-products-service/Dockerfile     -t pos-cashier-products-service .
-docker build -f apps/cashier-terminal-service/Dockerfile     -t pos-cashier-terminal-service .
-docker build -f apps/cashier-transactions-service/Dockerfile -t pos-cashier-transactions-service .
-docker build -f apps/cashier-sync-service/Dockerfile         -t pos-cashier-sync-service .
+docker build -f apps/cashier-api-gateway/Dockerfile          -t cashier-api-gateway .
+docker build -f apps/cashier-authen-service/Dockerfile       -t cashier-authen-service .
+docker build -f apps/cashier-members-service/Dockerfile      -t cashier-members-service .
+docker build -f apps/cashier-orders-service/Dockerfile       -t cashier-orders-service .
+docker build -f apps/cashier-products-service/Dockerfile     -t cashier-products-service .
+docker build -f apps/cashier-terminal-service/Dockerfile     -t cashier-terminal-service .
+docker build -f apps/cashier-transactions-service/Dockerfile -t cashier-transactions-service .
+docker build -f apps/cashier-sync-service/Dockerfile         -t cashier-sync-service .
+```
+
+```bash
+docker run --rm cashier-api-gateway:1.0.0
+docker run --rm -it <xxx> sh
+```
+
+
+```bash
+docker rm -f charming_cohen
+
+docker run --rm -p 3000:3000 \
+  -e AUTHEN_SERVICE_URL=http://host.docker.internal:3005 \
+  -e MEMBERS_SERVICE_URL=http://host.docker.internal:3004 \
+  -e ORDERS_SERVICE_URL=http://host.docker.internal:3002 \
+  -e PRODUCTS_SERVICE_URL=http://host.docker.internal:3001 \
+  -e TERMINAL_SERVICE_URL=http://host.docker.internal:3007 \
+  -e TRANSACTIONS_SERVICE_URL=http://host.docker.internal:3006 \
+  cashier-api-gateway:1.0.0
+
+docker compose up -d --no-deps cashier-api-gateway
 ```

@@ -40,7 +40,7 @@ services:
 
   # one-off: apply drizzle migrations + seed (idempotent), then exit — every DB service waits for it
   db-migrate:
-    image: pos-cashier-authen-service
+    image: cashier-authen-service
     build: &authen-build
       context: .
       dockerfile: apps/cashier-authen-service/Dockerfile
@@ -55,7 +55,7 @@ services:
 
   cashier-authen-service:
     <<: *service
-    image: pos-cashier-authen-service
+    image: cashier-authen-service
     build: *authen-build
     environment:
       <<: [*db, *redis]
@@ -71,7 +71,7 @@ services:
 
   cashier-members-service:
     <<: *service
-    image: pos-cashier-members-service
+    image: cashier-members-service
     build:
       context: .
       dockerfile: apps/cashier-members-service/Dockerfile
@@ -84,7 +84,7 @@ services:
 
   cashier-orders-service:
     <<: *service
-    image: pos-cashier-orders-service
+    image: cashier-orders-service
     build:
       context: .
       dockerfile: apps/cashier-orders-service/Dockerfile
@@ -100,7 +100,7 @@ services:
 
   cashier-products-service:
     <<: *service
-    image: pos-cashier-products-service
+    image: cashier-products-service
     build:
       context: .
       dockerfile: apps/cashier-products-service/Dockerfile
@@ -119,7 +119,7 @@ services:
 
   cashier-terminal-service:
     <<: *service
-    image: pos-cashier-terminal-service
+    image: cashier-terminal-service
     build:
       context: .
       dockerfile: apps/cashier-terminal-service/Dockerfile
@@ -134,7 +134,7 @@ services:
 
   cashier-transactions-service:
     <<: *service
-    image: pos-cashier-transactions-service
+    image: cashier-transactions-service
     build:
       context: .
       dockerfile: apps/cashier-transactions-service/Dockerfile
@@ -148,7 +148,7 @@ services:
   cashier-sync-service:
     # exits 0 on purpose when APP_MODE=offline (worker disabled), so only restart on crash
     restart: on-failure
-    image: pos-cashier-sync-service
+    image: cashier-sync-service
     build:
       context: .
       dockerfile: apps/cashier-sync-service/Dockerfile
@@ -166,7 +166,7 @@ services:
 
   cashier-api-gateway:
     <<: *service
-    image: pos-cashier-api-gateway
+    image: cashier-api-gateway
     build:
       context: .
       dockerfile: apps/cashier-api-gateway/Dockerfile
@@ -189,7 +189,7 @@ services:
 
   cashier-app:
     <<: *service
-    image: pos-cashier-web
+    image: cashier-app
     build:
       context: .
       dockerfile: apps/cashier-app/Dockerfile

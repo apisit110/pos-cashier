@@ -1,13 +1,13 @@
 # syntax=docker/dockerfile:1
 # build from repo root (token is needed for @apisit110/pos-ui on GitHub Packages, passed as a secret — never baked into a layer):
-#   docker build -f apps/cashier-app/Dockerfile -t pos-cashier-web \
+#   docker build -f apps/cashier-app/Dockerfile -t cashier-app \
 #     --secret id=NODE_AUTH_TOKEN,env=NODE_AUTH_TOKEN \
 #     --build-arg NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1 \
 #     --build-arg NEXT_PUBLIC_APP_MODE=online .
 
 ARG NODE_VERSION=22.22.2
 ARG ALPINE_VERSION=3.22
-ARG APP=pos-cashier-web
+ARG APP=cashier-app
 
 # ---------- stage 1: prune monorepo to only what this app needs ----------
 FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS pruner

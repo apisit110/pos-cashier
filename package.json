@@ -4,7 +4,8 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev --concurrency 20",
-    "dev:cashier": "turbo dev --filter=pos-cashier-*",
+    "dev:cashier": "turbo dev --filter=cashier-*",
+    "dev:cashier:nogateway": "turbo dev --concurrency 20 --filter=cashier-app... --filter=cashier-authen-service... --filter=cashier-members-service... --filter=cashier-orders-service... --filter=cashier-products-service... --filter=cashier-sync-service... --filter=cashier-terminal-service... --filter=cashier-transactions-service...",
     "watch": "nodemon",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",

@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1
-# build from repo root: docker build -f apps/cashier-authen-service/Dockerfile -t pos-cashier-authen-service .
+# build from repo root: docker build -f apps/cashier-authen-service/Dockerfile -t cashier-authen-service .
 
 ARG NODE_VERSION=22.22.2
 ARG ALPINE_VERSION=3.22
-ARG APP=pos-cashier-authen-service
+ARG APP=cashier-authen-service
 
 # ---------- stage 1: prune monorepo to only what this app needs ----------
 FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS pruner

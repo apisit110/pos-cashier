@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1
-# build from repo root: docker build -f apps/cashier-terminal-service/Dockerfile -t pos-cashier-terminal-service .
+# build from repo root: docker build -f apps/cashier-terminal-service/Dockerfile -t cashier-terminal-service .
 
 ARG NODE_VERSION=22.22.2
 ARG ALPINE_VERSION=3.22
-ARG APP=pos-cashier-terminal-service
+ARG APP=cashier-terminal-service
 
 # ---------- stage 1: prune monorepo to only what this app needs ----------
 FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS pruner
