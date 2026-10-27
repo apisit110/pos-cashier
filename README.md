@@ -27,16 +27,16 @@ pnpm run dev
 ---
 
 ```bash
-docker build -f apps/<โฟลเดอร์ service>/Dockerfile -t <ชื่อ image> .
+docker build -f apps/<โฟลเดอร์ service>/Dockerfile -t pos-cashier/<ชื่อ image> .
 
-docker build -f apps/cashier-api-gateway/Dockerfile          -t cashier-api-gateway .
-docker build -f apps/cashier-authen-service/Dockerfile       -t cashier-authen-service .
-docker build -f apps/cashier-members-service/Dockerfile      -t cashier-members-service .
-docker build -f apps/cashier-orders-service/Dockerfile       -t cashier-orders-service .
-docker build -f apps/cashier-products-service/Dockerfile     -t cashier-products-service .
-docker build -f apps/cashier-terminal-service/Dockerfile     -t cashier-terminal-service .
-docker build -f apps/cashier-transactions-service/Dockerfile -t cashier-transactions-service .
-docker build -f apps/cashier-sync-service/Dockerfile         -t cashier-sync-service .
+docker build -f apps/cashier-api-gateway/Dockerfile          -t pos-cashier/cashier-api-gateway .
+docker build -f apps/cashier-authen-service/Dockerfile       -t pos-cashier/cashier-authen-service .
+docker build -f apps/cashier-members-service/Dockerfile      -t pos-cashier/cashier-members-service .
+docker build -f apps/cashier-orders-service/Dockerfile       -t pos-cashier/cashier-orders-service .
+docker build -f apps/cashier-products-service/Dockerfile     -t pos-cashier/cashier-products-service .
+docker build -f apps/cashier-terminal-service/Dockerfile     -t pos-cashier/cashier-terminal-service .
+docker build -f apps/cashier-transactions-service/Dockerfile -t pos-cashier/cashier-transactions-service .
+docker build -f apps/cashier-sync-service/Dockerfile         -t pos-cashier/cashier-sync-service .
 ```
 
 ```bash
@@ -47,7 +47,7 @@ docker run --rm -p 3000:3000 \
   -e PRODUCTS_SERVICE_URL=http://host.docker.internal:3001 \
   -e TERMINAL_SERVICE_URL=http://host.docker.internal:3007 \
   -e TRANSACTIONS_SERVICE_URL=http://host.docker.internal:3006 \
-  cashier-api-gateway:1.0.0
+  pos-cashier/cashier-api-gateway:1.0.0
 ```
 
 ```bash

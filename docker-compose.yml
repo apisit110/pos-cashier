@@ -1,6 +1,8 @@
-# copy .env.example to .env (repo root) and fill in real values, then:
+# copy .env.example to .env (repo root) — compose-level vars (release, ports, web build args)
+# per-service runtime env is written inline below (x-* anchors hold the shared values)
+# then:
 #   docker compose up -d --build
-# images are tagged <service>:${RELEASE} (default latest), e.g. RELEASE=1.0.0 docker compose up -d --build
+# images are tagged pos-cashier/<service>:${RELEASE} (default latest), e.g. RELEASE=1.0.0 docker compose up -d --build
 # web needs NODE_AUTH_TOKEN (GitHub Packages, @apisit110/pos-ui) exported in the shell at build time
 
 name: pos-cashier
@@ -15,21 +17,27 @@ x-redis: &redis
   REDIS_HOST: redis
   REDIS_PORT: 6379
 
+# shared by every service — used to sign (authen) and verify staff JWTs
+x-jwt: &jwt
+  JWT_SECRET: ad823f9c58b2beca27a1cbc38b899d8039c9122979fe604b49c3246c4bd994db
+
+# pos-sync-service (pos-center) — merchant credential of provider POS_CASHIER, used when APP_MODE=online
 x-sync: &sync
-  SYNC_SERVICE_URL: ${SYNC_SERVICE_URL:-http://host.docker.internal:4002}
-  SYNC_PARTNER_ID: ${SYNC_PARTNER_ID:-}
-  SYNC_CLIENT_ID: ${SYNC_CLIENT_ID:-}
-  SYNC_CLIENT_SECRET: ${SYNC_CLIENT_SECRET:-}
-  SYNC_TID: ${SYNC_TID:-}
+  SYNC_SERVICE_URL: http://host.docker.internal:4002
+  SYNC_PARTNER_ID: "0001"
+  SYNC_CLIENT_ID: cid_21b91ceb2633bc30e8a0ed6418b909fc
+  SYNC_CLIENT_SECRET: cs_2OXHDh1onpyvdwPs3_cfSgkYI31a4DG1fj85yPYUpGk
+  SYNC_TID: "0001000101"
 
 x-db-tool: &db-tool
-  image: cashier-authen-service:${RELEASE:-latest}
+  image: pos-cashier/cashier-authen-service:${RELEASE:-latest}
   # run manually only — never started by a plain `docker compose up`
   profiles: ["db"]
   entrypoint: ["/sbin/tini", "--", "node"]
   environment:
     <<: *db
-    APP_MODE: ${APP_MODE:-online}
+    # online | offline — offline seeds default staffs/terminal
+    APP_MODE: online
   volumes:
     - db-data:/data
 
@@ -59,15 +67,19 @@ services:
 
   cashier-authen-service:
     <<: *service
-    image: cashier-authen-service:${RELEASE:-latest}
+    image: pos-cashier/cashier-authen-service:${RELEASE:-latest}
     build:
       context: .
       dockerfile: apps/cashier-authen-service/Dockerfile
     environment:
-      <<: [*db, *redis]
-      APP_MODE: ${APP_MODE:-online}
-      MID: ${MID:?MID is required}
-      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      <<: [*db, *redis, *jwt]
+      # online | offline — offline seeds default staffs/terminal
+      APP_MODE: online
+      # merchant id from pos-center
+      MID: "0001"
+      # optional — defaults are in the code
+      # SYNC_STAFFS_TIMEOUT_MS:
+      # SYNC_PULL_DELAY_MS:
     volumes:
       - db-data:/data
     depends_on:
@@ -76,25 +88,23 @@ services:
 
   cashier-members-service:
     <<: *service
-    image: cashier-members-service:${RELEASE:-latest}
+    image: pos-cashier/cashier-members-service:${RELEASE:-latest}
     build:
       context: .
       dockerfile: apps/cashier-members-service/Dockerfile
     environment:
-      <<: *db
-      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      <<: [*db, *jwt]
     volumes:
       - db-data:/data
 
   cashier-orders-service:
     <<: *service
-    image: cashier-orders-service:${RELEASE:-latest}
+    image: pos-cashier/cashier-orders-service:${RELEASE:-latest}
     build:
       context: .
       dockerfile: apps/cashier-orders-service/Dockerfile
     environment:
-      <<: [*db, *redis]
-      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      <<: [*db, *redis, *jwt]
     volumes:
       - db-data:/data
     depends_on:
@@ -103,14 +113,16 @@ services:
 
   cashier-products-service:
     <<: *service
-    image: cashier-products-service:${RELEASE:-latest}
+    image: pos-cashier/cashier-products-service:${RELEASE:-latest}
     build:
       context: .
       dockerfile: apps/cashier-products-service/Dockerfile
     environment:
-      <<: [*db, *redis, *sync]
-      APP_MODE: ${APP_MODE:-online}
-      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      <<: [*db, *redis, *jwt, *sync]
+      # online | offline — offline disables OutboxWorker (no sync attempts to pos-center)
+      APP_MODE: online
+      # optional — default is in the code
+      # SYNC_PRODUCTS_TIMEOUT_MS:
     volumes:
       - db-data:/data
     extra_hosts:
@@ -121,13 +133,14 @@ services:
 
   cashier-terminal-service:
     <<: *service
-    image: cashier-terminal-service:${RELEASE:-latest}
+    image: pos-cashier/cashier-terminal-service:${RELEASE:-latest}
     build:
       context: .
       dockerfile: apps/cashier-terminal-service/Dockerfile
     environment:
       <<: [*db, *sync]
-      APP_MODE: ${APP_MODE:-online}
+      # online | offline — offline seeds the default terminal
+      APP_MODE: online
     volumes:
       - db-data:/data
     extra_hosts:
@@ -135,26 +148,29 @@ services:
 
   cashier-transactions-service:
     <<: *service
-    image: cashier-transactions-service:${RELEASE:-latest}
+    image: pos-cashier/cashier-transactions-service:${RELEASE:-latest}
     build:
       context: .
       dockerfile: apps/cashier-transactions-service/Dockerfile
     environment:
-      <<: *db
-      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      <<: [*db, *jwt]
     volumes:
       - db-data:/data
 
   cashier-sync-service:
     # exits 0 on purpose when APP_MODE=offline (worker disabled), so only restart on crash
     restart: on-failure
-    image: cashier-sync-service:${RELEASE:-latest}
+    image: pos-cashier/cashier-sync-service:${RELEASE:-latest}
     build:
       context: .
       dockerfile: apps/cashier-sync-service/Dockerfile
     environment:
       <<: [*db, *redis, *sync]
-      APP_MODE: ${APP_MODE:-online}
+      # online | offline — offline disables the BullMQ worker (no sync-order/sync-transaction
+      # jobs to pos-center); jobs stay queued in Redis until restarted in online mode
+      APP_MODE: online
+      # optional — default is in the code
+      # SYNC_PULL_DELAY_MS:
     volumes:
       - db-data:/data
     extra_hosts:
@@ -165,7 +181,7 @@ services:
 
   cashier-api-gateway:
     <<: *service
-    image: cashier-api-gateway:${RELEASE:-latest}
+    image: pos-cashier/cashier-api-gateway:${RELEASE:-latest}
     build:
       context: .
       dockerfile: apps/cashier-api-gateway/Dockerfile
@@ -188,7 +204,7 @@ services:
 
   cashier-app:
     <<: *service
-    image: cashier-app:${RELEASE:-latest}
+    image: pos-cashier/cashier-app:${RELEASE:-latest}
     build:
       context: .
       dockerfile: apps/cashier-app/Dockerfile
@@ -197,7 +213,7 @@ services:
       args:
         # called from the browser, so it must be reachable from the user's machine (not a compose service name)
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000/api/v1}
-        NEXT_PUBLIC_APP_MODE: ${APP_MODE:-online}
+        NEXT_PUBLIC_APP_MODE: ${NEXT_PUBLIC_APP_MODE:-online}
     ports:
       - "${WEB_PORT:-3008}:3008"
     depends_on:
