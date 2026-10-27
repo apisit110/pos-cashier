@@ -1,4 +1,5 @@
-import { Worker, Job } from 'bullmq';
+import { Worker, Job, DelayedError } from 'bullmq';
+import { isSyncTokenError } from '@lightning-pos/sync-client';
 import { SyncOrderUseCase } from '../../application/usecases/SyncOrderUseCase';
 import { SyncTransactionUseCase } from '../../application/usecases/SyncTransactionUseCase';
 import { SyncProductsUseCase } from '../../application/usecases/SyncProductsUseCase';
@@ -22,15 +23,34 @@ export function createSyncWorker(
       console.error('[SyncWorker] Failed to schedule sync-pull:', error);
     });
 
+  /**
+   * Orders / transactions must reach pos-center: when the sync token is rejected (wrong credential),
+   * postpone the job until the client may request a token again instead of using up its attempts.
+   */
+  const pushOrPostpone = async (job: Job, token: string | undefined, push: () => Promise<void>) => {
+    try {
+      await push();
+    } catch (error) {
+      if (!isSyncTokenError(error) || !token) throw error;
+      console.error(`[SyncWorker] ${error.message}, job ${job.id} (${job.name}) postponed`);
+      await job.moveToDelayed(error.retryAt, token);
+      throw new DelayedError();
+    }
+  };
+
   const worker = new Worker(
     SYNC_QUEUE_NAME,
-    async (job: Job) => {
+    async (job: Job, token?: string) => {
       switch (job.name) {
         case SYNC_JOBS.SYNC_ORDER:
-          await schedulePull(await syncOrderUseCase.execute(job.data.orderId));
+          await pushOrPostpone(job, token, async () => {
+            await schedulePull(await syncOrderUseCase.execute(job.data.orderId));
+          });
           break;
         case SYNC_JOBS.SYNC_TRANSACTION:
-          await schedulePull(await syncTransactionUseCase.execute(job.data.transactionId));
+          await pushOrPostpone(job, token, async () => {
+            await schedulePull(await syncTransactionUseCase.execute(job.data.transactionId));
+          });
           break;
         case SYNC_JOBS.SYNC_PRODUCTS:
           // return value is read back by cashier-products-service via job.waitUntilFinished

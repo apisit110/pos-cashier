@@ -1,3 +1,4 @@
+import { isSyncTokenError } from '@lightning-pos/sync-client';
 import { ISyncOutboxRepository } from '../../domain/repositories/ISyncOutboxRepository';
 import { IProductCenterRepository } from '../../domain/repositories/IProductCenterRepository';
 
@@ -34,6 +35,11 @@ export class OutboxWorker {
         await this.outboxRepository.markDone(entry.id);
         console.log(`[OutboxWorker] Synced product ${entry.product.id}`);
       } catch (error) {
+        // not a problem of this product: stop the round without using up retries, the next poll tries again
+        if (isSyncTokenError(error)) {
+          console.error(`[OutboxWorker] ${error.message}, ${entries.length} entries wait for the next poll`);
+          return;
+        }
         console.error(`[OutboxWorker] Failed to sync product ${entry.product.id} (attempt ${entry.retryCount + 1}):`, error);
         await this.outboxRepository.markFailed(entry.id);
       }
