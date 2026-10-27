@@ -7,6 +7,79 @@ pos-cashier
 
 ---
 
+
+# Functional
+
+## Backlog
+
+[] stock system
+[] member system
+[] promotion system
+[] discount on sales
+[] Purchase with Purchase (PWP)
+[] hold order
+
+Senario
+- Cashier scan barcode to create order for Alice 
+- Alice wait a moment to grap other product
+- Cashier Hold Order
+- Cashier scan barcode to create a new order for Bob
+- Cashier complete order of Bob
+- Cashier switch back to order of Alice
+
+> Can hold more then 1 order?
+
+[] QR_PROMPTPAY Payment Method
+[] 1 bill can pay with multi payment
+
+- Bill = 100
+- CASH = 5
+- QR_PROMPTPAY = 95
+
+
+
+## Dashboard
+
+[x] daily summary
+[x] trend weeky
+
+## Sales
+
+[x] sale
+
+## Transaction
+
+[x] view/search transaction
+[x] view transaction detail
+
+## Product Management
+
+[x] create product
+[x] edit product
+
+## Staff Management
+
+[x] login
+[x] logout
+[x] role permission
+[x] create staff
+
+## Offline mode
+
+[x] can login event if offline
+[x] can sales event if offline
+[x] can manage product event if offline
+
+## Online mode
+
+[x] sync pull staff
+[x] sync pull product
+[x] sync push product
+[x] sync push order
+[x] sync push transaction
+
+---
+
 All services share a single SQLite database (`pos-cashier.db` at the repo root):
 
 - `packages/model` (`@lightning-pos/model`) defines the schema (drizzle tables) for every service.
