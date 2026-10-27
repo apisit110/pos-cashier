@@ -5,83 +5,6 @@ pos-cashier
 > barcode 1D คือ บาร์โค้ด แถบยาว
 > barcode 2D คือ บาร์โค้ด สี่เหลี่ยม
 
-Functional
-
-- [x] - login
-- [x] - ขายสินค้า
-  - [x] - สร้างคำสั่งซื้อ Order
-    - [x] - ส่งข้อมูลการสร้างคำสั่งซื้อไปยัง pos-center
-  - [x] - สร้างรายการชำระเงิน Transaction
-    - [x] - ส่งข้อมูลการสร้างคำสั่งซื้อไปยัง pos-center
-- [x] - ดูรายการขาย
-- [x] - ดูรายการสินค้า
-- [x] - ดึงรายการสินค้าจาก pos-center
-- [x] - ดูพนักงานในระบบ
-- [x] - สร้างพนักงานในระบบ
-
----
-
-### onboard - offline mode
-
-- กำหนด env ใน cashier แล้วใช้ได้เลย
-- MID
-
-### onboard - online mode
-
-- สร้างที่ center แล้วได้ค่าต่างมากำหนด env ใน cashier
-
-### login - offline mode
-
-- ใช้ username pin ตอน onboard
-
-### login - online mode
-
-- ใช้ username pin ตอน onboard
-- จากนั้นเช็คกับ center
-
-### product - create - offline mode
-
-### product - create - online mode
-
-สร้างสินค้าแล้ว sync ไปยัง center ด้วย
-
-### product - edit - offline mode
-
-### product - edit - online mode
-
-### product - sync - online mode
-
-### sell - create - offline mode
-
-### sell - create - online mode
-
----
-
-Set up
-
-environment
-
-- คัดลอก `.env.example` เป็น `.env` ในทุก app และ `packages/database` แล้วใส่ค่าจริง (`JWT_SECRET` ต้องเหมือนกันทุก service, `SYNC_CLIENT_ID` / `SYNC_CLIENT_SECRET` ได้จาก pos-center)
-
-- MID คือ merchant id ได้มาจาก pos-center สร้างให้
-- SID คือ store id ได้มาจาก pos-center สร้างให้
-- TID คือ terminal id ได้มาจาก pos-center สร้างให้
-
-User Access Management (UAM)
-
-| Action           | Guest | Manager | Cashier |
-| ---------------- | ----- | ------- | ------- |
-| login            | [x]   | [ ]     | [ ]     |
-| dashboard:view   | [ ]   | [x]     | [ ]     |
-| sell:create      | [ ]   | [x]     | [x]     |
-| transaction:view | [ ]   | [x]     | [ ]     |
-| products:view    | [ ]   | [x]     | [ ]     |
-| product:create   | [ ]   | [x]     | [ ]     |
-| product:edit     | [ ]   | [x]     | [ ]     |
-| products:sync    | [ ]   | [x]     | [ ]     |
-| staff:view       | [ ]   | [x]     | [ ]     |
-| staff:create     | [ ]   | [x]     | [ ]     |
-
 ---
 
 All services share a single SQLite database (`pos-cashier.db` at the repo root):
@@ -101,28 +24,6 @@ pnpm --filter @lightning-pos/database db:seed all
 pnpm run dev
 ```
 
-todo
-
-- [ ] - report summary daily
-- [ ] - report summary weekly
-- [ ] - report summary monthly
-- [ ] - report summary yearly
-
-- [x] - theme light
-- [x] - theme dark
-
-- [x] - create product
-- [x] - sync product (upload)
-- [x] - update product + sync (upload)
-
-- [x] - sync order (upload)
-- [x] - sync transaction (upload)
-- [ ] - sync user (upload)
-- [ ] - sync promotion (download)
-
-- [ ] - receipt
-- [ ] - void (HOLD)
-
 ---
 
 ```bash
@@ -139,14 +40,6 @@ docker build -f apps/cashier-sync-service/Dockerfile         -t cashier-sync-ser
 ```
 
 ```bash
-docker run --rm cashier-api-gateway:1.0.0
-docker run --rm -it <xxx> sh
-```
-
-
-```bash
-docker rm -f charming_cohen
-
 docker run --rm -p 3000:3000 \
   -e AUTHEN_SERVICE_URL=http://host.docker.internal:3005 \
   -e MEMBERS_SERVICE_URL=http://host.docker.internal:3004 \
@@ -155,8 +48,6 @@ docker run --rm -p 3000:3000 \
   -e TERMINAL_SERVICE_URL=http://host.docker.internal:3007 \
   -e TRANSACTIONS_SERVICE_URL=http://host.docker.internal:3006 \
   cashier-api-gateway:1.0.0
-
-docker compose up -d --no-deps cashier-api-gateway
 ```
 
 ```bash
