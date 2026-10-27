@@ -67,7 +67,9 @@ export function createSyncClient(config: SyncClientConfig): AxiosInstance {
 
   client.interceptors.response.use(undefined, async (error: AxiosError) => {
     const request = error.config as RetryableRequestConfig | undefined;
-    if (error.response?.status !== 401 || !request || request._retried) {
+    // a 401 from the token request itself means a wrong credential, retrying it would loop forever
+    const isTokenRequest = request?.url?.endsWith('/auth/token');
+    if (error.response?.status !== 401 || !request || request._retried || isTokenRequest) {
       throw error;
     }
 

@@ -40,7 +40,7 @@ export const TerminalSetupPage: React.FC<TerminalSetupPageProps> = ({ onComplete
       await activateTerminalUseCase.execute(tid);
       onComplete();
     } catch (err: any) {
-      const message = err.response?.data?.message || err.message || t.terminalSetup.errorFailed;
+      const message = err.response?.data?.res_desc || err.response?.data?.message || err.message || t.terminalSetup.errorFailed;
       setError(Array.isArray(message) ? message.join(', ') : message);
     } finally {
       setIsLoading(false);
