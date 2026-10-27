@@ -53,9 +53,8 @@ docker run --rm -p 3000:3000 \
 ```bash
 # first deploy, or after the schema changes
 RELEASE=1.0.0 docker compose run --rm db-migrate
-RELEASE=1.0.0 docker compose run --rm db-seed      # only if you need it
+RELEASE=1.0.0 docker compose run --rm db-seed
 
-# start the services
 RELEASE=1.0.0 docker compose up -d
 
 # down and remove volume (for remove sqlite file)

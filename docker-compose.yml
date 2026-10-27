@@ -16,8 +16,8 @@ x-jwt: &jwt
 x-sync: &sync
   SYNC_SERVICE_URL: http://host.docker.internal:4002
   SYNC_PARTNER_ID: "0001"
-  SYNC_CLIENT_ID: cid_21b91ceb2633bc30e8a0ed6418b909fc
-  SYNC_CLIENT_SECRET: cs_2OXHDh1onpyvdwPs3_cfSgkYI31a4DG1fj85yPYUpGk
+  SYNC_CLIENT_ID: cid_6838a5fff9e922ed0b4b47b7ab68975b
+  SYNC_CLIENT_SECRET: cs_LFuYb2bG7IhkP5HUgrxEINjNTaFsL7GjsEqbg_TIZ8w
   SYNC_TID: "0001000101"
 
 x-db-tool: &db-tool
