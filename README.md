@@ -57,4 +57,8 @@ RELEASE=1.0.0 docker compose run --rm db-seed      # only if you need it
 
 # start the services
 RELEASE=1.0.0 docker compose up -d
+
+# down and remove volume (for remove sqlite file)
+RELEASE=1.0.0 docker compose down
+RELEASE=1.0.0 docker compose down -v
 ```
