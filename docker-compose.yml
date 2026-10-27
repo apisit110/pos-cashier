@@ -1,5 +1,6 @@
 # copy .env.example to .env (repo root) and fill in real values, then:
 #   docker compose up -d --build
+# images are tagged <service>:${RELEASE} (default latest), e.g. RELEASE=1.0.0 docker compose up -d --build
 # web needs NODE_AUTH_TOKEN (GitHub Packages, @apisit110/pos-ui) exported in the shell at build time
 
 name: pos-cashier
@@ -21,9 +22,16 @@ x-sync: &sync
   SYNC_CLIENT_SECRET: ${SYNC_CLIENT_SECRET:-}
   SYNC_TID: ${SYNC_TID:-}
 
-x-after-migrate: &after-migrate
-  db-migrate:
-    condition: service_completed_successfully
+x-db-tool: &db-tool
+  image: cashier-authen-service:${RELEASE:-latest}
+  # run manually only — never started by a plain `docker compose up`
+  profiles: ["db"]
+  entrypoint: ["/sbin/tini", "--", "node"]
+  environment:
+    <<: *db
+    APP_MODE: ${APP_MODE:-online}
+  volumes:
+    - db-data:/data
 
 services:
   redis:
@@ -38,25 +46,23 @@ services:
       timeout: 3s
       retries: 10
 
-  # one-off: apply drizzle migrations + seed (idempotent), then exit — every DB service waits for it
+  # one-off db tools (reuse the authen image), run by hand before/after deploying:
+  #   docker compose run --rm db-migrate
+  #   docker compose run --rm db-seed
   db-migrate:
-    image: cashier-authen-service
-    build: &authen-build
-      context: .
-      dockerfile: apps/cashier-authen-service/Dockerfile
-    entrypoint: ["/sbin/tini", "--", "sh", "-c"]
-    command:
-      - node node_modules/@lightning-pos/database/dist/cli/migrate.js && node node_modules/@lightning-pos/database/dist/cli/seed.js
-    environment:
-      <<: *db
-      APP_MODE: ${APP_MODE:-online}
-    volumes:
-      - db-data:/data
+    <<: *db-tool
+    command: ["node_modules/@lightning-pos/database/dist/cli/migrate.js"]
+
+  db-seed:
+    <<: *db-tool
+    command: ["node_modules/@lightning-pos/database/dist/cli/seed.js"]
 
   cashier-authen-service:
     <<: *service
-    image: cashier-authen-service
-    build: *authen-build
+    image: cashier-authen-service:${RELEASE:-latest}
+    build:
+      context: .
+      dockerfile: apps/cashier-authen-service/Dockerfile
     environment:
       <<: [*db, *redis]
       APP_MODE: ${APP_MODE:-online}
@@ -65,13 +71,12 @@ services:
     volumes:
       - db-data:/data
     depends_on:
-      <<: *after-migrate
       redis:
         condition: service_healthy
 
   cashier-members-service:
     <<: *service
-    image: cashier-members-service
+    image: cashier-members-service:${RELEASE:-latest}
     build:
       context: .
       dockerfile: apps/cashier-members-service/Dockerfile
@@ -80,11 +85,10 @@ services:
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
     volumes:
       - db-data:/data
-    depends_on: *after-migrate
 
   cashier-orders-service:
     <<: *service
-    image: cashier-orders-service
+    image: cashier-orders-service:${RELEASE:-latest}
     build:
       context: .
       dockerfile: apps/cashier-orders-service/Dockerfile
@@ -94,13 +98,12 @@ services:
     volumes:
       - db-data:/data
     depends_on:
-      <<: *after-migrate
       redis:
         condition: service_healthy
 
   cashier-products-service:
     <<: *service
-    image: cashier-products-service
+    image: cashier-products-service:${RELEASE:-latest}
     build:
       context: .
       dockerfile: apps/cashier-products-service/Dockerfile
@@ -113,13 +116,12 @@ services:
     extra_hosts:
       - host.docker.internal:host-gateway
     depends_on:
-      <<: *after-migrate
       redis:
         condition: service_healthy
 
   cashier-terminal-service:
     <<: *service
-    image: cashier-terminal-service
+    image: cashier-terminal-service:${RELEASE:-latest}
     build:
       context: .
       dockerfile: apps/cashier-terminal-service/Dockerfile
@@ -130,11 +132,10 @@ services:
       - db-data:/data
     extra_hosts:
       - host.docker.internal:host-gateway
-    depends_on: *after-migrate
 
   cashier-transactions-service:
     <<: *service
-    image: cashier-transactions-service
+    image: cashier-transactions-service:${RELEASE:-latest}
     build:
       context: .
       dockerfile: apps/cashier-transactions-service/Dockerfile
@@ -143,12 +144,11 @@ services:
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
     volumes:
       - db-data:/data
-    depends_on: *after-migrate
 
   cashier-sync-service:
     # exits 0 on purpose when APP_MODE=offline (worker disabled), so only restart on crash
     restart: on-failure
-    image: cashier-sync-service
+    image: cashier-sync-service:${RELEASE:-latest}
     build:
       context: .
       dockerfile: apps/cashier-sync-service/Dockerfile
@@ -160,13 +160,12 @@ services:
     extra_hosts:
       - host.docker.internal:host-gateway
     depends_on:
-      <<: *after-migrate
       redis:
         condition: service_healthy
 
   cashier-api-gateway:
     <<: *service
-    image: cashier-api-gateway
+    image: cashier-api-gateway:${RELEASE:-latest}
     build:
       context: .
       dockerfile: apps/cashier-api-gateway/Dockerfile
@@ -189,7 +188,7 @@ services:
 
   cashier-app:
     <<: *service
-    image: cashier-app
+    image: cashier-app:${RELEASE:-latest}
     build:
       context: .
       dockerfile: apps/cashier-app/Dockerfile
