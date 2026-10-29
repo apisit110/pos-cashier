@@ -19,6 +19,8 @@ x-sync: &sync
   SYNC_CLIENT_ID: cid_6838a5fff9e922ed0b4b47b7ab68975b
   SYNC_CLIENT_SECRET: cs_LFuYb2bG7IhkP5HUgrxEINjNTaFsL7GjsEqbg_TIZ8w
   SYNC_TID: "0001000101"
+  # x-origin-secret of the pos-sync-service Function URL (terraform var pos_sync_service_origin_secret), set in .env
+  SYNC_ORIGIN_SECRET: ${SYNC_ORIGIN_SECRET:-}
 
 x-db-tool: &db-tool
   image: pos-cashier/cashier-authen-service:${RELEASE:-latest}

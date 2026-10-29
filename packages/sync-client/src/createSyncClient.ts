@@ -40,6 +40,9 @@ export function createSyncClient(config: SyncClientConfig): AxiosInstance {
   let tokenError: SyncTokenError | null = null;
   let rejectedCount = 0;
 
+  // no CloudFront in front of the Function URL, so every request carries the origin secret itself
+  const originHeaders: Record<string, string> = config.originSecret ? { 'x-origin-secret': config.originSecret } : {};
+
   const requestToken = async (): Promise<string> => {
     let response;
     try {
@@ -50,6 +53,7 @@ export function createSyncClient(config: SyncClientConfig): AxiosInstance {
           timeout: 10000,
           headers: {
             'Content-Type': 'application/json',
+            ...originHeaders,
             'x-partner-id': config.partnerId,
             'x-client-id': config.clientId,
             'x-client-secret': config.clientSecret,
@@ -92,6 +96,7 @@ export function createSyncClient(config: SyncClientConfig): AxiosInstance {
     timeout: 10000,
     headers: {
       'Content-Type': 'application/json',
+      ...originHeaders,
     },
   });
 
